@@ -107,5 +107,31 @@ namespace OGP::Math {
 		constexpr inline bool operator !=(const Bounds<TComponent>& bounds) const noexcept {
 			return (top != bounds.top) || (bottom != bounds.bottom) || (left != bounds.left) || (right != bounds.right);
 		}
+
+		constexpr inline Bounds<TComponent>& operator +=(const Vector2<TComponent>& offset) noexcept {
+			top += offset.y;
+			bottom += offset.y;
+			left += offset.x;
+			right += offset.x;
+			return *this;
+		}
+
+		constexpr inline Bounds<TComponent> operator +(const Vector2<TComponent>& offset) const noexcept {
+			Bounds<TComponent> ret(*this);
+			return ret += offset;
+		}
+	
+		constexpr inline Bounds<TComponent>& operator -=(const Vector2<TComponent>& offset) noexcept {
+			top -= offset.y;
+			bottom -= offset.y;
+			left -= offset.x;
+			right -= offset.x;
+			return *this;
+		}
+
+		constexpr inline Bounds<TComponent> operator -(const Vector2<TComponent>& offset) const noexcept {
+			Bounds<TComponent> ret(*this);
+			return ret -= offset;
+		}
 	};
 }
