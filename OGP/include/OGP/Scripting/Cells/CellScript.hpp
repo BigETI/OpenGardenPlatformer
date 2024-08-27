@@ -20,9 +20,8 @@ namespace OGP::Scripting::Cells {
 		OGP_API CellScript(OGP::SceneManagement::Node* node);
 
 		OGP_API std::weak_ptr<OGP::Scripting::Environment::GardenScript> GetGarden() const noexcept;
-		OGP_API void SetGarden(std::weak_ptr<OGP::Scripting::Environment::GardenScript> garden);
 		OGP_API OGP::Environment::EGardenCellType GetGardenCellType() const noexcept;
-		OGP_API void SetGardenCellType(OGP::Environment::EGardenCellType gardenCellType);
+		OGP_API void UpdateProperties(OGP::Environment::EGardenCellType gardenCellType, std::weak_ptr<OGP::Scripting::Environment::GardenScript> garden);
 		OGP_API const std::weak_ptr<OGP::Scripting::Rendering::SpriteRendererScript>& GetBackgroundSpriteRenderer() const noexcept;
 		OGP_API const std::weak_ptr<OGP::Scripting::Rendering::SpriteRendererScript>& GetForegroundSpriteRenderer() const noexcept;
 		OGP_API virtual bool IsSolid() const noexcept;

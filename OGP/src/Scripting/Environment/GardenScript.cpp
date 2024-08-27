@@ -47,6 +47,7 @@ GardenScript::GardenScript(Node* node) :
 	Script(node),
 	timeInGameSeconds(static_cast<size_t>(0)),
 	score(static_cast<size_t>(0)),
+	harvestableCount(static_cast<size_t>(0)),
 	redKeyCount(static_cast<size_t>(0)),
 	yellowKeyCount(static_cast<size_t>(0)),
 	greenKeyCount(static_cast<size_t>(0)) {
@@ -102,6 +103,72 @@ bool GardenScript::RemoveEntity(shared_ptr<EntityScript> entity) noexcept {
 		}
 	}
 	return ret;
+}
+
+size_t GardenScript::GetHarvestableCount() const noexcept {
+	return harvestableCount;
+}
+
+void GardenScript::IncrementHarvestableCount() noexcept {
+	harvestableCount++;
+}
+
+void GardenScript::DecrementHarvestableCount() noexcept {
+	if (harvestableCount > static_cast<size_t>(0)) {
+		--harvestableCount;
+	}
+}
+
+size_t GardenScript::GetRedKeyCount() const noexcept {
+	return redKeyCount;
+}
+
+size_t GardenScript::GetYellowKeyCount() const noexcept {
+	return yellowKeyCount;
+}
+
+size_t GardenScript::GetGreenKeyCount() const noexcept {
+	return greenKeyCount;
+}
+
+void GardenScript::AddRedKey() noexcept {
+	++redKeyCount;
+}
+
+bool GardenScript::UseRedKey() noexcept {
+	bool ret(redKeyCount > static_cast<size_t>(0));
+	if (ret) {
+		--redKeyCount;
+	}
+	return ret;
+}
+
+void GardenScript::AddYellowKey() noexcept {
+	++yellowKeyCount;
+}
+
+bool GardenScript::UseYellowKey() noexcept {
+	bool ret(yellowKeyCount > static_cast<size_t>(0));
+	if (ret) {
+		--yellowKeyCount;
+	}
+	return ret;
+}
+
+void GardenScript::AddGreenKey() noexcept {
+	++greenKeyCount;
+}
+
+bool GardenScript::UseGreenKey() noexcept {
+	bool ret(greenKeyCount > static_cast<size_t>(0));
+	if (ret) {
+		--greenKeyCount;
+	}
+	return ret;
+}
+
+bool GardenScript::IsCompletionEnabled() const noexcept {
+	return harvestableCount == static_cast<size_t>(0);
 }
 
 void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
@@ -161,8 +228,7 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 					default:
 						cell = cell_node->AddScript<CellScript>();
 					}
-					cell->SetGarden(garden);
-					cell->SetGardenCellType(garden_cell_type);
+					cell->UpdateProperties(garden_cell_type, garden);
 					cell_node->SetLocalPosition(cell_position.GetConverted<float>());
 					gardenCells.SetCell(cell_position, cell);
 				}
@@ -286,8 +352,12 @@ bool GardenScript::IsTopDeadlyAt(const Vector2<size_t>& position) const noexcept
 }
 
 bool GardenScript::IsWinnableAt(const Vector2<size_t>& position) const noexcept {
-	shared_ptr<CellScript> garden_cell(GetCellAt(position));
-	return ((position.y + static_cast<size_t>(1)) >= gardenCells.GetSize().y) && garden_cell && garden_cell->IsClimbingUpAllowed();
+	bool ret(false);
+	if (IsCompletionEnabled()) {
+		shared_ptr<CellScript> garden_cell(GetCellAt(position));
+		ret = ((position.y + static_cast<size_t>(1)) >= gardenCells.GetSize().y) && garden_cell && garden_cell->IsClimbingUpAllowed();
+	}
+	return ret;
 }
 
 bool GardenScript::DigAt(const Vector2<size_t>& position) noexcept {
@@ -307,42 +377,6 @@ bool GardenScript::InteractAt(const Vector2<size_t>& position, EntityScript* sou
 				ret = entity->Interact(relative_source_position) || ret;
 			}
 		}
-	}
-	return ret;
-}
-
-void GardenScript::AddRedKey() noexcept {
-	++redKeyCount;
-}
-
-bool GardenScript::UseRedKey() noexcept {
-	bool ret(redKeyCount > static_cast<size_t>(0));
-	if (ret) {
-		--redKeyCount;
-	}
-	return ret;
-}
-
-void GardenScript::AddYellowKey() noexcept {
-	++yellowKeyCount;
-}
-
-bool GardenScript::UseYellowKey() noexcept {
-	bool ret(yellowKeyCount > static_cast<size_t>(0));
-	if (ret) {
-		--yellowKeyCount;
-	}
-	return ret;
-}
-
-void GardenScript::AddGreenKey() noexcept {
-	++greenKeyCount;
-}
-
-bool GardenScript::UseGreenKey() noexcept {
-	bool ret(greenKeyCount > static_cast<size_t>(0));
-	if (ret) {
-		--greenKeyCount;
 	}
 	return ret;
 }
