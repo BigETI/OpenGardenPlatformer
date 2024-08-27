@@ -5,10 +5,10 @@
 
 #include <magic_enum.hpp>
 
+#include <OGP/Cells/EGardenCellType.hpp>
 #include <OGP/Collections/EGridResizingRule.hpp>
 #include <OGP/Collections/ResizableGrid.hpp>
-#include <OGP/Environment/EGardenCellType.hpp>
-#include <OGP/Environment/EGardenEntityType.hpp>
+#include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Environment/GardenData.hpp>
 #include <OGP/Math/Vector2.hpp>
 #include <OGP/ResourceManagement/ResourceID.hpp>
@@ -32,7 +32,9 @@
 #include <OGP/Scripting/Rendering/SpriteRendererScript.hpp>
 #include <OGP/Scripting/Script.hpp>
 
+using namespace OGP::Cells;
 using namespace OGP::Collections;
+using namespace OGP::Entities;
 using namespace OGP::Environment;
 using namespace OGP::Math;
 using namespace OGP::ResourceManagement;

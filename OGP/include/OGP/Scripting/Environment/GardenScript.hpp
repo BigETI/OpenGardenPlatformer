@@ -6,7 +6,6 @@
 
 #include "../../Collections/ResizableGrid.hpp"
 #include "../../Exportables/Exportable.hxx"
-#include "../../Environment/EGardenCellType.hpp"
 #include "../../Environment/GardenData.hpp"
 #include "../../EventSystem/Event.hpp"
 #include "../Cells/CellScript.hpp"

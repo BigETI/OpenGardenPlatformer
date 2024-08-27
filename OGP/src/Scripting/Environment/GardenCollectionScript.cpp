@@ -8,12 +8,12 @@
 #include <string>
 #include <vector>
 
-#include <OGP/Environment/EGardenCellType.hpp>
+#include <OGP/Cells/EGardenCellType.hpp>
 #include <OGP/Math/Vector2.hpp>
 #include <OGP/Scripting/Environment/GardenCollectionScript.hpp>
 #include <OGP/Serialization/LegacyGardenCollectionDeserializer.hpp>
 
-using namespace OGP::Environment;
+using namespace OGP::Cells;
 using namespace OGP::Math;
 using namespace OGP::SceneManagement;
 using namespace OGP::Scripting;

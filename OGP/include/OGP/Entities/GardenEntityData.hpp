@@ -8,7 +8,7 @@
 #include "../Math/Bounds.hpp"
 #include "EGardenEntityType.hpp"
 
-namespace OGP::Environment {
+namespace OGP::Entities {
 	struct GardenEntityData {
 		EGardenEntityType type;
 		OGP::Math::Vector2<std::size_t> position;

@@ -4,8 +4,11 @@
 #include <istream>
 #include <iostream>
 
+#include <OGP/Cells/EGardenCellType.hpp>
 #include <OGP/Collections/EGridResizingRule.hpp>
-#include <OGP/Environment/EGardenCellType.hpp>
+#include <OGP/Entities/EGardenEntityType.hpp>
+#include <OGP/Entities/GardenEntityData.hpp>
+#include <OGP/Environment/GardenCollectionData.hpp>
 #include <OGP/Environment/Legacy/ELegacyGardenAirCellTypeVariant.hpp>
 #include <OGP/Environment/Legacy/ELegacyGardenCellType.hpp>
 #include <OGP/Environment/Legacy/ELegacyGardenClimbableCellTypeVariant.hpp>
@@ -19,11 +22,12 @@
 #include <OGP/Environment/Legacy/ELegacyGardenVegetableEntityVariantType.hpp>
 #include <OGP/Environment/Legacy/ELegacyGardenWaterCellTypeVariant.hpp>
 #include <OGP/Environment/Legacy/ELegacyGardenWormEntityVariantType.hpp>
-#include <OGP/Environment/GardenCollectionData.hpp>
 #include <OGP/Math/Vector2.hpp>
 #include <OGP/Serialization/LegacyGardenCollectionDeserializer.hpp>
 
+using namespace OGP::Cells;
 using namespace OGP::Collections;
+using namespace OGP::Entities;
 using namespace OGP::Environment;
 using namespace OGP::Environment::Legacy;
 using namespace OGP::Math;

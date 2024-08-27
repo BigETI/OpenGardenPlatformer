@@ -1,14 +1,13 @@
 #include <memory>
 
-#include <OGP/Environment/EGardenEntityType.hpp>
-#include <OGP/Environment/GardenData.hpp>
+#include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Math/Vector2.hpp>
 #include <OGP/SceneManagement/Node.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/PickupEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
-using namespace OGP::Environment;
+using namespace OGP::Entities;
 using namespace OGP::Math;
 using namespace OGP::SceneManagement;
 using namespace OGP::Scripting::Entities;

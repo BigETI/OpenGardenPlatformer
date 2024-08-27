@@ -7,7 +7,6 @@
 #include <memory>
 #include <vector>
 
-#include "../../Environment/EGardenCellType.hpp"
 #include "../../Environment/GardenCollectionData.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "../../Math/Vector2.hpp"

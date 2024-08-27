@@ -4,17 +4,17 @@
 #include <string>
 #include <vector>
 
+#include "../Cells/EGardenCellType.hpp"
 #include "../Collections/ResizableGrid.hpp"
+#include "../Entities/GardenEntityData.hpp"
 #include "../Math/Vector2.hpp"
-#include "EGardenCellType.hpp"
-#include "GardenEntityData.hpp"
 
 namespace OGP::Environment {
 	struct GardenData {
 		std::string name;
 		std::string midiPath;
 		std::size_t timeInGameSeconds;
-		OGP::Collections::ResizableGrid<EGardenCellType> cells;
-		std::vector<GardenEntityData> entities;
+		OGP::Collections::ResizableGrid<OGP::Cells::EGardenCellType> cells;
+		std::vector<OGP::Entities::GardenEntityData> entities;
 	};
 }

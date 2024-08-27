@@ -4,7 +4,7 @@
 #include <memory>
 #include <chrono>
 
-#include "../../Environment/GardenEntityData.hpp"
+#include "../../Entities/GardenEntityData.hpp"
 #include "../../EventSystem/Event.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "../../Game.hpp"
@@ -31,7 +31,7 @@ namespace OGP::Scripting::Entities {
 		OGP_API void Kill();
 		OGP_API void Win();
 
-		OGP_API virtual void Spawn(const OGP::Environment::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
+		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
 		
 	protected:
 

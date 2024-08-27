@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../../Environment/EGardenCellType.hpp"
+#include "../../Cells/EGardenCellType.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "../../SceneManagement/Node.hpp"
 #include "../Environment/GardenScript.hpp"
@@ -20,8 +20,8 @@ namespace OGP::Scripting::Cells {
 		OGP_API CellScript(OGP::SceneManagement::Node* node);
 
 		OGP_API std::weak_ptr<OGP::Scripting::Environment::GardenScript> GetGarden() const noexcept;
-		OGP_API OGP::Environment::EGardenCellType GetGardenCellType() const noexcept;
-		OGP_API void UpdateProperties(OGP::Environment::EGardenCellType gardenCellType, std::weak_ptr<OGP::Scripting::Environment::GardenScript> garden);
+		OGP_API OGP::Cells::EGardenCellType GetGardenCellType() const noexcept;
+		OGP_API void UpdateProperties(OGP::Cells::EGardenCellType gardenCellType, std::weak_ptr<OGP::Scripting::Environment::GardenScript> garden);
 		OGP_API const std::weak_ptr<OGP::Scripting::Rendering::SpriteRendererScript>& GetBackgroundSpriteRenderer() const noexcept;
 		OGP_API const std::weak_ptr<OGP::Scripting::Rendering::SpriteRendererScript>& GetForegroundSpriteRenderer() const noexcept;
 		OGP_API virtual bool IsSolid() const noexcept;
@@ -36,7 +36,7 @@ namespace OGP::Scripting::Cells {
 	private:
 
 		std::weak_ptr<OGP::Scripting::Environment::GardenScript> garden;
-		OGP::Environment::EGardenCellType gardenCellType;
+		OGP::Cells::EGardenCellType gardenCellType;
 		std::weak_ptr<OGP::Scripting::Rendering::SpriteRendererScript> backgroundSpriteRenderer;
 		std::weak_ptr<OGP::Scripting::Rendering::SpriteRendererScript> foregroundSpriteRenderer;
 	};

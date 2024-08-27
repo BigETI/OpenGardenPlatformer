@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <memory>
 
-#include <OGP/Environment/EGardenCellType.hpp>
+#include <OGP/Cells/EGardenCellType.hpp>
 #include <OGP/Game.hpp>
 #include <OGP/Rendering/Color.hpp>
 #include <OGP/SceneManagement/Node.hpp>
@@ -12,7 +12,7 @@
 #include <OGP/Scripting/Rendering/SpriteRendererScript.hpp>
 
 using namespace OGP;
-using namespace OGP::Environment;
+using namespace OGP::Cells;
 using namespace OGP::Rendering;
 using namespace OGP::SceneManagement;
 using namespace OGP::Scripting::Cells;

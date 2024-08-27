@@ -2,7 +2,7 @@
 #include <cstddef>
 #include <memory>
 
-#include <OGP/Environment/GardenEntityData.hpp>
+#include <OGP/Entities/GardenEntityData.hpp>
 #include <OGP/Game.hpp>
 #include <OGP/Math/Vector2.hpp>
 #include <OGP/ResourceManagement/ResourceID.hpp>
@@ -13,7 +13,7 @@
 #include <OGP/Scripting/Rendering/SpriteRendererScript.hpp>
 
 using namespace OGP;
-using namespace OGP::Environment;
+using namespace OGP::Entities;
 using namespace OGP::Hashing;
 using namespace OGP::Math;
 using namespace OGP::ResourceManagement;

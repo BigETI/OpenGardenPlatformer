@@ -1,6 +1,6 @@
 #pragma once
 
-namespace OGP::Environment {
+namespace OGP::Entities {
 	enum class EGardenEntityType {
 		Player,
 		Marmot,

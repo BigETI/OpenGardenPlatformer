@@ -1,6 +1,6 @@
 #pragma once
 
-namespace OGP::Environment {
+namespace OGP::Cells {
 	enum class EGardenCellType {
 		Air,
 		Fence,

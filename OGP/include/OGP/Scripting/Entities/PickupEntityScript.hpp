@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Environment/GardenData.hpp"
+#include "../../Entities/GardenEntityData.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "../../Math/Vector2.hpp"
 #include "../../SceneManagement/Node.hpp"
@@ -17,6 +17,6 @@ namespace OGP::Scripting::Entities {
 
 	protected:
 
-		OGP_API virtual void Spawn(const OGP::Environment::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
+		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
 	};
 }

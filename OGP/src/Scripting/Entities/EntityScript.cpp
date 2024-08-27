@@ -1,8 +1,8 @@
 #include <cstddef>
 #include <memory>
 
-#include <OGP/Environment/EGardenEntityType.hpp>
-#include <OGP/Environment/GardenEntityData.hpp>
+#include <OGP/Entities/EGardenEntityType.hpp>
+#include <OGP/Entities/GardenEntityData.hpp>
 #include <OGP/Math/Vector2.hpp>
 #include <OGP/ResourceManagement/ResourceID.hpp>
 #include <OGP/SceneManagement/Node.hpp>
@@ -11,7 +11,7 @@
 #include <OGP/Scripting/Rendering/SpriteRendererScript.hpp>
 #include <OGP/Scripting/Script.hpp>
 
-using namespace OGP::Environment;
+using namespace OGP::Entities;
 using namespace OGP::Math;
 using namespace OGP::ResourceManagement;
 using namespace OGP::SceneManagement;
