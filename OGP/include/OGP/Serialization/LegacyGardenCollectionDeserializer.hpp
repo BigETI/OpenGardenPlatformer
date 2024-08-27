@@ -78,12 +78,12 @@ namespace OGP::Serialization {
 		}
 
 		template <typename TInputComponent, typename TOutputComponent = TInputComponent>
-		constexpr static bool TryReadingBounds(std::istream& inputStream, std::size_t gardenHeight, OGP::Math::Bounds<TOutputComponent>& result) noexcept {
+		constexpr static bool TryReadingBounds(std::istream& inputStream, OGP::Math::Bounds<TOutputComponent>& result) noexcept {
 			return
-				TryReadingValueAndFixingYPosition<TInputComponent, TOutputComponent>(inputStream, gardenHeight, result.left) &&
-				TryReadingValueAndFixingYPosition<TInputComponent, TOutputComponent>(inputStream, gardenHeight, result.top) &&
-				TryReadingValueAndFixingYPosition<TInputComponent, TOutputComponent>(inputStream, gardenHeight, result.right) &&
-				TryReadingValueAndFixingYPosition<TInputComponent, TOutputComponent>(inputStream, gardenHeight, result.bottom);
+				TryReadingValue<TInputComponent, TOutputComponent>(inputStream, result.left) &&
+				TryReadingValue<TInputComponent, TOutputComponent>(inputStream, result.top) &&
+				TryReadingValue<TInputComponent, TOutputComponent>(inputStream, result.right) &&
+				TryReadingValue<TInputComponent, TOutputComponent>(inputStream, result.bottom);
 		}
 
 		template <typename TArrayElement, size_t ArraySize>
