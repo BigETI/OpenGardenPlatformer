@@ -96,5 +96,25 @@ namespace OGP::Math {
 		constexpr inline bool operator !=(const Rectangle<TComponent>& rectangle) const noexcept {
 			return (position != rectangle.position) || (size != rectangle.size);
 		}
+
+		constexpr inline Rectangle<TComponent>& operator +=(const Vector2<TComponent>& offset) noexcept {
+			position += offset;
+			return *this;
+		}
+
+		constexpr inline Rectangle<TComponent> operator +(const Vector2<TComponent>& offset) const noexcept {
+			Rectangle<TComponent> ret(*this);
+			return ret += offset;
+		}
+
+		constexpr inline Rectangle<TComponent>& operator -=(const Vector2<TComponent>& offset) noexcept {
+			position -= offset;
+			return *this;
+		}
+
+		constexpr inline Rectangle<TComponent> operator -(const Vector2<TComponent>& offset) const noexcept {
+			Rectangle<TComponent> ret(*this);
+			return ret -= offset;
+		}
 	};
 }
