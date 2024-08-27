@@ -19,12 +19,14 @@ Documentation will be published in the future.
 
 ✅: *Supported* | ⚠: *Not tested yet*
 
-## Plans
+## Goals
 
-| Plan                           | Priority |
-| ------------------------------ | -------- |
-| Full re-creation of game logic | Highest  | 
-| Modern editor                  | High     |
-| Animated and detailed sprites  | High     |
-| Modern sound effects           | Medium   |
-| Visual effects                 | Low      |
+| Goal                           | Priority | Status |
+| ------------------------------ | -------- | ------ |
+| Full re-creation of game logic | Highest  | 👷‍♂️      |
+| Modern editor                  | High     | 🕒      |
+| Animated and detailed sprites  | High     | 🕒      |
+| Modern sound effects           | Medium   | 🕒      |
+| Visual effects                 | Low      | 🕒      |
+
+👷‍♂️: *In progress* | 🕒: *Planned*
