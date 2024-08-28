@@ -1,8 +1,10 @@
+#include <chrono>
 #include <cstddef>
 #include <memory>
 
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
+#include <OGP/Game.hpp>
 #include <OGP/Math/Vector2.hpp>
 #include <OGP/ResourceManagement/ResourceID.hpp>
 #include <OGP/SceneManagement/Node.hpp>
@@ -11,6 +13,7 @@
 #include <OGP/Scripting/Rendering/SpriteRendererScript.hpp>
 #include <OGP/Scripting/Script.hpp>
 
+using namespace OGP;
 using namespace OGP::Entities;
 using namespace OGP::Math;
 using namespace OGP::ResourceManagement;
@@ -20,6 +23,7 @@ using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 using namespace OGP::Scripting::Rendering;
 using namespace std;
+using namespace std::chrono;
 
 const ResourceID debugEntitiesTextureResourceID("Debug/Textures/Entities.png");
 const Vector2<float> debugEntitySourceRectangleSize(Vector2<float>(1.0f, 1.0f) / 8.0f);
@@ -43,9 +47,19 @@ const Vector2<size_t>& EntityScript::GetCurrentPosition() const noexcept {
 	return currentPosition;
 }
 
+Vector2<float> EntityScript::GetToBeRenderedPosition() const noexcept {
+	Vector2<float> ret;
+	if (shared_ptr<EntityScript> mounted_at_entity = mountedAtEntity.lock()) {
+		ret = mounted_at_entity->GetToBeRenderedPosition();
+	}
+	else {
+		ret = currentPosition.GetConverted<float>();
+	}
+	return ret;
+}
+
 void EntityScript::SetCurrentPosition(const Vector2<size_t>& currentPosition) noexcept {
 	this->currentPosition = currentPosition;
-	GetNode().SetLocalPosition(currentPosition.GetConverted<float>());
 }
 
 weak_ptr<SpriteRendererScript> EntityScript::GetSpriteRenderer() const noexcept {
@@ -54,6 +68,33 @@ weak_ptr<SpriteRendererScript> EntityScript::GetSpriteRenderer() const noexcept 
 
 weak_ptr<GardenScript> EntityScript::GetGarden() const noexcept {
 	return garden;
+}
+
+weak_ptr<EntityScript> EntityScript::GetMountedAtEntity() const noexcept {
+	return mountedAtEntity;
+}
+
+bool EntityScript::MountAt(const shared_ptr<EntityScript>& mountedAtEntity) noexcept {
+	bool ret(false);
+	if (mountedAtEntity && (mountedAtEntity.get() != this)) {
+		if (shared_ptr<EntityScript> mounted_at_entity = this->mountedAtEntity.lock()) {
+			if (mounted_at_entity != mountedAtEntity) {
+				this->mountedAtEntity = mountedAtEntity;
+				ret = true;
+			}
+		}
+		else {
+			this->mountedAtEntity = mountedAtEntity;
+			ret = true;
+		}
+	}
+	return ret;
+}
+
+bool EntityScript::Dismount() noexcept {
+	bool ret(!mountedAtEntity.expired());
+	mountedAtEntity.reset();
+	return ret;
 }
 
 void EntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_ptr<GardenScript> garden) {
@@ -67,6 +108,12 @@ void EntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_ptr<Ga
 	OnSpawned(gardenEntityData);
 }
 
-bool EntityScript::Interact(const Vector2<int>& relativeSourcePosition) {
+bool EntityScript::Interact(EntityScript& sourceEntity) {
 	return false;
+}
+
+void EntityScript::OnBeforeFrameRender(Game& game, high_resolution_clock::duration deltaTime) {
+	if (shared_ptr<SpriteRendererScript> sprite_renderer = spriteRenderer.lock()) {
+		GetNode().SetLocalPosition(GetToBeRenderedPosition());
+	}
 }

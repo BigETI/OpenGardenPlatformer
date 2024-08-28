@@ -91,6 +91,20 @@ const vector<weak_ptr<EntityScript>>& GardenScript::GetEntities() const noexcept
 	return entities;
 }
 
+bool GardenScript::TryGettingEntity(const EntityScript& entity, shared_ptr<EntityScript>& result) const noexcept {
+	bool ret(false);
+	for (const auto& target_entity : entities) {
+		if (shared_ptr<EntityScript> current_target_entity = target_entity.lock()) {
+			if (current_target_entity.get() == &entity) {
+				result = current_target_entity;
+				ret = true;
+				break;
+			}
+		}
+	}
+	return ret;
+}
+
 bool GardenScript::RemoveEntity(shared_ptr<EntityScript> entity) noexcept {
 	bool ret(false);
 	for (int index(static_cast<int>(entities.size()) - 1); index >= 0; index--) {
@@ -317,7 +331,9 @@ vector<shared_ptr<EntityScript>>& GardenScript::GetEntitiesAt(const Vector2<size
 	result.clear();
 	for (auto entity : entities) {
 		if (shared_ptr<EntityScript> current_entity = entity.lock()) {
-			result.push_back(current_entity);
+			if (current_entity->GetCurrentPosition() == position) {
+				result.push_back(current_entity);
+			}
 		}
 	}
 	return result;
@@ -367,17 +383,14 @@ bool GardenScript::DigAt(const Vector2<size_t>& position) noexcept {
 	return garden_cell && garden_cell->Dig();
 }
 
-bool GardenScript::InteractAt(const Vector2<size_t>& position, EntityScript* sourceEntity) noexcept {
+bool GardenScript::InteractAt(const Vector2<size_t>& position, EntityScript& sourceEntity) noexcept {
 	bool ret(false);
-	if (sourceEntity) {
-		shared_ptr<CellScript> garden_cell(GetCellAt(position));
-		vector<shared_ptr<EntityScript>> entities;
-		Vector2<int> relative_source_position(sourceEntity->GetCurrentPosition().GetConverted<int>() - position.GetConverted<int>());
-		ret = garden_cell && garden_cell->Interact();
-		for (const auto& entity : GetEntitiesAt(position, entities)) {
-			if (entity->GetCurrentPosition() == position) {
-				ret = entity->Interact(relative_source_position) || ret;
-			}
+	shared_ptr<CellScript> garden_cell(GetCellAt(position));
+	vector<shared_ptr<EntityScript>> target_entities;
+	ret = garden_cell && garden_cell->Interact();
+	for (const auto& target_entity : GetEntitiesAt(position, target_entities)) {
+		if (target_entity.get() != &sourceEntity) {
+			ret = target_entity->Interact(sourceEntity) || ret;
 		}
 	}
 	return ret;

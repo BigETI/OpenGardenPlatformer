@@ -18,9 +18,9 @@ PickupEntityScript::PickupEntityScript(Node* node) : EntityScript(node) {
 	// ...
 }
 
-bool PickupEntityScript::Interact(const Vector2<int>& relativeSourcePosition) {
+bool PickupEntityScript::Interact(EntityScript& sourceEntity) {
 	bool ret(false);
-	if (relativeSourcePosition == Vector2<int>()) {
+	if (GetCurrentPosition() == sourceEntity.GetCurrentPosition()) {
 		if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
 			ret = true;
 			switch (GetGardenEntityData().type) {

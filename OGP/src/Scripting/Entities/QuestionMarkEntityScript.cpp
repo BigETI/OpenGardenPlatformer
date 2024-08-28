@@ -1,4 +1,3 @@
-#include <OGP/Math/Vector2.hpp>
 #include <OGP/SceneManagement/Node.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/QuestionMarkEntityScript.hpp>
@@ -11,7 +10,7 @@ QuestionMarkEntityScript::QuestionMarkEntityScript(Node* node) : EntityScript(no
 	// ...
 }
 
-bool QuestionMarkEntityScript::Interact(const Vector2<int>& relativeSourcePosition) {
+bool QuestionMarkEntityScript::Interact(EntityScript& sourceEntity) {
 
 	// TODO: Implement question mark interaction
 	

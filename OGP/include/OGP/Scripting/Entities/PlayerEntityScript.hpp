@@ -31,6 +31,7 @@ namespace OGP::Scripting::Entities {
 		OGP_API void Kill();
 		OGP_API void Win();
 
+		OGP_API virtual OGP::Math::Vector2<float> GetToBeRenderedPosition() const noexcept override;
 		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
 		
 	protected:
@@ -43,6 +44,7 @@ namespace OGP::Scripting::Entities {
 		bool hasNotWonYet;
 		OGP::Math::Vector2<std::size_t> targetPosition;
 		float movementProgress;
+		OGP::Math::Vector2<float> toBeRenderedAtOffset;
 
 		// TODO: Separate to an input handling script
 		bool isWalkingLeft;

@@ -25,6 +25,7 @@ namespace OGP::Scripting {
 		OGP::EventSystem::Event<OGP::Game&> OnEnabled;
 		OGP::EventSystem::Event<OGP::Game&> OnDisabled;
 		OGP::EventSystem::Event<OGP::Game&, std::chrono::high_resolution_clock::duration> OnGameTicked;
+		OGP::EventSystem::Event<OGP::Game&, std::chrono::high_resolution_clock::duration> OnBeforeFrameRendered;
 		OGP::EventSystem::Event<OGP::Game&, std::chrono::high_resolution_clock::duration> OnFrameRendered;
 
 		OGP_API Script(OGP::SceneManagement::Node* node);
@@ -40,6 +41,7 @@ namespace OGP::Scripting {
 		OGP_API const OGP::SceneManagement::Node& GetNode() const noexcept;
 		OGP_API OGP::SceneManagement::Node& GetNode() noexcept;
 		OGP_API void InitializeOrGameTick(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime);
+		OGP_API void InitializeOrBeforeFrameRender(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime);
 		OGP_API void InitializeOrFrameRender(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime);
 		OGP_API void Deinitialize();
 		OGP_API void Enable();
@@ -55,6 +57,7 @@ namespace OGP::Scripting {
 		OGP_API virtual void OnEnable(OGP::Game& game);
 		OGP_API virtual void OnDisable(OGP::Game& game);
 		OGP_API virtual void OnGameTick(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime);
+		OGP_API virtual void OnBeforeFrameRender(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime);
 		OGP_API virtual void OnFrameRender(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime);
 
 	private:

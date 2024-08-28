@@ -38,6 +38,7 @@ namespace OGP::Scripting::Environment {
 		OGP_API const OGP::Collections::ResizableGrid<std::weak_ptr<OGP::Scripting::Cells::CellScript>>& GetGardenCells() const noexcept;
 		OGP_API OGP::Collections::ResizableGrid<std::weak_ptr<OGP::Scripting::Cells::CellScript>>& GetGardenCells() noexcept;
 		OGP_API const std::vector<std::weak_ptr<OGP::Scripting::Entities::EntityScript>>& GetEntities() const noexcept;
+		OGP_API bool TryGettingEntity(const OGP::Scripting::Entities::EntityScript& entity, std::shared_ptr<OGP::Scripting::Entities::EntityScript>& result) const noexcept;
 		OGP_API bool RemoveEntity(std::shared_ptr<OGP::Scripting::Entities::EntityScript> entity) noexcept;
 		OGP_API std::size_t GetHarvestableCount() const noexcept;
 		OGP_API void IncrementHarvestableCount() noexcept;
@@ -63,7 +64,7 @@ namespace OGP::Scripting::Environment {
 		OGP_API bool IsTopDeadlyAt(const OGP::Math::Vector2<std::size_t>& position) const noexcept;
 		OGP_API bool IsWinnableAt(const OGP::Math::Vector2<std::size_t>& position) const noexcept;
 		OGP_API bool DigAt(const OGP::Math::Vector2<std::size_t>& position) noexcept;
-		OGP_API bool InteractAt(const OGP::Math::Vector2<std::size_t>& position, OGP::Scripting::Entities::EntityScript* sourceEntity) noexcept;
+		OGP_API bool InteractAt(const OGP::Math::Vector2<std::size_t>& position, OGP::Scripting::Entities::EntityScript& sourceEntity) noexcept;
 
 	private:
 

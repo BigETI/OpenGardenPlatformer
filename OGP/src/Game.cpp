@@ -115,6 +115,9 @@ int Game::Start() {
 				last_rendered_frame_tick_time = now;
 				frame_render_time_debt += frame_render_time - target_frame_render_time;
 				for (const auto& scene : scenes) {
+					scene->BeforeFrameRenderScripts(*this, frame_render_time);
+				}
+				for (const auto& scene : scenes) {
 					scene->FrameRenderScripts(*this, frame_render_time);
 				}
 				for (auto& rendering_context : renderingContexts) {

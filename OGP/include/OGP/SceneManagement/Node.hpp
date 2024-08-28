@@ -191,6 +191,7 @@ namespace OGP::SceneManagement {
 		}
 		OGP_API void RemoveAllScripts();
 		OGP_API void GameTickScripts(Game& game, std::chrono::high_resolution_clock::duration deltaTime);
+		OGP_API void BeforeFrameRenderScripts(Game& game, std::chrono::high_resolution_clock::duration deltaTime);
 		OGP_API void FrameRenderScripts(Game& game, std::chrono::high_resolution_clock::duration deltaTime);
 		OGP_API void Destroy();
 

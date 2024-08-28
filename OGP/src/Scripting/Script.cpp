@@ -58,6 +58,23 @@ void Script::InitializeOrGameTick(Game& game, high_resolution_clock::duration de
 	}
 }
 
+void Script::InitializeOrBeforeFrameRender(Game& game, high_resolution_clock::duration deltaTime) {
+	if (!isInitialized) {
+		this->game = &game;
+		isInitialized = true;
+		OnInitialize(game);
+		OnInitialized(game);
+		if (isEnabled) {
+			OnEnable(game);
+			OnEnabled(game);
+		}
+	}
+	if (isEnabled && (this->game == &game)) {
+		OnBeforeFrameRender(game, deltaTime);
+		OnBeforeFrameRendered(game, deltaTime);
+	}
+}
+
 void Script::InitializeOrFrameRender(Game& game, high_resolution_clock::duration deltaTime) {
 	if (!isInitialized) {
 		this->game = &game;
@@ -125,6 +142,10 @@ void Script::OnDisable(Game& game) {
 }
 
 void Script::OnGameTick(Game& game, high_resolution_clock::duration deltaTime) {
+	// ...
+}
+
+void Script::OnBeforeFrameRender(Game& game, high_resolution_clock::duration deltaTime) {
 	// ...
 }
 

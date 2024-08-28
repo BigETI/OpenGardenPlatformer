@@ -36,6 +36,6 @@ void GardenCameraScript::OnFrameRender(Game& game, high_resolution_clock::durati
 	
 	// TODO: Add support for constraining view at garden bounds
 	if (shared_ptr<EntityScript> to_spectate_entity = toSpectateEntity.lock()) {
-		GetNode().SetLocalPosition(to_spectate_entity->GetNode().GetLocalPosition());
+		GetNode().SetLocalPosition(to_spectate_entity->GetToBeRenderedPosition());
 	}
 }

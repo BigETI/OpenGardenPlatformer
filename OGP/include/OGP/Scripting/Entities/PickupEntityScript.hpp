@@ -1,8 +1,9 @@
 #pragma once
 
+#include <memory>
+
 #include "../../Entities/GardenEntityData.hpp"
 #include "../../Exportables/Exportable.hxx"
-#include "../../Math/Vector2.hpp"
 #include "../../SceneManagement/Node.hpp"
 #include "../Environment/GardenScript.hpp"
 #include "EntityScript.hpp"
@@ -13,7 +14,7 @@ namespace OGP::Scripting::Entities {
 
 		OGP_API PickupEntityScript(OGP::SceneManagement::Node* node);
 
-		OGP_API virtual bool Interact(const OGP::Math::Vector2<int>& relativeSourcePosition) override;
+		OGP_API virtual bool Interact(EntityScript& sourceEntity) override;
 
 	protected:
 

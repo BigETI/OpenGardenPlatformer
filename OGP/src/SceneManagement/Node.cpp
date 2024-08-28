@@ -319,6 +319,34 @@ void Node::GameTickScripts(Game& game, high_resolution_clock::duration deltaTime
 	}
 }
 
+void Node::BeforeFrameRenderScripts(Game& game, high_resolution_clock::duration deltaTime) {
+	if (isMarkedForDeletion) {
+		for (auto child : children) {
+			child->Destroy();
+		}
+	}
+	if (isLocallyEnabled) {
+		for (auto child : children) {
+			child->BeforeFrameRenderScripts(game, deltaTime);
+		}
+	}
+	if (isMarkedForDeletion) {
+		for (auto script : scripts) {
+			OnScriptRemoved(script);
+			script->Deinitialize();
+		}
+		scripts.clear();
+		children.clear();
+	}
+	else if (isLocallyEnabled) {
+		temporaryScripts = scripts;
+		for (auto script : temporaryScripts) {
+			script->InitializeOrBeforeFrameRender(game, deltaTime);
+		}
+		temporaryScripts.clear();
+	}
+}
+
 void Node::FrameRenderScripts(Game& game, high_resolution_clock::duration deltaTime) {
 	if (isMarkedForDeletion) {
 		for (auto child : children) {
