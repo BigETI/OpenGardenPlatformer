@@ -48,6 +48,10 @@ namespace OGP::Math {
 			// ...
 		}
 
+		constexpr inline bool IsContained(const Vector2<TComponent>& position) const noexcept {
+			return GetBounds().IsContained(position);
+		}
+
 		constexpr inline Rectangle<TComponent> GetCorrected() const noexcept {
 			return Rectangle<TComponent>(
 				Vector2<TComponent>(std::min(position.x, position.x + size.x), std::min(position.y, position.y + size.y)),
