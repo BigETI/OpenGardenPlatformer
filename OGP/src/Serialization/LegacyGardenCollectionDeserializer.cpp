@@ -385,6 +385,8 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 						cerr << "Failed to read marmot entity bounds at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
 						return false;
 					}
+					entity_data.bounds.left = -entity_data.bounds.left;
+					entity_data.bounds.bottom = -entity_data.bounds.bottom;
 					entity_data.bounds += entity_data.position.GetConverted<int64_t>();
 					break;
 				case ELegacyGardenEntityType::Worm:
@@ -403,6 +405,8 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 						cerr << "Failed to read worm entity bounds at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
 						return false;
 					}
+					entity_data.bounds.left = -entity_data.bounds.left;
+					entity_data.bounds.bottom = -entity_data.bounds.bottom;
 					entity_data.bounds += entity_data.position.GetConverted<int64_t>();
 					break;
 				case ELegacyGardenEntityType::Lift:
@@ -427,6 +431,8 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 						cerr << "Failed to read lift entity bounds at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
 						return false;
 					}
+					entity_data.bounds.left = -entity_data.bounds.left;
+					entity_data.bounds.bottom = -entity_data.bounds.bottom;
 					entity_data.bounds += entity_data.position.GetConverted<int64_t>();
 					break;
 				case ELegacyGardenEntityType::Key:
