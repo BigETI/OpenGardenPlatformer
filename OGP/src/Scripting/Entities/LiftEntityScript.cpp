@@ -6,6 +6,7 @@
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Entities/ELiftMovementState.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
+#include <OGP/Math/Easing.hpp>
 #include <OGP/Math/Vector2.hpp>
 #include <OGP/Game.hpp>
 #include <OGP/SceneManagement/Node.hpp>
@@ -25,7 +26,13 @@ using namespace std::chrono;
 constexpr const float maximalMovementSpeed(80.0f / 8.0f);
 constexpr const float maximalParkingTime(1.0f);
 
-LiftEntityScript::LiftEntityScript(Node* node) : EntityScript(node), liftMovementState(ELiftMovementState::Up), movementProgress(0.0f), parkingProgress(0.0f) {
+LiftEntityScript::LiftEntityScript(Node* node) :
+	EntityScript(node),
+	liftMovementState(ELiftMovementState::Up),
+	movementProgress(0.0f),
+	parkingProgress(0.0f),
+	hasStartedToMove(true),
+	isFinishingToMove(false) {
 	// ...
 }
 
@@ -33,16 +40,16 @@ Vector2<float> LiftEntityScript::GetToBeRenderedPosition() const noexcept {
 	Vector2<float> ret(EntityScript::GetToBeRenderedPosition());
 	switch (liftMovementState) {
 	case ELiftMovementState::Up:
-		ret += Vector2<float>(0.0f, movementProgress);
+		ret += Vector2<float>(0.0f, GetAnimatedMovementProgress());
 		break;
 	case ELiftMovementState::Down:
-		ret += Vector2<float>(0.0f, -movementProgress);
+		ret += Vector2<float>(0.0f, -GetAnimatedMovementProgress());
 		break;
 	case ELiftMovementState::Left:
-		ret += Vector2<float>(-movementProgress, 0.0f);
+		ret += Vector2<float>(-GetAnimatedMovementProgress(), 0.0f);
 		break;
 	case ELiftMovementState::Right:
-		ret += Vector2<float>(movementProgress, 0.0f);
+		ret += Vector2<float>(GetAnimatedMovementProgress(), 0.0f);
 		break;
 	default:
 		break;
@@ -100,7 +107,14 @@ void LiftEntityScript::OnGameTick(Game& game, high_resolution_clock::duration de
 					else {
 						float movement_progress(min(movementProgress, 1.0f));
 						if (movement_progress >= 1.0f) {
+							hasStartedToMove = false;
 							SetCurrentPosition(target_position);
+							if (IsAtTopBound(*garden) || garden->IsSolidAt(target_position)) {
+								ParkFromMovingUp();
+							}
+							else {
+								isFinishingToMove = IsMovingUpReachesEnd(*garden);
+							}
 						}
 					}
 				}
@@ -119,7 +133,14 @@ void LiftEntityScript::OnGameTick(Game& game, high_resolution_clock::duration de
 						else {
 							float movement_progress(min(movementProgress, 1.0f));
 							if (movement_progress >= 1.0f) {
+								hasStartedToMove = false;
 								SetCurrentPosition(target_position);
+								if (IsAtBottomBound(*garden) || garden->IsSolidAt(target_position)) {
+									ParkFromMovingDown();
+								}
+								else {
+									isFinishingToMove = IsMovingDownReachesEnd(*garden);
+								}
 							}
 						}
 					}
@@ -142,7 +163,14 @@ void LiftEntityScript::OnGameTick(Game& game, high_resolution_clock::duration de
 						else {
 							float movement_progress(min(movementProgress, 1.0f));
 							if (movement_progress >= 1.0f) {
+								hasStartedToMove = false;
 								SetCurrentPosition(target_position);
+								if (IsAtLeftBound(*garden) || garden->IsSolidAt(target_position)) {
+									ParkFromMovingLeft();
+								}
+								else {
+									isFinishingToMove = IsMovingLeftReachesEnd(*garden);
+								}
 							}
 						}
 					}
@@ -164,7 +192,14 @@ void LiftEntityScript::OnGameTick(Game& game, high_resolution_clock::duration de
 					else {
 						float movement_progress(min(movementProgress, 1.0f));
 						if (movement_progress >= 1.0f) {
+							hasStartedToMove = false;
 							SetCurrentPosition(target_position);
+							if (IsAtRightBound(*garden) || garden->IsSolidAt(target_position)) {
+								ParkFromMovingRight();
+							}
+							else {
+								isFinishingToMove = IsMovingRightReachesEnd(*garden);
+							}
 						}
 					}
 				}
@@ -326,19 +361,35 @@ void LiftEntityScript::OnGameTick(Game& game, high_resolution_clock::duration de
 }
 
 bool LiftEntityScript::IsAtTopBound(const GardenScript& garden) const noexcept {
-	return GetCurrentPosition().y == GetGardenEntityData().bounds.top;
+	return IsAtTopBound(garden, GetCurrentPosition().y);
+}
+
+bool LiftEntityScript::IsAtTopBound(const GardenScript& garden, size_t targetYPosition) const noexcept {
+	return targetYPosition == GetGardenEntityData().bounds.top;
 }
 
 bool LiftEntityScript::IsAtBottomBound(const GardenScript& garden) const noexcept {
-	return GetCurrentPosition().y == GetGardenEntityData().bounds.bottom;
+	return IsAtBottomBound(garden, GetCurrentPosition().y);
+}
+
+bool LiftEntityScript::IsAtBottomBound(const GardenScript& garden, size_t targetYPosition) const noexcept {
+	return targetYPosition == GetGardenEntityData().bounds.bottom;
 }
 
 bool LiftEntityScript::IsAtLeftBound(const GardenScript& garden) const noexcept {
-	return GetCurrentPosition().x == GetGardenEntityData().bounds.left;
+	return IsAtLeftBound(garden, GetCurrentPosition().x);
+}
+
+bool LiftEntityScript::IsAtLeftBound(const GardenScript& garden, size_t targetXPosition) const noexcept {
+	return targetXPosition == GetGardenEntityData().bounds.left;
 }
 
 bool LiftEntityScript::IsAtRightBound(const GardenScript& garden) const noexcept {
-	return GetCurrentPosition().x == GetGardenEntityData().bounds.right;
+	return IsAtRightBound(garden, GetCurrentPosition().x);
+}
+
+bool LiftEntityScript::IsAtRightBound(const GardenScript& garden, size_t targetXPosition) const noexcept {
+	return targetXPosition == GetGardenEntityData().bounds.right;
 }
 
 bool LiftEntityScript::SwitchToMovingUp(const GardenScript& garden) noexcept {
@@ -347,6 +398,7 @@ bool LiftEntityScript::SwitchToMovingUp(const GardenScript& garden) noexcept {
 	if (GetGardenEntityData().bounds.IsContained(target_position.GetConverted<int64_t>()) && !garden.IsSolidAt(target_position)) {
 		liftMovementState = ELiftMovementState::Up;
 		SwitchToMoving();
+		isFinishingToMove = IsMovingUpReachesEnd(garden);
 		ret = true;
 	}
 	return ret;
@@ -359,6 +411,7 @@ bool LiftEntityScript::SwitchToMovingDown(const GardenScript& garden) noexcept {
 		if (GetGardenEntityData().bounds.IsContained(target_position.GetConverted<int64_t>()) && !garden.IsSolidAt(target_position)) {
 			liftMovementState = ELiftMovementState::Down;
 			SwitchToMoving();
+			isFinishingToMove = IsMovingDownReachesEnd(garden);
 			ret = true;
 		}
 	}
@@ -372,6 +425,7 @@ bool LiftEntityScript::SwitchToMovingLeft(const GardenScript& garden) noexcept {
 		if (GetGardenEntityData().bounds.IsContained(target_position.GetConverted<int64_t>()) && !garden.IsSolidAt(target_position)) {
 			liftMovementState = ELiftMovementState::Left;
 			SwitchToMoving();
+			isFinishingToMove = IsMovingLeftReachesEnd(garden);
 			ret = true;
 		}
 	}
@@ -384,6 +438,7 @@ bool LiftEntityScript::SwitchToMovingRight(const GardenScript& garden) noexcept 
 	if (GetGardenEntityData().bounds.IsContained(target_position.GetConverted<int64_t>()) && !garden.IsSolidAt(target_position)) {
 		liftMovementState = ELiftMovementState::Right;
 		SwitchToMoving();
+		isFinishingToMove = IsMovingRightReachesEnd(garden);
 		ret = true;
 	}
 	return ret;
@@ -392,6 +447,35 @@ bool LiftEntityScript::SwitchToMovingRight(const GardenScript& garden) noexcept 
 void LiftEntityScript::SwitchToMoving() noexcept {
 	movementProgress = (parkingProgress - 1.0) * maximalMovementSpeed;
 	parkingProgress = 0.0f;
+	hasStartedToMove = true;
+}
+
+bool LiftEntityScript::IsMovingUpReachesEnd(const GardenScript& garden) const noexcept {
+	Vector2<size_t> target_position(GetCurrentPosition() + Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(2)));
+	return IsAtTopBound(garden, GetCurrentPosition().y + static_cast<size_t>(1)) || garden.IsSolidAt(target_position);
+}
+
+bool LiftEntityScript::IsMovingDownReachesEnd(const GardenScript& garden) const noexcept {
+	bool ret(true);
+	if (GetCurrentPosition().y > static_cast<size_t>(1)) {
+		Vector2<size_t> target_position(GetCurrentPosition() - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(2)));
+		ret = IsAtBottomBound(garden, GetCurrentPosition().y - static_cast<size_t>(1)) || garden.IsSolidAt(target_position);
+	}
+	return ret;
+}
+
+bool LiftEntityScript::IsMovingLeftReachesEnd(const GardenScript& garden) const noexcept {
+	bool ret(true);
+	if (GetCurrentPosition().x > static_cast<size_t>(1)) {
+		Vector2<size_t> target_position(GetCurrentPosition() - Vector2<size_t>(static_cast<size_t>(2), static_cast<size_t>(0)));
+		ret = IsAtLeftBound(garden, GetCurrentPosition().x - static_cast<size_t>(1)) || garden.IsSolidAt(target_position);
+	}
+	return ret;
+}
+
+bool LiftEntityScript::IsMovingRightReachesEnd(const GardenScript& garden) const noexcept {
+	Vector2<size_t> target_position(GetCurrentPosition() + Vector2<size_t>(static_cast<size_t>(2), static_cast<size_t>(0)));
+	return IsAtRightBound(garden, GetCurrentPosition().x + static_cast<size_t>(1)) || garden.IsSolidAt(target_position);
 }
 
 void LiftEntityScript::ParkFromMovingUp() noexcept {
@@ -415,6 +499,11 @@ void LiftEntityScript::ParkFromMovingRight() noexcept {
 }
 
 void LiftEntityScript::Park() noexcept {
-	parkingProgress = movementProgress / maximalMovementSpeed;
+	parkingProgress = min(movementProgress - 1.0f, 0.0f) / maximalMovementSpeed;
 	movementProgress = 0.0f;
+	isFinishingToMove = false;
+}
+
+float LiftEntityScript::GetAnimatedMovementProgress() const noexcept {
+	return hasStartedToMove ? (isFinishingToMove ? Easing::EaseInOut(movementProgress) : Easing::EaseIn(movementProgress)) : (isFinishingToMove ? Easing::EaseOut(movementProgress) : movementProgress);
 }

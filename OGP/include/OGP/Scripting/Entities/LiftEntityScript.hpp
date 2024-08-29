@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstddef>
 #include <memory>
 
 #include "../../Entities/ELiftMovementState.hpp"
@@ -30,20 +31,31 @@ namespace OGP::Scripting::Entities {
 		OGP::Entities::ELiftMovementState liftMovementState;
 		float movementProgress;
 		float parkingProgress;
+		bool hasStartedToMove;
+		bool isFinishingToMove;
 
 		bool IsAtTopBound(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsAtTopBound(const OGP::Scripting::Environment::GardenScript& garden, std::size_t targetYPosition) const noexcept;
 		bool IsAtBottomBound(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsAtBottomBound(const OGP::Scripting::Environment::GardenScript& garden, std::size_t targetYPosition) const noexcept;
 		bool IsAtLeftBound(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsAtLeftBound(const OGP::Scripting::Environment::GardenScript& garden, std::size_t targetXPosition) const noexcept;
 		bool IsAtRightBound(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsAtRightBound(const OGP::Scripting::Environment::GardenScript& garden, std::size_t targetXPosition) const noexcept;
 		bool SwitchToMovingUp(const OGP::Scripting::Environment::GardenScript& garden) noexcept;
 		bool SwitchToMovingDown(const OGP::Scripting::Environment::GardenScript& garden) noexcept;
 		bool SwitchToMovingLeft(const OGP::Scripting::Environment::GardenScript& garden) noexcept;
 		bool SwitchToMovingRight(const OGP::Scripting::Environment::GardenScript& garden) noexcept;
 		void SwitchToMoving() noexcept;
+		bool IsMovingUpReachesEnd(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsMovingDownReachesEnd(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsMovingLeftReachesEnd(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
+		bool IsMovingRightReachesEnd(const OGP::Scripting::Environment::GardenScript& garden) const noexcept;
 		void ParkFromMovingUp() noexcept;
 		void ParkFromMovingDown() noexcept;
 		void ParkFromMovingLeft() noexcept;
 		void ParkFromMovingRight() noexcept;
 		void Park() noexcept;
+		float GetAnimatedMovementProgress() const noexcept;
 	};
 }
