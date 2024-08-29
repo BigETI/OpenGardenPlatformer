@@ -28,8 +28,8 @@ namespace OGP::Scripting::Entities {
 		OGP_API PlayerEntityScript(OGP::SceneManagement::Node* node);
 
 		OGP_API bool IsAlive() const noexcept;
-		OGP_API void Kill();
-		OGP_API void Win();
+		OGP_API bool Kill();
+		OGP_API bool Win();
 
 		OGP_API virtual OGP::Math::Vector2<float> GetToBeRenderedPosition() const noexcept override;
 		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;

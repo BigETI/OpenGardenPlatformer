@@ -52,18 +52,22 @@ bool PlayerEntityScript::IsAlive() const noexcept {
 	return isAlive;
 }
 
-void PlayerEntityScript::Kill() {
-	if (isAlive) {
+bool PlayerEntityScript::Kill() {
+	bool ret(isAlive);
+	if (ret) {
 		isAlive = false;
 		OnDied();
 	}
+	return ret;
 }
 
-void PlayerEntityScript::Win() {
-	if (hasNotWonYet) {
+bool PlayerEntityScript::Win() {
+	bool ret(hasNotWonYet);
+	if (ret) {
 		hasNotWonYet = true;
 		OnWon();
 	}
+	return ret;
 }
 
 Vector2<float> PlayerEntityScript::GetToBeRenderedPosition() const noexcept {
