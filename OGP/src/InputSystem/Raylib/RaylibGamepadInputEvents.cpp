@@ -9,7 +9,7 @@ using namespace OGP::InputSystem;
 using namespace OGP::InputSystem::Raylib;
 using namespace std;
 
-RaylibGamepadInputEvents::RaylibGamepadInputEvents() : gamepadIndex(static_cast<size_t>(0)) {
+RaylibGamepadInputEvents::RaylibGamepadInputEvents() : RaylibGamepadInputEvents(static_cast<size_t>(0)) {
 	// ...
 }
 
