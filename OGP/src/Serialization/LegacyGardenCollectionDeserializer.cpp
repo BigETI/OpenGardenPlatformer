@@ -402,7 +402,6 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 						cerr << "Failed to read worm entity bounds at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
 						return false;
 					}
-					cout << "[" << garden_index << "] Worm bounds: Top:" << entity_data.bounds.top << "; Bottom: " << entity_data.bounds.bottom << "; Left: " << entity_data.bounds.left << "; Right: " << entity_data.bounds.right << endl;
 					break;
 				case ELegacyGardenEntityType::Lift:
 					switch (static_cast<ELegacyGardenLiftEntityVariantType>(entity_type_variant)) {
