@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <istream>
@@ -67,7 +68,7 @@ namespace OGP::Serialization {
 			}
 			return ret;
 		}
-		
+
 		template <typename TInputValue, typename TOutputValue = TInputValue>
 		constexpr inline static bool TryReadingValueAndFixingYPosition(std::istream& inputStream, std::size_t gardenHeight, TOutputValue& result) noexcept {
 			bool ret(TryReadingValue<TInputValue, TOutputValue>(inputStream, result));
@@ -78,12 +79,26 @@ namespace OGP::Serialization {
 		}
 
 		template <typename TInputComponent, typename TOutputComponent = TInputComponent>
-		constexpr static bool TryReadingBounds(std::istream& inputStream, OGP::Math::Bounds<TOutputComponent>& result) noexcept {
-			return
-				TryReadingValue<TInputComponent, TOutputComponent>(inputStream, result.left) &&
-				TryReadingValue<TInputComponent, TOutputComponent>(inputStream, result.top) &&
-				TryReadingValue<TInputComponent, TOutputComponent>(inputStream, result.right) &&
-				TryReadingValue<TInputComponent, TOutputComponent>(inputStream, result.bottom);
+		constexpr static bool TryReadingBounds(std::istream& inputStream, const OGP::Math::Vector2<TOutputComponent>& entityPosition, const OGP::Math::Vector2<TOutputComponent>& gardenSize, OGP::Math::Bounds<TOutputComponent>& result) noexcept {
+			TInputComponent left;
+			TInputComponent top;
+			TInputComponent right;
+			TInputComponent bottom;
+			bool ret(
+				TryReadingValue<TInputComponent>(inputStream, left) &&
+				TryReadingValue<TInputComponent>(inputStream, top) &&
+				TryReadingValue<TInputComponent>(inputStream, right) &&
+				TryReadingValue<TInputComponent>(inputStream, bottom)
+			);
+			if (ret) {
+				result = OGP::Math::Bounds<TOutputComponent>(
+					std::clamp((top < static_cast<TOutputComponent>(0)) ? (static_cast<TOutputComponent>(gardenSize.y) - static_cast<TOutputComponent>(1)) : (static_cast<TOutputComponent>(entityPosition.y) + static_cast<TOutputComponent>(top)), static_cast<TOutputComponent>(0), static_cast<TOutputComponent>(gardenSize.y) - static_cast<TOutputComponent>(1)),
+					std::clamp((bottom < static_cast<TOutputComponent>(0)) ? static_cast<TOutputComponent>(0) : (static_cast<TOutputComponent>(entityPosition.y) - static_cast<TOutputComponent>(bottom)), static_cast<TOutputComponent>(0), static_cast<TOutputComponent>(gardenSize.y) - static_cast<TOutputComponent>(1)),
+					std::clamp((left < static_cast<TOutputComponent>(0)) ? static_cast<TOutputComponent>(0) : (static_cast<TOutputComponent>(entityPosition.x) - static_cast<TOutputComponent>(left)), static_cast<TOutputComponent>(0), static_cast<TOutputComponent>(gardenSize.x) - static_cast<TOutputComponent>(1)),
+					std::clamp((right < static_cast<TOutputComponent>(0)) ? (static_cast<TOutputComponent>(gardenSize.x) - static_cast<TOutputComponent>(1)) : (static_cast<TOutputComponent>(entityPosition.x) + static_cast<TOutputComponent>(right)), static_cast<TOutputComponent>(0), static_cast<TOutputComponent>(gardenSize.x) - static_cast<TOutputComponent>(1))
+				);
+			}
+			return ret;
 		}
 
 		template <typename TArrayElement, size_t ArraySize>

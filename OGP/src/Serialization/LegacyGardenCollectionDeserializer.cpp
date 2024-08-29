@@ -381,13 +381,10 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 						return false;
 					}
 					entity_data.type = EGardenEntityType::Marmot;
-					if (!TryReadingBounds<int16_t, int64_t>(inputStream, entity_data.bounds)) {
+					if (!TryReadingBounds<int16_t, int64_t>(inputStream, entity_data.position.GetConverted<int64_t>(), garden_data.cells.GetSize().GetConverted<int64_t>(), entity_data.bounds)) {
 						cerr << "Failed to read marmot entity bounds at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
 						return false;
 					}
-					entity_data.bounds.left = -entity_data.bounds.left;
-					entity_data.bounds.bottom = -entity_data.bounds.bottom;
-					entity_data.bounds += entity_data.position.GetConverted<int64_t>();
 					break;
 				case ELegacyGardenEntityType::Worm:
 					switch (static_cast<ELegacyGardenWormEntityVariantType>(entity_type_variant)) {
@@ -401,13 +398,11 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 						cerr << "Invalid worm entity type variant \"" << entity_type_variant << "\" at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
 						return false;
 					}
-					if (!TryReadingBounds<int16_t, int64_t>(inputStream, entity_data.bounds)) {
+					if (!TryReadingBounds<int16_t, int64_t>(inputStream, entity_data.position.GetConverted<int64_t>(), garden_data.cells.GetSize().GetConverted<int64_t>(), entity_data.bounds)) {
 						cerr << "Failed to read worm entity bounds at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
 						return false;
 					}
-					entity_data.bounds.left = -entity_data.bounds.left;
-					entity_data.bounds.bottom = -entity_data.bounds.bottom;
-					entity_data.bounds += entity_data.position.GetConverted<int64_t>();
+					cout << "[" << garden_index << "] Worm bounds: Top:" << entity_data.bounds.top << "; Bottom: " << entity_data.bounds.bottom << "; Left: " << entity_data.bounds.left << "; Right: " << entity_data.bounds.right << endl;
 					break;
 				case ELegacyGardenEntityType::Lift:
 					switch (static_cast<ELegacyGardenLiftEntityVariantType>(entity_type_variant)) {
@@ -427,13 +422,10 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 						cerr << "Invalid lift entity type variant \"" << entity_type_variant << "\" at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
 						return false;
 					}
-					if (!TryReadingBounds<int16_t, int64_t>(inputStream, entity_data.bounds)) {
+					if (!TryReadingBounds<int16_t, int64_t>(inputStream, entity_data.position.GetConverted<int64_t>(), garden_data.cells.GetSize().GetConverted<int64_t>(), entity_data.bounds)) {
 						cerr << "Failed to read lift entity bounds at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
 						return false;
 					}
-					entity_data.bounds.left = -entity_data.bounds.left;
-					entity_data.bounds.bottom = -entity_data.bounds.bottom;
-					entity_data.bounds += entity_data.position.GetConverted<int64_t>();
 					break;
 				case ELegacyGardenEntityType::Key:
 					switch (static_cast<ELegacyGardenKeyEntityVariantType>(entity_type_variant)) {
