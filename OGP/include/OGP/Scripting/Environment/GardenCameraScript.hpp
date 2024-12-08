@@ -3,25 +3,26 @@
 #include <chrono>
 #include <memory>
 
+#include <Klein/Engine.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+#include <Klein/Scripting/Script.hpp>
+
 #include "../../Exportables/Exportable.hxx"
-#include "../../Game.hpp"
-#include "../../SceneManagement/Node.hpp"
 #include "../Entities/EntityScript.hpp"
-#include "../Script.hpp"
 
 namespace OGP::Scripting::Environment {
-	class GardenCameraScript : public OGP::Scripting::Script {
+	class GardenCameraScript : public Klein::Scripting::Script {
 	public:
 
-		OGP_API GardenCameraScript(OGP::SceneManagement::Node* node);
+		OGP_API GardenCameraScript(Klein::SceneManagement::Node* node);
 
 		OGP_API std::weak_ptr<OGP::Scripting::Entities::EntityScript> GetToSpectateEntity() const noexcept;
 		OGP_API void SetToSpectateEntity(std::weak_ptr<OGP::Scripting::Entities::EntityScript> toSpectateEntity);
 
 	protected:
 
-		OGP_API virtual void OnInitialize(OGP::Game& game) override;
-		OGP_API virtual void OnFrameRender(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime) override;
+		OGP_API virtual void OnInitialize(Klein::Engine& engine) override;
+		OGP_API virtual void OnFrameRender(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
 
 	private:
 

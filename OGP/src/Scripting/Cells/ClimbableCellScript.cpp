@@ -2,23 +2,27 @@
 #include <cstdint>
 #include <memory>
 
+#include <Klein/Engine.hpp>
+#include <Klein/Rendering/Color.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+#include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
+
 #include <OGP/Cells/EGardenCellType.hpp>
-#include <OGP/Game.hpp>
-#include <OGP/Rendering/Color.hpp>
-#include <OGP/SceneManagement/Node.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/ClimbableCellScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
-#include <OGP/Scripting/Rendering/SpriteRendererScript.hpp>
 
-using namespace OGP::Cells;
-using namespace OGP::Rendering;
-using namespace OGP::SceneManagement;
-using namespace OGP::Scripting::Cells;
-using namespace OGP::Scripting::Environment;
-using namespace OGP::Scripting::Rendering;
 using namespace std;
 using namespace std::chrono;
+
+using namespace Klein;
+using namespace Klein::Rendering;
+using namespace Klein::SceneManagement;
+using namespace Klein::Scripting::Rendering;
+
+using namespace OGP::Cells;
+using namespace OGP::Scripting::Cells;
+using namespace OGP::Scripting::Environment;
 
 ClimbableCellScript::ClimbableCellScript(Node* node) : CellScript(node) {
 	// ...
@@ -51,7 +55,7 @@ bool ClimbableCellScript::IsClimbingUpAllowed() const noexcept {
 	return IsClimbable() && (GetGardenCellType() != EGardenCellType::Rope);
 }
 
-void ClimbableCellScript::OnFrameRender(Game& game, high_resolution_clock::duration deltaTime) {
+void ClimbableCellScript::OnFrameRender(Engine& engine, high_resolution_clock::duration deltaTime) {
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
 		if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
 			switch (GetGardenCellType()) {

@@ -4,8 +4,10 @@
 #include <istream>
 #include <iostream>
 
+#include <Klein/Collections/EGridResizingRule.hpp>
+#include <Klein/Math/Vector2.hpp>
+
 #include <OGP/Cells/EGardenCellType.hpp>
-#include <OGP/Collections/EGridResizingRule.hpp>
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
 #include <OGP/Environment/GardenCollectionData.hpp>
@@ -22,15 +24,15 @@
 #include <OGP/Environment/Legacy/ELegacyGardenVegetableEntityVariantType.hpp>
 #include <OGP/Environment/Legacy/ELegacyGardenWaterCellTypeVariant.hpp>
 #include <OGP/Environment/Legacy/ELegacyGardenWormEntityVariantType.hpp>
-#include <OGP/Math/Vector2.hpp>
 #include <OGP/Serialization/LegacyGardenCollectionDeserializer.hpp>
 
+using namespace Klein::Collections;
+using namespace Klein::Math;
+
 using namespace OGP::Cells;
-using namespace OGP::Collections;
 using namespace OGP::Entities;
 using namespace OGP::Environment;
 using namespace OGP::Environment::Legacy;
-using namespace OGP::Math;
 using namespace OGP::Serialization;
 using namespace std;
 

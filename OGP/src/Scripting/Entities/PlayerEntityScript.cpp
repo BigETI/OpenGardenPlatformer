@@ -2,27 +2,31 @@
 #include <cstddef>
 #include <memory>
 
+#include <Klein/Engine.hpp>
+#include <Klein/Math/Vector2.hpp>
+#include <Klein/Hashing/StringHash.hpp>
+#include <Klein/ResourceManagement/ResourceID.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+#include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
+
 #include <OGP/Entities/GardenEntityData.hpp>
-#include <OGP/Game.hpp>
-#include <OGP/Math/Vector2.hpp>
-#include <OGP/ResourceManagement/ResourceID.hpp>
-#include <OGP/SceneManagement/Node.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/PlayerEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
-#include <OGP/Scripting/Rendering/SpriteRendererScript.hpp>
 
-using namespace OGP;
-using namespace OGP::Entities;
-using namespace OGP::Hashing;
-using namespace OGP::Math;
-using namespace OGP::ResourceManagement;
-using namespace OGP::SceneManagement;
-using namespace OGP::Scripting::Entities;
-using namespace OGP::Scripting::Environment;
-using namespace OGP::Scripting::Rendering;
 using namespace std;
 using namespace std::chrono;
+
+using namespace Klein;
+using namespace Klein::Math;
+using namespace Klein::Hashing;
+using namespace Klein::ResourceManagement;
+using namespace Klein::SceneManagement;
+using namespace Klein::Scripting::Rendering;
+
+using namespace OGP::Entities;
+using namespace OGP::Scripting::Entities;
+using namespace OGP::Scripting::Environment;
 
 const StringHash wKeyStringHash("Keyboard.KeyCode.87");
 const StringHash aKeyStringHash("Keyboard.KeyCode.65");
@@ -82,7 +86,7 @@ void PlayerEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_
 	EntityScript::Spawn(gardenEntityData, garden);
 }
 
-void PlayerEntityScript::OnGameTick(Game& game, high_resolution_clock::duration deltaTime) {
+void PlayerEntityScript::OnGameTick(Engine& engine, high_resolution_clock::duration deltaTime) {
 	if (isAlive) {
 		if (shared_ptr<GardenScript> current_garden = GetGarden().lock()) {
 
@@ -90,7 +94,7 @@ void PlayerEntityScript::OnGameTick(Game& game, high_resolution_clock::duration 
 			// TODO: Add support for more keys
 			// TODO: Add gamepad support
 			// TODO: Add mouse support
-			for (const auto& input_event : game.GetCurrentInputEvents()) {
+			for (const auto& input_event : engine.GetCurrentInputEvents()) {
 				if (input_event.GetNameHash() == wKeyStringHash) {
 					isWalkingUp = input_event.IsPressing();
 				}

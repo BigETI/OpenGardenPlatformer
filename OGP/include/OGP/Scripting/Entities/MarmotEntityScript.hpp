@@ -2,19 +2,20 @@
 
 #include <chrono>
 
+#include <Klein/Engine.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+
 #include "../../Exportables/Exportable.hxx"
-#include "../../Game.hpp"
-#include "../../SceneManagement/Node.hpp"
 #include "EntityScript.hpp"
 
 namespace OGP::Scripting::Entities {
 	class MarmotEntityScript : public EntityScript {
 	public:
 
-		OGP_API MarmotEntityScript(OGP::SceneManagement::Node* node);
+		OGP_API MarmotEntityScript(Klein::SceneManagement::Node* node);
 
 	protected:
 
-		OGP_API virtual void OnGameTick(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime) override;
+		OGP_API virtual void OnGameTick(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
 	};
 }

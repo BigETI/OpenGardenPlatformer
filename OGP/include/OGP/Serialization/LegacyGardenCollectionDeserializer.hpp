@@ -7,9 +7,11 @@
 #include <string>
 #include <type_traits>
 
+#include <Klein/Math/Bounds.hpp>
+#include <Klein/Math/Vector2.hpp>
+
 #include "../Environment/GardenCollectionData.hpp"
 #include "../Exportables/Exportable.hxx"
-#include "../Math/Bounds.hpp"
 #include "IGardenCollectionDeserializer.hpp"
 
 namespace OGP::Serialization {
@@ -79,7 +81,7 @@ namespace OGP::Serialization {
 		}
 
 		template <typename TInputComponent, typename TOutputComponent = TInputComponent>
-		constexpr static bool TryReadingBounds(std::istream& inputStream, const OGP::Math::Vector2<TOutputComponent>& entityPosition, const OGP::Math::Vector2<TOutputComponent>& gardenSize, OGP::Math::Bounds<TOutputComponent>& result) noexcept {
+		constexpr static bool TryReadingBounds(std::istream& inputStream, const Klein::Math::Vector2<TOutputComponent>& entityPosition, const Klein::Math::Vector2<TOutputComponent>& gardenSize, Klein::Math::Bounds<TOutputComponent>& result) noexcept {
 			TInputComponent left;
 			TInputComponent top;
 			TInputComponent right;
@@ -91,7 +93,7 @@ namespace OGP::Serialization {
 				TryReadingValue<TInputComponent>(inputStream, bottom)
 			);
 			if (ret) {
-				result = OGP::Math::Bounds<TOutputComponent>(
+				result = Klein::Math::Bounds<TOutputComponent>(
 					std::clamp((top < static_cast<TOutputComponent>(0)) ? (static_cast<TOutputComponent>(gardenSize.y) - static_cast<TOutputComponent>(1)) : (static_cast<TOutputComponent>(entityPosition.y) + static_cast<TOutputComponent>(top)), static_cast<TOutputComponent>(0), static_cast<TOutputComponent>(gardenSize.y) - static_cast<TOutputComponent>(1)),
 					std::clamp((bottom < static_cast<TOutputComponent>(0)) ? static_cast<TOutputComponent>(0) : (static_cast<TOutputComponent>(entityPosition.y) - static_cast<TOutputComponent>(bottom)), static_cast<TOutputComponent>(0), static_cast<TOutputComponent>(gardenSize.y) - static_cast<TOutputComponent>(1)),
 					std::clamp((left < static_cast<TOutputComponent>(0)) ? static_cast<TOutputComponent>(0) : (static_cast<TOutputComponent>(entityPosition.x) - static_cast<TOutputComponent>(left)), static_cast<TOutputComponent>(0), static_cast<TOutputComponent>(gardenSize.x) - static_cast<TOutputComponent>(1)),

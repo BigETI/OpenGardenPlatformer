@@ -1,9 +1,10 @@
-#include <OGP/SceneManagement/Node.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/QuestionMarkEntityScript.hpp>
 
-using namespace OGP::Math;
-using namespace OGP::SceneManagement;
+using namespace Klein::SceneManagement;
+
 using namespace OGP::Scripting::Entities;
 
 QuestionMarkEntityScript::QuestionMarkEntityScript(Node* node) : EntityScript(node) {
@@ -13,6 +14,6 @@ QuestionMarkEntityScript::QuestionMarkEntityScript(Node* node) : EntityScript(no
 bool QuestionMarkEntityScript::Interact(EntityScript& sourceEntity) {
 
 	// TODO: Implement question mark interaction
-	
+
 	return false;
 }

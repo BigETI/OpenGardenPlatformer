@@ -3,25 +3,28 @@
 #include <cstdint>
 #include <memory>
 
+#include <Klein/Engine.hpp>
+#include <Klein/Math/Easing.hpp>
+#include <Klein/Math/Vector2.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Entities/ELiftMovementState.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
-#include <OGP/Math/Easing.hpp>
-#include <OGP/Math/Vector2.hpp>
-#include <OGP/Game.hpp>
-#include <OGP/SceneManagement/Node.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/LiftEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
-using namespace OGP;
-using namespace OGP::Entities;
-using namespace OGP::Math;
-using namespace OGP::SceneManagement;
-using namespace OGP::Scripting::Entities;
-using namespace OGP::Scripting::Environment;
 using namespace std;
 using namespace std::chrono;
+
+using namespace Klein;
+using namespace Klein::Math;
+using namespace Klein::SceneManagement;
+
+using namespace OGP::Entities;
+using namespace OGP::Scripting::Entities;
+using namespace OGP::Scripting::Environment;
 
 constexpr const float maximalMovementSpeed(80.0f / 8.0f);
 constexpr const float maximalParkingTime(1.0f);
@@ -88,7 +91,7 @@ bool LiftEntityScript::Interact(EntityScript& sourceEntity) {
 	return ret;
 }
 
-void LiftEntityScript::OnGameTick(Game& game, high_resolution_clock::duration deltaTime) {
+void LiftEntityScript::OnGameTick(Engine& engine, high_resolution_clock::duration deltaTime) {
 	movementProgress += duration<float>(deltaTime).count() * maximalMovementSpeed;
 	parkingProgress += duration<float>(deltaTime).count();
 	do {

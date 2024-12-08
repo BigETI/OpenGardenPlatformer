@@ -7,19 +7,21 @@
 #include <memory>
 #include <vector>
 
+#include <Klein/Engine.hpp>
+#include <Klein/Math/Vector2.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+#include <Klein/Scripting/Script.hpp>
+
 #include "../../Environment/GardenCollectionData.hpp"
 #include "../../Exportables/Exportable.hxx"
-#include "../../Math/Vector2.hpp"
-//#include "../../SceneManagement/Node.hpp"
 #include "../../Serialization/IGardenCollectionDeserializer.hpp"
-#include "../Script.hpp"
 #include "GardenScript.hpp"
 
 namespace OGP::Scripting::Environment {
-	class GardenCollectionScript : public OGP::Scripting::Script {
+	class GardenCollectionScript : public Klein::Scripting::Script {
 	public:
 
-		OGP_API GardenCollectionScript(OGP::SceneManagement::Node* node);
+		OGP_API GardenCollectionScript(Klein::SceneManagement::Node* node);
 
 		OGP_API bool LoadGardenCollectionFile(const std::filesystem::path& gardenCollectionFilePath);
 		OGP_API void UnloadGarden();
@@ -29,7 +31,7 @@ namespace OGP::Scripting::Environment {
 
 	protected:
 
-		OGP_API virtual void OnGameTick(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime) override;
+		OGP_API virtual void OnGameTick(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
 
 	private:
 

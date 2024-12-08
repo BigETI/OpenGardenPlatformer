@@ -2,16 +2,17 @@
 
 #include <chrono>
 
+#include <Klein/Engine.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+
 #include "../../Exportables/Exportable.hxx"
-#include "../../Game.hpp"
-#include "../../SceneManagement/Node.hpp"
 #include "CellScript.hpp"
 
 namespace OGP::Scripting::Cells {
 	class DoorCellScript : public CellScript {
 	public:
 
-		OGP_API DoorCellScript(OGP::SceneManagement::Node* node);
+		OGP_API DoorCellScript(Klein::SceneManagement::Node* node);
 
 		OGP_API virtual bool IsSolid() const noexcept override;
 		OGP_API virtual bool IsTopDeadly() const noexcept override;
@@ -19,7 +20,7 @@ namespace OGP::Scripting::Cells {
 
 	protected:
 
-		OGP_API virtual void OnFrameRender(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime) override;
+		OGP_API virtual void OnFrameRender(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
 
 	private:
 

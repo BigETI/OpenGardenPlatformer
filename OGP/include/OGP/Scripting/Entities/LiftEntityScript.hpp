@@ -4,11 +4,13 @@
 #include <cstddef>
 #include <memory>
 
+#include <Klein/Engine.hpp>
+#include <Klein/Math/Vector2.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+
 #include "../../Entities/ELiftMovementState.hpp"
 #include "../../Entities/GardenEntityData.hpp"
 #include "../../Exportables/Exportable.hxx"
-#include "../../Game.hpp"
-#include "../../SceneManagement/Node.hpp"
 #include "../Environment/GardenScript.hpp"
 #include "EntityScript.hpp"
 
@@ -16,15 +18,15 @@ namespace OGP::Scripting::Entities {
 	class LiftEntityScript : public EntityScript {
 	public:
 
-		OGP_API LiftEntityScript(OGP::SceneManagement::Node* node);
+		OGP_API LiftEntityScript(Klein::SceneManagement::Node* node);
 
-		OGP_API virtual OGP::Math::Vector2<float> GetToBeRenderedPosition() const noexcept override;
+		OGP_API virtual Klein::Math::Vector2<float> GetToBeRenderedPosition() const noexcept override;
 		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
 		OGP_API virtual bool Interact(EntityScript& sourceEntity) override;
 
 	protected:
 
-		OGP_API virtual void OnGameTick(OGP::Game& game, std::chrono::high_resolution_clock::duration deltaTime) override;
+		OGP_API virtual void OnGameTick(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
 
 	private:
 

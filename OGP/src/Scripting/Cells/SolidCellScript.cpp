@@ -1,8 +1,10 @@
-#include <OGP/SceneManagement/Node.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/SolidCellScript.hpp>
 
-using namespace OGP::SceneManagement;
+using namespace Klein::SceneManagement;
+
 using namespace OGP::Scripting::Cells;
 
 SolidCellScript::SolidCellScript(Node* node) : CellScript(node) {

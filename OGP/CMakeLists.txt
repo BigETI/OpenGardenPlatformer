@@ -13,17 +13,6 @@ add_subdirectory ("deps")
 #################################
 
 add_library (OGPStatic STATIC
-	"src/EventSystem/ObserverID.cpp"
-	"src/Game.cpp"
-	"src/InputSystem/InputEvent.cpp"	
-	"src/InputSystem/Raylib/RaylibGamepadInputEvents.cpp"
-	"src/InputSystem/Raylib/RaylibInputHandler.cpp"
-	"src/Rendering/Raylib/RaylibWindowRenderer.cpp"
-	"src/Rendering/RenderingContext.cpp"
-	"src/Rendering/RenderingContextElement.cpp"
-	"src/ResourceManagement/FileSystem.cpp"
-	"src/ResourceManagement/Raylib/RaylibTexture2DResourceManager.cpp"
-	"src/SceneManagement/Node.cpp"
 	"src/Scripting/Cells/CellScript.cpp"
 	"src/Scripting/Cells/ClimbableCellScript.cpp"
 	"src/Scripting/Cells/DeadlyCellScript.cpp"
@@ -42,9 +31,6 @@ add_library (OGPStatic STATIC
 	"src/Scripting/Environment/GardenCameraScript.cpp"
 	"src/Scripting/Environment/GardenCollectionScript.cpp"
 	"src/Scripting/Environment/GardenScript.cpp"
-	"src/Scripting/Rendering/CameraScript.cpp"
-	"src/Scripting/Rendering/SpriteRendererScript.cpp"
-	"src/Scripting/Script.cpp"
 	"src/Serialization/LegacyGardenCollectionDeserializer.cpp"
 )
 
@@ -57,7 +43,7 @@ target_compile_features (OGPStatic
 )
 
 target_compile_definitions (OGPStatic
-	PRIVATE IS_OPEN_GARDEN_PLATFORMER_STATIC
+	PUBLIC IS_OGP_STATIC
 )
 
 target_include_directories (OGPStatic
@@ -65,8 +51,8 @@ target_include_directories (OGPStatic
 )
 
 target_link_libraries (OGPStatic
+	PUBLIC KleinStatic
 	PUBLIC magic_enum
-	PUBLIC raylib
 )
 
 ##################################
@@ -76,17 +62,6 @@ target_link_libraries (OGPStatic
 ##################################
 
 add_library (OGP SHARED
-	"src/EventSystem/ObserverID.cpp"
-	"src/Game.cpp"
-	"src/InputSystem/InputEvent.cpp"	
-	"src/InputSystem/Raylib/RaylibGamepadInputEvents.cpp"
-	"src/InputSystem/Raylib/RaylibInputHandler.cpp"
-	"src/Rendering/Raylib/RaylibWindowRenderer.cpp"
-	"src/Rendering/RenderingContext.cpp"
-	"src/Rendering/RenderingContextElement.cpp"
-	"src/ResourceManagement/FileSystem.cpp"
-	"src/ResourceManagement/Raylib/RaylibTexture2DResourceManager.cpp"
-	"src/SceneManagement/Node.cpp"
 	"src/Scripting/Cells/CellScript.cpp"
 	"src/Scripting/Cells/ClimbableCellScript.cpp"
 	"src/Scripting/Cells/DeadlyCellScript.cpp"
@@ -105,9 +80,6 @@ add_library (OGP SHARED
 	"src/Scripting/Environment/GardenCameraScript.cpp"
 	"src/Scripting/Environment/GardenCollectionScript.cpp"
 	"src/Scripting/Environment/GardenScript.cpp"
-	"src/Scripting/Rendering/CameraScript.cpp"
-	"src/Scripting/Rendering/SpriteRendererScript.cpp"
-	"src/Scripting/Script.cpp"
 	"src/Serialization/LegacyGardenCollectionDeserializer.cpp"
 )
 
@@ -120,12 +92,12 @@ set_property (TARGET OGP
 )
 
 target_link_libraries (OGP
+	PUBLIC Klein
 	PUBLIC magic_enum
-	PUBLIC raylib
 )
 
 target_compile_definitions (OGP
-	PRIVATE IS_OPEN_GARDEN_PLATFORMER_EXPORTING
+	PUBLIC IS_OGP_EXPORTING
 )
 
 include_directories (OGP

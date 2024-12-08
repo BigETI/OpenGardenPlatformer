@@ -8,20 +8,26 @@
 #include <string>
 #include <vector>
 
+#include <Klein/Engine.hpp>
+#include <Klein/Math/Vector2.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+
 #include <OGP/Cells/EGardenCellType.hpp>
-#include <OGP/Math/Vector2.hpp>
 #include <OGP/Scripting/Environment/GardenCollectionScript.hpp>
 #include <OGP/Serialization/LegacyGardenCollectionDeserializer.hpp>
 
-using namespace OGP::Cells;
-using namespace OGP::Math;
-using namespace OGP::SceneManagement;
-using namespace OGP::Scripting;
-using namespace OGP::Scripting::Environment;
-using namespace OGP::Serialization;
 using namespace std;
 using namespace std::chrono;
 using namespace std::filesystem;
+
+using namespace Klein;
+using namespace Klein::Math;
+using namespace Klein::SceneManagement;
+
+using namespace OGP::Cells;
+using namespace OGP::Scripting;
+using namespace OGP::Scripting::Environment;
+using namespace OGP::Serialization;
 
 GardenCollectionScript::GardenCollectionScript(Node* node) :
 	Script(node),
@@ -72,7 +78,7 @@ bool GardenCollectionScript::SelectGardenIndex(size_t gardenIndex, bool isForceL
 	return ret;
 }
 
-void GardenCollectionScript::OnGameTick(Game& game, high_resolution_clock::duration deltaTime) {
+void GardenCollectionScript::OnGameTick(Engine& engine, high_resolution_clock::duration deltaTime) {
 	if (isSelectingGarden) {
 		isSelectingGarden = false;
 		selectedGardenIndex = toSelectGardenIndex;

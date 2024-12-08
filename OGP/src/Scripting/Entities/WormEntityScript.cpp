@@ -2,25 +2,28 @@
 #include <cstddef>
 #include <memory>
 
+#include <Klein/Engine.hpp>
+#include <Klein/Math/Easing.hpp>
+#include <Klein/Math/Vector2.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+
 #include <OGP/Entities/EWormMovementState.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
-#include <OGP/Game.hpp>
-#include <OGP/Math/Easing.hpp>
-#include <OGP/Math/Vector2.hpp>
-#include <OGP/SceneManagement/Node.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/PlayerEntityScript.hpp>
 #include <OGP/Scripting/Entities/WormEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
-using namespace OGP;
-using namespace OGP::Entities;
-using namespace OGP::Math;
-using namespace OGP::SceneManagement;
-using namespace OGP::Scripting::Entities;
-using namespace OGP::Scripting::Environment;
 using namespace std;
 using namespace std::chrono;
+
+using namespace Klein;
+using namespace Klein::Math;
+using namespace Klein::SceneManagement;
+
+using namespace OGP::Entities;
+using namespace OGP::Scripting::Entities;
+using namespace OGP::Scripting::Environment;
 
 constexpr const float maximalMovementSpeed(20.0f / 8.0f);
 
@@ -74,7 +77,7 @@ bool WormEntityScript::Interact(EntityScript& sourceEntity) {
 	return ret;
 }
 
-void WormEntityScript::OnGameTick(Game& game, high_resolution_clock::duration deltaTime) {
+void WormEntityScript::OnGameTick(Engine& engine, high_resolution_clock::duration deltaTime) {
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
 		movementProgress += duration<float>(deltaTime).count() * maximalMovementSpeed;
 		do {

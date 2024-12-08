@@ -1,6 +1,6 @@
 # Open Garden Platformer
 
-A cross-platform and open-source implementation of Daisy's Garden 2, using [raylib](https://www.raylib.com/) and a custom 2D engine built around it.
+A cross-platform and open-source implementation of Daisy's Garden 2, using [Klein](https://github.com/BigETI/Klein).
 
 The idea is to bring a 16-bit Windows application to the world of modern native applications.
 

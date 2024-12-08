@@ -5,13 +5,17 @@
 
 #include <magic_enum.hpp>
 
+#include <Klein/Engine.hpp>
+#include <Klein/Collections/EGridResizingRule.hpp>
+#include <Klein/Collections/ResizableGrid.hpp>
+#include <Klein/Math/Vector2.hpp>
+#include <Klein/ResourceManagement/ResourceID.hpp>
+#include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
+#include <Klein/Scripting/Script.hpp>
+
 #include <OGP/Cells/EGardenCellType.hpp>
-#include <OGP/Collections/EGridResizingRule.hpp>
-#include <OGP/Collections/ResizableGrid.hpp>
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Environment/GardenData.hpp>
-#include <OGP/Math/Vector2.hpp>
-#include <OGP/ResourceManagement/ResourceID.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/ClimbableCellScript.hpp>
 #include <OGP/Scripting/Cells/DeadlyCellScript.hpp>
@@ -29,21 +33,22 @@
 #include <OGP/Scripting/Entities/WormEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenCameraScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
-#include <OGP/Scripting/Rendering/SpriteRendererScript.hpp>
-#include <OGP/Scripting/Script.hpp>
+
+using namespace std;
+
+using namespace Klein;
+using namespace Klein::Collections;
+using namespace Klein::Math;
+using namespace Klein::ResourceManagement;
+using namespace Klein::SceneManagement;
+using namespace Klein::Scripting::Rendering;
 
 using namespace OGP::Cells;
-using namespace OGP::Collections;
 using namespace OGP::Entities;
 using namespace OGP::Environment;
-using namespace OGP::Math;
-using namespace OGP::ResourceManagement;
-using namespace OGP::SceneManagement;
 using namespace OGP::Scripting::Cells;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
-using namespace OGP::Scripting::Rendering;
-using namespace std;
 
 GardenScript::GardenScript(Node* node) :
 	Script(node),
@@ -304,7 +309,7 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 			default:
 				entity = entity_node->AddScript<EntityScript>();
 			}
-			entity->OnDeinitialized += [this, entity = weak_ptr<EntityScript>(entity)](Game& game) {
+			entity->OnDeinitialized += [this, entity = weak_ptr<EntityScript>(entity)](Engine& engine) {
 				if (shared_ptr<EntityScript> current_entity = entity.lock()) {
 					this->RemoveEntity(current_entity);
 				}

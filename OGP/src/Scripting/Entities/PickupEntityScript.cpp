@@ -1,18 +1,21 @@
 #include <memory>
 
+#include <Klein/Math/Vector2.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+
 #include <OGP/Entities/EGardenEntityType.hpp>
-#include <OGP/Math/Vector2.hpp>
-#include <OGP/SceneManagement/Node.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/PickupEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
+using namespace std;
+
+using namespace Klein::Math;
+using namespace Klein::SceneManagement;
+
 using namespace OGP::Entities;
-using namespace OGP::Math;
-using namespace OGP::SceneManagement;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
-using namespace std;
 
 PickupEntityScript::PickupEntityScript(Node* node) : EntityScript(node) {
 	// ...

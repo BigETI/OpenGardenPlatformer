@@ -17,7 +17,7 @@ set_property (TARGET OGPGame
 )
 
 target_compile_definitions (OGPGame
-	PRIVATE IS_OPEN_GARDEN_PLATFORMER_STATIC
+	PRIVATE IS_OGP_STATIC
 )
 
 #target_include_directories (OGPGame

@@ -2,28 +2,31 @@
 #include <cstddef>
 #include <memory>
 
+#include <Klein/Engine.hpp>
+#include <Klein/Math/Vector2.hpp>
+#include <Klein/ResourceManagement/ResourceID.hpp>
+#include <Klein/SceneManagement/Node.hpp>
+#include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
+#include <Klein/Scripting/Script.hpp>
+
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
-#include <OGP/Game.hpp>
-#include <OGP/Math/Vector2.hpp>
-#include <OGP/ResourceManagement/ResourceID.hpp>
-#include <OGP/SceneManagement/Node.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
-#include <OGP/Scripting/Rendering/SpriteRendererScript.hpp>
-#include <OGP/Scripting/Script.hpp>
 
-using namespace OGP;
+using namespace std;
+using namespace std::chrono;
+
+using namespace Klein;
+using namespace Klein::Math;
+using namespace Klein::ResourceManagement;
+using namespace Klein::SceneManagement;
+using namespace Klein::Scripting::Rendering;
+
 using namespace OGP::Entities;
-using namespace OGP::Math;
-using namespace OGP::ResourceManagement;
-using namespace OGP::SceneManagement;
 using namespace OGP::Scripting;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
-using namespace OGP::Scripting::Rendering;
-using namespace std;
-using namespace std::chrono;
 
 const ResourceID debugEntitiesTextureResourceID("Debug/Textures/Entities.png");
 const Vector2<float> debugEntitySourceRectangleSize(Vector2<float>(1.0f, 1.0f) / 8.0f);
@@ -112,7 +115,7 @@ bool EntityScript::Interact(EntityScript& sourceEntity) {
 	return false;
 }
 
-void EntityScript::OnBeforeFrameRender(Game& game, high_resolution_clock::duration deltaTime) {
+void EntityScript::OnBeforeFrameRender(Engine& engine, high_resolution_clock::duration deltaTime) {
 	if (shared_ptr<SpriteRendererScript> sprite_renderer = spriteRenderer.lock()) {
 		GetNode().SetLocalPosition(GetToBeRenderedPosition());
 	}

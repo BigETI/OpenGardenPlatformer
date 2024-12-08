@@ -17,7 +17,7 @@ set_property (TARGET OGPEditor
 )
 
 target_compile_definitions (OGPEditor
-	PRIVATE IS_OPEN_GARDEN_PLATFORMER_STATIC
+	PRIVATE IS_OGP_STATIC
 )
 
 target_include_directories (OGPEditor
