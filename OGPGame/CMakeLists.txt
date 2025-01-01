@@ -8,16 +8,12 @@ add_executable (OGPGame
 	"src/main.cpp"
 )
 
-target_compile_features (OGPGame
-	PRIVATE cxx_std_23
-)
-
 set_property (TARGET OGPGame
 	PROPERTY COMPILE_WARNING_AS_ERROR ON
 )
 
-target_compile_definitions (OGPGame
-	PRIVATE IS_OGP_STATIC
+target_compile_features (OGPGame
+	PRIVATE cxx_std_23
 )
 
 #target_include_directories (OGPGame

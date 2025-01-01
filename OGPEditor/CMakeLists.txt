@@ -8,20 +8,16 @@ add_executable (OGPEditor
 	"src/main.cpp"
 )
 
-target_compile_features (OGPEditor
-	PRIVATE cxx_std_23
-)
-
 set_property (TARGET OGPEditor
 	PROPERTY COMPILE_WARNING_AS_ERROR ON
 )
 
-target_compile_definitions (OGPEditor
-	PRIVATE IS_OGP_STATIC
+target_compile_features (OGPEditor
+	PRIVATE cxx_std_23
 )
 
 target_include_directories (OGPEditor
-	PUBLIC "include"
+	PRIVATE "include"
 )
 
 target_link_libraries (OGPEditor

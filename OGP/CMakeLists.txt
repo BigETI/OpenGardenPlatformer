@@ -83,25 +83,25 @@ add_library (OGP SHARED
 	"src/Serialization/LegacyGardenCollectionDeserializer.cpp"
 )
 
-target_compile_features (OGP
-	PRIVATE cxx_std_23
-)
-
 set_property (TARGET OGP
 	PROPERTY COMPILE_WARNING_AS_ERROR ON
 )
 
-target_link_libraries (OGP
-	PUBLIC Klein
-	PUBLIC magic_enum
+target_compile_features (OGP
+	PRIVATE cxx_std_23
 )
 
 target_compile_definitions (OGP
 	PUBLIC IS_OGP_EXPORTING
 )
 
-include_directories (OGP
+target_include_directories (OGP
 	PUBLIC "include"
+)
+
+target_link_libraries (OGP
+	PUBLIC Klein
+	PUBLIC magic_enum
 )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
