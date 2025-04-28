@@ -1,13 +1,15 @@
 #pragma once
 
+#include <chrono>
 #include <cstddef>
 #include <memory>
-#include <chrono>
 
 #include <Klein/Engine.hpp>
 #include <Klein/EventSystem/Event.hpp>
 #include <Klein/Math/Vector2.hpp>
+#include <Klein/Physics/Intersection.hpp>
 #include <Klein/SceneManagement/Node.hpp>
+#include <Klein/Scripting/Physics/AABBColliderScript.hpp>
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 
 #include "../../Entities/GardenEntityData.hpp"
@@ -46,6 +48,7 @@ namespace OGP::Scripting::Entities {
 		Klein::Math::Vector2<std::size_t> targetPosition;
 		float movementProgress;
 		Klein::Math::Vector2<float> toBeRenderedAtOffset;
+		std::weak_ptr<Klein::Scripting::Physics::AABBColliderScript> collider;
 
 		// TODO: Separate to an input handling script
 		bool isWalkingLeft;
@@ -54,5 +57,6 @@ namespace OGP::Scripting::Entities {
 		bool isWalkingDown;
 		bool isDiggingLeft;
 		bool isDiggingRight;
+
 	};
 }

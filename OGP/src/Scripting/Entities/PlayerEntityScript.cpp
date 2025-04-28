@@ -3,10 +3,13 @@
 #include <memory>
 
 #include <Klein/Engine.hpp>
+#include <Klein/Math/Bounds.hpp>
 #include <Klein/Math/Vector2.hpp>
 #include <Klein/Hashing/StringHash.hpp>
+#include <Klein/Physics/Intersection.hpp>
 #include <Klein/ResourceManagement/ResourceID.hpp>
 #include <Klein/SceneManagement/Node.hpp>
+#include <Klein/Scripting/Physics/AABBColliderScript.hpp>
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 
 #include <OGP/Entities/GardenEntityData.hpp>
@@ -20,8 +23,10 @@ using namespace std::chrono;
 using namespace Klein;
 using namespace Klein::Math;
 using namespace Klein::Hashing;
+using namespace Klein::Physics;
 using namespace Klein::ResourceManagement;
 using namespace Klein::SceneManagement;
+using namespace Klein::Scripting::Physics;
 using namespace Klein::Scripting::Rendering;
 
 using namespace OGP::Entities;
@@ -50,6 +55,9 @@ PlayerEntityScript::PlayerEntityScript(Node* node) :
 	if (shared_ptr<SpriteRendererScript> sprite_renderer = GetSpriteRenderer().lock()) {
 		sprite_renderer->SetLayerIndex(0U);
 	}
+	shared_ptr<AABBColliderScript> collider(GetNode().CreateNewChild()->EnsureScript<AABBColliderScript>());
+	collider->SetLocalCollisionRectangle(Rectangle<float>(Vector2<float>(), Vector2<float>(0.5f, 0.875f)));
+	this->collider = collider;
 }
 
 bool PlayerEntityScript::IsAlive() const noexcept {
@@ -255,6 +263,19 @@ void PlayerEntityScript::OnGameTick(Engine& engine, high_resolution_clock::durat
 					}
 				}
 			} while (movementProgress >= 1.0f);
+		}
+		if (shared_ptr<AABBColliderScript> collider = this->collider.lock()) {
+			collider->EnumerateIntersections(
+				[this](Intersection intersection) {
+					Node* parent(intersection.destinationCollider->GetNode().GetParent());
+					if (parent) {
+						shared_ptr<EntityScript> entity;
+						if (parent->TryGettingScript<EntityScript>(entity) && entity->IsDeadly()) {
+							Kill();
+						}
+					}
+				}
+			);
 		}
 	}
 }

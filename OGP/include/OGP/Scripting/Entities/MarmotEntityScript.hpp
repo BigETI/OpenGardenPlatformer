@@ -14,6 +14,8 @@ namespace OGP::Scripting::Entities {
 
 		OGP_API MarmotEntityScript(Klein::SceneManagement::Node* node);
 
+		OGP_API virtual bool IsDeadly() const noexcept override;
+
 	protected:
 
 		OGP_API virtual void OnGameTick(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;

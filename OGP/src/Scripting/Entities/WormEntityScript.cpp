@@ -4,8 +4,10 @@
 
 #include <Klein/Engine.hpp>
 #include <Klein/Math/Easing.hpp>
+#include <Klein/Math/Rectangle.hpp>
 #include <Klein/Math/Vector2.hpp>
 #include <Klein/SceneManagement/Node.hpp>
+#include <Klein/Scripting/Physics/AABBColliderScript.hpp>
 
 #include <OGP/Entities/EWormMovementState.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
@@ -20,6 +22,7 @@ using namespace std::chrono;
 using namespace Klein;
 using namespace Klein::Math;
 using namespace Klein::SceneManagement;
+using namespace Klein::Scripting::Physics;
 
 using namespace OGP::Entities;
 using namespace OGP::Scripting::Entities;
@@ -33,7 +36,8 @@ WormEntityScript::WormEntityScript(Node* node) :
 	movementProgress(0.0f),
 	hasStartedToMove(true),
 	isFinishingToMove(false) {
-	// ...
+	shared_ptr<AABBColliderScript> collider(GetNode().CreateNewChild()->EnsureScript<AABBColliderScript>());
+	collider->SetLocalCollisionRectangle(Rectangle<float>(Vector2<float>(0.0f, -0.375f), Vector2<float>(1.0f, 0.25f)));
 }
 
 Vector2<float> WormEntityScript::GetToBeRenderedPosition() const noexcept {
@@ -47,6 +51,10 @@ Vector2<float> WormEntityScript::GetToBeRenderedPosition() const noexcept {
 		break;
 	}
 	return ret;
+}
+
+bool WormEntityScript::IsDeadly() const noexcept {
+	return true;
 }
 
 void WormEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_ptr<GardenScript> garden) {
@@ -65,16 +73,6 @@ void WormEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_pt
 	movementProgress = 0.0f;
 	hasStartedToMove = true;
 	EntityScript::Spawn(gardenEntityData, garden);
-}
-
-bool WormEntityScript::Interact(EntityScript& sourceEntity) {
-	bool ret(false);
-	if (sourceEntity.GetCurrentPosition() == GetCurrentPosition()) {
-		if (PlayerEntityScript* player_entity = dynamic_cast<PlayerEntityScript*>(&sourceEntity)) {
-			ret = player_entity->Kill();
-		}
-	}
-	return ret;
 }
 
 void WormEntityScript::OnGameTick(Engine& engine, high_resolution_clock::duration deltaTime) {

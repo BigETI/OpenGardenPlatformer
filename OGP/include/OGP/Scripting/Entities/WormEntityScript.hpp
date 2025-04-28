@@ -21,8 +21,8 @@ namespace OGP::Scripting::Entities {
 		OGP_API WormEntityScript(Klein::SceneManagement::Node* node);
 
 		OGP_API virtual Klein::Math::Vector2<float> GetToBeRenderedPosition() const noexcept override;
+		OGP_API virtual bool IsDeadly() const noexcept override;
 		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
-		OGP_API virtual bool Interact(EntityScript& sourceEntity) override;
 
 	protected:
 

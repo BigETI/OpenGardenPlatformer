@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <Klein/Engine.hpp>
+#include <Klein/Math/Rectangle.hpp>
 #include <Klein/Math/Vector2.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
@@ -30,6 +31,7 @@ namespace OGP::Scripting::Entities {
 		OGP_API const Klein::Math::Vector2<std::size_t>& GetCurrentPosition() const noexcept;
 		OGP_API virtual Klein::Math::Vector2<float> GetToBeRenderedPosition() const noexcept;
 		OGP_API void SetCurrentPosition(const Klein::Math::Vector2<std::size_t>& currentPosition) noexcept;
+		OGP_API virtual bool IsDeadly() const noexcept;
 		OGP_API std::weak_ptr<Klein::Scripting::Rendering::SpriteRendererScript> GetSpriteRenderer() const noexcept;
 		OGP_API std::weak_ptr<OGP::Scripting::Environment::GardenScript> GetGarden() const noexcept;
 		OGP_API std::weak_ptr<EntityScript> GetMountedAtEntity() const noexcept;

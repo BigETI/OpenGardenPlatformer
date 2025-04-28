@@ -16,13 +16,21 @@ set (FETCHCONTENT_QUIET FALSE)
 
 set (KLEIN_DISABLE_TESTS ON)
 
+if (OGP_USE_LOCAL_KLEIN_DEPENDENCY)
+#FetchContent_Declare (Klein
+#	GIT_REPOSITORY "../../../../../Klein"
+#	GIT_TAG "dev"
+#	GIT_SHALLOW TRUE
+#)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../Klein" Klein)
+else()
 FetchContent_Declare (Klein
 	GIT_REPOSITORY https://github.com/BigETI/Klein.git
 	GIT_TAG "dev"
 	GIT_SHALLOW TRUE
 )
-
 FetchContent_MakeAvailable (Klein)
+endif()
 
 ################
 #              #

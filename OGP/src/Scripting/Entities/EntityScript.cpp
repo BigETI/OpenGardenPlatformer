@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <Klein/Engine.hpp>
+#include <Klein/Math/Bounds.hpp>
 #include <Klein/Math/Vector2.hpp>
 #include <Klein/ResourceManagement/ResourceID.hpp>
 #include <Klein/SceneManagement/Node.hpp>
@@ -31,7 +32,7 @@ using namespace OGP::Scripting::Environment;
 const ResourceID debugEntitiesTextureResourceID("Debug/Textures/Entities.png");
 const Vector2<float> debugEntitySourceRectangleSize(Vector2<float>(1.0f, 1.0f) / 8.0f);
 
-Rectangle<float> GetDebugEntitySourceRectangle(EGardenEntityType gardenEntityType) {
+constexpr static Rectangle<float> GetDebugEntitySourceRectangle(EGardenEntityType gardenEntityType) {
 	return Rectangle<float>(Vector2<float>(static_cast<float>(static_cast<int>(gardenEntityType) % 8), static_cast<float>(static_cast<int>(gardenEntityType) / 8)) / 8.0f, debugEntitySourceRectangleSize);
 }
 
@@ -63,6 +64,10 @@ Vector2<float> EntityScript::GetToBeRenderedPosition() const noexcept {
 
 void EntityScript::SetCurrentPosition(const Vector2<size_t>& currentPosition) noexcept {
 	this->currentPosition = currentPosition;
+}
+
+bool EntityScript::IsDeadly() const noexcept {
+	return false;
 }
 
 weak_ptr<SpriteRendererScript> EntityScript::GetSpriteRenderer() const noexcept {
