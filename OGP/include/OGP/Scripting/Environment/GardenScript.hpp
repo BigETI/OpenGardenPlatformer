@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -39,21 +40,31 @@ namespace OGP::Scripting::Environment {
 		OGP_API const Klein::Collections::ResizableGrid<std::weak_ptr<OGP::Scripting::Cells::CellScript>>& GetGardenCells() const noexcept;
 		OGP_API Klein::Collections::ResizableGrid<std::weak_ptr<OGP::Scripting::Cells::CellScript>>& GetGardenCells() noexcept;
 		OGP_API const std::vector<std::weak_ptr<OGP::Scripting::Entities::EntityScript>>& GetEntities() const noexcept;
+		
+		template <typename TEntityScript = OGP::Scripting::Entities::EntityScript>
+		constexpr inline void EnumerateEntities(const std::function<void(const TEntityScript& entity)>& onEntityEnumerated) const noexcept {
+			for (const auto& entity_ptr : entities) {
+				if (std::shared_ptr<TEntityScript> entity = std::dynamic_pointer_cast<TEntityScript>(entity_ptr.lock())) {
+					onEntityEnumerated(*(entity.get()));
+				}
+			}
+		}
+		
 		OGP_API bool TryGettingEntity(const OGP::Scripting::Entities::EntityScript& entity, std::shared_ptr<OGP::Scripting::Entities::EntityScript>& result) const noexcept;
 		OGP_API bool RemoveEntity(std::shared_ptr<OGP::Scripting::Entities::EntityScript> entity) noexcept;
 		OGP_API std::size_t GetHarvestableCount() const noexcept;
 		OGP_API void IncrementHarvestableCount() noexcept;
 		OGP_API void DecrementHarvestableCount() noexcept;
-		std::size_t GetRedKeyCount() const noexcept;
-		std::size_t GetYellowKeyCount() const noexcept;
-		std::size_t GetGreenKeyCount() const noexcept;
+		OGP_API std::size_t GetRedKeyCount() const noexcept;
+		OGP_API std::size_t GetYellowKeyCount() const noexcept;
+		OGP_API std::size_t GetGreenKeyCount() const noexcept;
 		OGP_API void AddRedKey() noexcept;
 		OGP_API bool UseRedKey() noexcept;
 		OGP_API void AddYellowKey() noexcept;
 		OGP_API bool UseYellowKey() noexcept;
 		OGP_API void AddGreenKey() noexcept;
 		OGP_API bool UseGreenKey() noexcept;
-		bool IsCompletionEnabled() const noexcept;
+		OGP_API bool IsCompletionEnabled() const noexcept;
 		OGP_API void LoadGardenFromGardenData(const OGP::Environment::GardenData& gardenData);
 		OGP_API std::shared_ptr<OGP::Scripting::Cells::CellScript> GetCellAt(const Klein::Math::Vector2<std::size_t>& position) const noexcept;
 		OGP_API std::vector<std::shared_ptr<OGP::Scripting::Entities::EntityScript>>& GetEntitiesAt(const Klein::Math::Vector2<std::size_t>& position, std::vector<std::shared_ptr<OGP::Scripting::Entities::EntityScript>>& result) const noexcept;

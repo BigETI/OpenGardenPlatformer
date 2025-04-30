@@ -1,46 +1,46 @@
 #pragma once
 
 #include <chrono>
+#include <cstddef>
 #include <memory>
 
 #include <Klein/Engine.hpp>
-#include <Klein/EventSystem/Event.hpp>
+#include <Klein/Math/Vector2.hpp>
 #include <Klein/SceneManagement/Node.hpp>
-#include <Klein/Scripting/Physics/AABBColliderScript.hpp>
 
 #include "../../Entities/GardenEntityData.hpp"
 #include "../../Entities/HumanoidInput.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "../Environment/GardenScript.hpp"
-#include "HumanoidEntityScript.hpp"
+#include "EntityScript.hpp"
 
 namespace OGP::Scripting::Environment {
 	class GardenScript;
 }
 
 namespace OGP::Scripting::Entities {
-	class PlayerEntityScript : public HumanoidEntityScript {
+	class HumanoidEntityScript : public EntityScript {
 	public:
 
-		Klein::EventSystem::Event<> OnDied;
-		Klein::EventSystem::Event<> OnWon;
+		OGP_API HumanoidEntityScript(Klein::SceneManagement::Node* node);
 
-		OGP_API PlayerEntityScript(Klein::SceneManagement::Node* node);
-
-		OGP_API virtual bool IsAlive() const noexcept override;
-		OGP_API virtual bool Kill() override;
-		OGP_API virtual bool Win() override;
+		OGP_API virtual bool IsAlive() const noexcept;
+		OGP_API virtual float GetMaximalMovementSpeed() const noexcept;
+		OGP_API virtual bool Kill();
+		OGP_API virtual bool Win();
+		OGP_API virtual Klein::Math::Vector2<float> GetToBeRenderedPosition() const noexcept override;
 		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
-		
+
 	protected:
 
-		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine) override;
+		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine);
 		OGP_API virtual void OnGameTick(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
 
 	private:
 
-		bool isAlive;
-		bool hasNotWonYet;
-		std::weak_ptr<Klein::Scripting::Physics::AABBColliderScript> collider;
+		OGP::Entities::HumanoidInput input;
+		Klein::Math::Vector2<std::size_t> targetPosition;
+		float movementProgress;
+		Klein::Math::Vector2<float> toBeRenderedAtOffset;
 	};
 }

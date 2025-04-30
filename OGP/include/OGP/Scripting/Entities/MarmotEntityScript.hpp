@@ -1,15 +1,14 @@
 #pragma once
 
-#include <chrono>
-
 #include <Klein/Engine.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 
+#include "../../Entities/HumanoidInput.hpp"
 #include "../../Exportables/Exportable.hxx"
-#include "EntityScript.hpp"
+#include "HumanoidEntityScript.hpp"
 
 namespace OGP::Scripting::Entities {
-	class MarmotEntityScript : public EntityScript {
+	class MarmotEntityScript : public HumanoidEntityScript {
 	public:
 
 		OGP_API MarmotEntityScript(Klein::SceneManagement::Node* node);
@@ -18,6 +17,6 @@ namespace OGP::Scripting::Entities {
 
 	protected:
 
-		OGP_API virtual void OnGameTick(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
+		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine) override;
 	};
 }

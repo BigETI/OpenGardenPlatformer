@@ -13,6 +13,7 @@ add_subdirectory ("deps")
 #################################
 
 add_library (OGPStatic STATIC
+	"src/Entities/HumanoidInput.cpp"
 	"src/Scripting/Cells/CellScript.cpp"
 	"src/Scripting/Cells/ClimbableCellScript.cpp"
 	"src/Scripting/Cells/DeadlyCellScript.cpp"
@@ -22,6 +23,7 @@ add_library (OGPStatic STATIC
 	"src/Scripting/Cells/SolidCellScript.cpp"
 	"src/Scripting/Cells/TopDeadlyCellScript.cpp"
 	"src/Scripting/Entities/EntityScript.cpp"
+	"src/Scripting/Entities/HumanoidEntityScript.cpp"
 	"src/Scripting/Entities/LiftEntityScript.cpp"
 	"src/Scripting/Entities/MarmotEntityScript.cpp"
 	"src/Scripting/Entities/PickupEntityScript.cpp"
@@ -62,6 +64,7 @@ target_link_libraries (OGPStatic
 ##################################
 
 add_library (OGP SHARED
+	"src/Entities/HumanoidInput.cpp"
 	"src/Scripting/Cells/CellScript.cpp"
 	"src/Scripting/Cells/ClimbableCellScript.cpp"
 	"src/Scripting/Cells/DeadlyCellScript.cpp"
@@ -71,6 +74,7 @@ add_library (OGP SHARED
 	"src/Scripting/Cells/SolidCellScript.cpp"
 	"src/Scripting/Cells/TopDeadlyCellScript.cpp"
 	"src/Scripting/Entities/EntityScript.cpp"
+	"src/Scripting/Entities/HumanoidEntityScript.cpp"
 	"src/Scripting/Entities/LiftEntityScript.cpp"
 	"src/Scripting/Entities/MarmotEntityScript.cpp"
 	"src/Scripting/Entities/PickupEntityScript.cpp"

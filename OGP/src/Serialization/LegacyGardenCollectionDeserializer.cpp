@@ -379,7 +379,7 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 					break;
 				case ELegacyGardenEntityType::Marmot:
 					if (entity_type_variant != 0) {
-						cerr << "Invalid player entity type variant \"" << entity_type_variant << "\" at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
+						cerr << "Invalid marmot entity type variant \"" << entity_type_variant << "\" at entity index \"" << entity_index << "\" and garden index \"" << garden_index << "\"." << endl;
 						return false;
 					}
 					entity_data.type = EGardenEntityType::Marmot;
