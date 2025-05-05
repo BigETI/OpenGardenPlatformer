@@ -6,6 +6,7 @@
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/PickupEntityScript.hpp>
+#include <OGP/Scripting/Entities/PlayerEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
 using namespace std;
@@ -23,50 +24,59 @@ PickupEntityScript::PickupEntityScript(Node* node) : EntityScript(node) {
 
 bool PickupEntityScript::Interact(EntityScript& sourceEntity) {
 	bool ret(false);
-	if (GetCurrentPosition() == sourceEntity.GetCurrentPosition()) {
+	PlayerEntityScript* source_player_entity(dynamic_cast<PlayerEntityScript*>(&sourceEntity));
+	if (source_player_entity && (GetCurrentPosition() == sourceEntity.GetCurrentPosition())) {
 		if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
 			ret = true;
 			switch (GetGardenEntityData().type) {
 			case EGardenEntityType::RedKey:
-				garden->AddRedKey();
+				source_player_entity->AddRedKey();
 				break;
 			case EGardenEntityType::YellowKey:
-				garden->AddYellowKey();
+				source_player_entity->AddYellowKey();
 				break;
 			case EGardenEntityType::GreenKey:
-				garden->AddGreenKey();
+				source_player_entity->AddGreenKey();
 				break;
 			case EGardenEntityType::Apple:
-			case EGardenEntityType::Sunflower:
 				garden->DecrementHarvestableCount();
-				garden->AddScore(static_cast<size_t>(100));
+				source_player_entity->AddScore(static_cast<size_t>(100));
 				break;
 			case EGardenEntityType::Lemon:
-			case EGardenEntityType::Tulip:
 				garden->DecrementHarvestableCount();
-				garden->AddScore(static_cast<size_t>(80));
+				source_player_entity->AddScore(static_cast<size_t>(80));
 				break;
 			case EGardenEntityType::Cherry:
 			case EGardenEntityType::Spinach:
-			case EGardenEntityType::YellowDaisy:
 				garden->DecrementHarvestableCount();
-				garden->AddScore(static_cast<size_t>(60));
+				source_player_entity->AddScore(static_cast<size_t>(60));
 				break;
 			case EGardenEntityType::Pineapple:
 			case EGardenEntityType::Carrot:
-			case EGardenEntityType::Rose:
 				garden->DecrementHarvestableCount();
-				garden->AddScore(static_cast<size_t>(40));
+				source_player_entity->AddScore(static_cast<size_t>(40));
 				break;
 			case EGardenEntityType::Garlic:
 				garden->DecrementHarvestableCount();
-				garden->AddScore(static_cast<size_t>(100));
-				// TODO: Implement logic for garlic
+				source_player_entity->ActivateGarlicEffect();
+				source_player_entity->AddScore(static_cast<size_t>(100));
 				break;
 			case EGardenEntityType::Mushroom:
 				garden->DecrementHarvestableCount();
-				garden->AddScore(static_cast<size_t>(80));
-				// TODO: Implement logic for mushroom
+				source_player_entity->ActivateMushroomEffect();
+				source_player_entity->AddScore(static_cast<size_t>(80));
+				break;
+			case EGardenEntityType::Sunflower:
+				source_player_entity->AddScore(static_cast<size_t>(100));
+				break;
+			case EGardenEntityType::Tulip:
+				source_player_entity->AddScore(static_cast<size_t>(80));
+				break;
+			case EGardenEntityType::YellowDaisy:
+				source_player_entity->AddScore(static_cast<size_t>(60));
+				break;
+			case EGardenEntityType::Rose:
+				source_player_entity->AddScore(static_cast<size_t>(40));
 				break;
 			default:
 				ret = false;
@@ -83,15 +93,11 @@ void PickupEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_
 	EntityScript::Spawn(gardenEntityData, garden);
 	switch (GetGardenEntityData().type) {
 	case EGardenEntityType::Apple:
-	case EGardenEntityType::Sunflower:
 	case EGardenEntityType::Lemon:
-	case EGardenEntityType::Tulip:
 	case EGardenEntityType::Cherry:
 	case EGardenEntityType::Spinach:
-	case EGardenEntityType::YellowDaisy:
 	case EGardenEntityType::Pineapple:
 	case EGardenEntityType::Carrot:
-	case EGardenEntityType::Rose:
 	case EGardenEntityType::Garlic:
 	case EGardenEntityType::Mushroom:
 		garden->IncrementHarvestableCount();

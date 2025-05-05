@@ -9,6 +9,7 @@
 
 #include <OGP/Cells/EGardenCellType.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
+#include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
 using namespace std;
@@ -20,6 +21,7 @@ using namespace Klein::Scripting::Rendering;
 
 using namespace OGP::Cells;
 using namespace OGP::Scripting::Cells;
+using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
 const ResourceID debugCellsTextureResourceID(string("Debug/Textures/Cells.png"));
@@ -100,6 +102,6 @@ bool CellScript::Dig() noexcept {
 	return false;
 }
 
-bool CellScript::Interact() noexcept {
+bool CellScript::Interact(EntityScript& sourceEntity) noexcept {
 	return false;
 }

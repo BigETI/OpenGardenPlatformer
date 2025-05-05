@@ -86,7 +86,9 @@ All items need to be collected in order to make a garden finishable
     - Makes invisible and invincible for 10 seconds
 - Spinach (60 points)
 - Carrot (40 points)
-- Flowers
+
+### Flowers
+
 - Sunflower (100 points)
 - Tulip (80 points)
 - Yellow daisy (60 points)

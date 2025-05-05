@@ -6,6 +6,7 @@
 #include <Klein/SceneManagement/Node.hpp>
 
 #include "../../Exportables/Exportable.hxx"
+#include "../Entities/EntityScript.hpp"
 #include "CellScript.hpp"
 
 namespace OGP::Scripting::Cells {
@@ -16,7 +17,7 @@ namespace OGP::Scripting::Cells {
 
 		OGP_API virtual bool IsSolid() const noexcept override;
 		OGP_API virtual bool IsTopDeadly() const noexcept override;
-		OGP_API virtual bool Interact() noexcept override;
+		OGP_API virtual bool Interact(OGP::Scripting::Entities::EntityScript& sourceEntity) noexcept override;
 
 	protected:
 

@@ -34,9 +34,6 @@ namespace OGP::Scripting::Environment {
 		OGP_API const std::string& GetGardenName() const noexcept;
 		OGP_API std::string& GetGardenName(std::string& result) const;
 		OGP_API std::size_t GetTimeInGameSeconds() const noexcept;
-		OGP_API std::size_t GetScore() const noexcept;
-		OGP_API void SetScore(std::size_t score) noexcept;
-		OGP_API void AddScore(std::size_t score) noexcept;
 		OGP_API const Klein::Collections::ResizableGrid<std::weak_ptr<OGP::Scripting::Cells::CellScript>>& GetGardenCells() const noexcept;
 		OGP_API Klein::Collections::ResizableGrid<std::weak_ptr<OGP::Scripting::Cells::CellScript>>& GetGardenCells() noexcept;
 		OGP_API const std::vector<std::weak_ptr<OGP::Scripting::Entities::EntityScript>>& GetEntities() const noexcept;
@@ -55,15 +52,6 @@ namespace OGP::Scripting::Environment {
 		OGP_API std::size_t GetHarvestableCount() const noexcept;
 		OGP_API void IncrementHarvestableCount() noexcept;
 		OGP_API void DecrementHarvestableCount() noexcept;
-		OGP_API std::size_t GetRedKeyCount() const noexcept;
-		OGP_API std::size_t GetYellowKeyCount() const noexcept;
-		OGP_API std::size_t GetGreenKeyCount() const noexcept;
-		OGP_API void AddRedKey() noexcept;
-		OGP_API bool UseRedKey() noexcept;
-		OGP_API void AddYellowKey() noexcept;
-		OGP_API bool UseYellowKey() noexcept;
-		OGP_API void AddGreenKey() noexcept;
-		OGP_API bool UseGreenKey() noexcept;
 		OGP_API bool IsCompletionEnabled() const noexcept;
 		OGP_API void LoadGardenFromGardenData(const OGP::Environment::GardenData& gardenData);
 		OGP_API std::shared_ptr<OGP::Scripting::Cells::CellScript> GetCellAt(const Klein::Math::Vector2<std::size_t>& position) const noexcept;
@@ -82,12 +70,8 @@ namespace OGP::Scripting::Environment {
 
 		std::string gardenName;
 		std::size_t timeInGameSeconds;
-		std::size_t score;
 		Klein::Collections::ResizableGrid<std::weak_ptr<OGP::Scripting::Cells::CellScript>> gardenCells;
 		std::vector<std::weak_ptr<OGP::Scripting::Entities::EntityScript>> entities;
 		std::size_t harvestableCount;
-		std::size_t redKeyCount;
-		std::size_t yellowKeyCount;
-		std::size_t greenKeyCount;
 	};
 }

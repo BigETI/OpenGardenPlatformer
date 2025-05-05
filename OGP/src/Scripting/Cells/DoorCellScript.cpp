@@ -10,6 +10,8 @@
 #include <OGP/Cells/EGardenCellType.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/DoorCellScript.hpp>
+#include <OGP/Scripting/Entities/EntityScript.hpp>
+#include <OGP/Scripting/Entities/PlayerEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
 using namespace std;
@@ -22,6 +24,7 @@ using namespace Klein::Scripting::Rendering;
 
 using namespace OGP::Cells;
 using namespace OGP::Scripting::Cells;
+using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
 DoorCellScript::DoorCellScript(Node* node) : CellScript(node), isOpen(false) {
@@ -36,32 +39,33 @@ bool DoorCellScript::IsTopDeadly() const noexcept {
 	return true;
 }
 
-bool DoorCellScript::Interact() noexcept {
+bool DoorCellScript::Interact(EntityScript& sourceEntity) noexcept {
 	bool ret(false);
-	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
+	if (PlayerEntityScript* source_player_entity = dynamic_cast<PlayerEntityScript*>(&sourceEntity)) {
 		switch (GetGardenCellType()) {
 		case EGardenCellType::RedDoor:
 		case EGardenCellType::AutomaticallyClosingRedDoor:
-			ret = garden->UseRedKey();
+			ret = source_player_entity->UseRedKey();
 			if (ret) {
 				isOpen = true;
 			}
 			break;
 		case EGardenCellType::YellowDoor:
 		case EGardenCellType::AutomaticallyClosingYellowDoor:
-			ret = garden->UseYellowKey();
+			ret = source_player_entity->UseYellowKey();
 			if (ret) {
 				isOpen = true;
 			}
 			break;
 		case EGardenCellType::GreenDoor:
 		case EGardenCellType::AutomaticallyClosingGreenDoor:
-			ret = garden->UseGreenKey();
+			ret = source_player_entity->UseGreenKey();
 			if (ret) {
 				isOpen = true;
 			}
 			break;
 		default:
+			break;
 		}
 	}
 	return ret;

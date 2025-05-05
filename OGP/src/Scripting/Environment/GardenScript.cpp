@@ -53,11 +53,7 @@ using namespace OGP::Scripting::Environment;
 GardenScript::GardenScript(Node* node) :
 	Script(node),
 	timeInGameSeconds(static_cast<size_t>(0)),
-	score(static_cast<size_t>(0)),
-	harvestableCount(static_cast<size_t>(0)),
-	redKeyCount(static_cast<size_t>(0)),
-	yellowKeyCount(static_cast<size_t>(0)),
-	greenKeyCount(static_cast<size_t>(0)) {
+	harvestableCount(static_cast<size_t>(0)) {
 	// ...
 }
 
@@ -71,17 +67,6 @@ string& GardenScript::GetGardenName(std::string& result) const {
 
 size_t GardenScript::GetTimeInGameSeconds() const noexcept {
 	return timeInGameSeconds;
-}
-size_t GardenScript::GetScore() const noexcept {
-	return score;
-}
-
-void GardenScript::SetScore(size_t score) noexcept {
-	this->score = score;
-}
-
-void GardenScript::AddScore(size_t score) noexcept {
-	SetScore(this->score + score);
 }
 
 const ResizableGrid<weak_ptr<CellScript>>& GardenScript::GetGardenCells() const noexcept {
@@ -138,54 +123,6 @@ void GardenScript::DecrementHarvestableCount() noexcept {
 	if (harvestableCount > static_cast<size_t>(0)) {
 		--harvestableCount;
 	}
-}
-
-size_t GardenScript::GetRedKeyCount() const noexcept {
-	return redKeyCount;
-}
-
-size_t GardenScript::GetYellowKeyCount() const noexcept {
-	return yellowKeyCount;
-}
-
-size_t GardenScript::GetGreenKeyCount() const noexcept {
-	return greenKeyCount;
-}
-
-void GardenScript::AddRedKey() noexcept {
-	++redKeyCount;
-}
-
-bool GardenScript::UseRedKey() noexcept {
-	bool ret(redKeyCount > static_cast<size_t>(0));
-	if (ret) {
-		--redKeyCount;
-	}
-	return ret;
-}
-
-void GardenScript::AddYellowKey() noexcept {
-	++yellowKeyCount;
-}
-
-bool GardenScript::UseYellowKey() noexcept {
-	bool ret(yellowKeyCount > static_cast<size_t>(0));
-	if (ret) {
-		--yellowKeyCount;
-	}
-	return ret;
-}
-
-void GardenScript::AddGreenKey() noexcept {
-	++greenKeyCount;
-}
-
-bool GardenScript::UseGreenKey() noexcept {
-	bool ret(greenKeyCount > static_cast<size_t>(0));
-	if (ret) {
-		--greenKeyCount;
-	}
-	return ret;
 }
 
 bool GardenScript::IsCompletionEnabled() const noexcept {
@@ -392,7 +329,7 @@ bool GardenScript::InteractAt(const Vector2<size_t>& position, EntityScript& sou
 	bool ret(false);
 	shared_ptr<CellScript> garden_cell(GetCellAt(position));
 	vector<shared_ptr<EntityScript>> target_entities;
-	ret = garden_cell && garden_cell->Interact();
+	ret = garden_cell && garden_cell->Interact(sourceEntity);
 	for (const auto& target_entity : GetEntitiesAt(position, target_entities)) {
 		if (target_entity.get() != &sourceEntity) {
 			ret = target_entity->Interact(sourceEntity) || ret;

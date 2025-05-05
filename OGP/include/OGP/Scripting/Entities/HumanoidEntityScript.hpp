@@ -10,6 +10,7 @@
 
 #include "../../Entities/GardenEntityData.hpp"
 #include "../../Entities/HumanoidInput.hpp"
+#include "../../Environment/EKillerType.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "../Environment/GardenScript.hpp"
 #include "EntityScript.hpp"
@@ -26,7 +27,7 @@ namespace OGP::Scripting::Entities {
 
 		OGP_API virtual bool IsAlive() const noexcept;
 		OGP_API virtual float GetMaximalMovementSpeed() const noexcept;
-		OGP_API virtual bool Kill();
+		OGP_API virtual bool Kill(OGP::Environment::EKillerType killerType);
 		OGP_API virtual bool Win();
 		OGP_API virtual Klein::Math::Vector2<float> GetToBeRenderedPosition() const noexcept override;
 		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;

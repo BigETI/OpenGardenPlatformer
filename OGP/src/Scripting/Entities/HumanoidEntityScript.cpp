@@ -8,6 +8,7 @@
 
 #include <OGP/Entities/GardenEntityData.hpp>
 #include <OGP/Entities/HumanoidInput.hpp>
+#include <OGP/Environment/EKillerType.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/HumanoidEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
@@ -20,6 +21,7 @@ using namespace Klein::Math;
 using namespace Klein::SceneManagement;
 
 using namespace OGP::Entities;
+using namespace OGP::Environment;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
@@ -37,7 +39,7 @@ float HumanoidEntityScript::GetMaximalMovementSpeed() const noexcept {
 	return 10.0f;
 }
 
-bool HumanoidEntityScript::Kill() {
+bool HumanoidEntityScript::Kill(EKillerType killerType) {
 	return false;
 }
 
@@ -98,7 +100,7 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, high_resolution_clock::dur
 					break;
 				}
 				if (current_garden->IsDeadlyAt(current_position) || current_garden->IsSolidAt(current_position)) {
-					if (Kill()) {
+					if (Kill(EKillerType::Cell)) {
 						toBeRenderedAtOffset = Vector2<float>();
 					}
 					break;
@@ -108,7 +110,7 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, high_resolution_clock::dur
 				if (current_position.y > static_cast<size_t>(0)) {
 					Vector2<size_t> bottom_position(current_position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
 					if (current_garden->IsSolidAt(bottom_position) && current_garden->IsTopDeadlyAt(bottom_position)) {
-						if (Kill()) {
+						if (Kill(EKillerType::Cell)) {
 							toBeRenderedAtOffset = Vector2<float>();
 						}
 						break;
@@ -146,7 +148,7 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, high_resolution_clock::dur
 					if (!mounted_at_entity && (current_position.y > static_cast<size_t>(0)) && !current_garden->IsSolidAt(current_position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)))) {
 						is_not_moving = false;
 						if ((movement_progress >= 0.5f) && current_garden->IsTopDeadlyAt(current_position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)))) {
-							Kill();
+							Kill(EKillerType::Cell);
 							break;
 						}
 						if (movement_progress >= 1.0f) {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstddef>
 #include <memory>
 
 #include <Klein/Engine.hpp>
@@ -10,6 +11,7 @@
 
 #include "../../Entities/GardenEntityData.hpp"
 #include "../../Entities/HumanoidInput.hpp"
+#include "../../Environment/EKillerType.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "../Environment/GardenScript.hpp"
 #include "HumanoidEntityScript.hpp"
@@ -24,12 +26,41 @@ namespace OGP::Scripting::Entities {
 
 		Klein::EventSystem::Event<> OnDied;
 		Klein::EventSystem::Event<> OnWon;
+		Klein::EventSystem::Event<std::size_t> OnScoreChanged;
+		Klein::EventSystem::Event<> OnRedKeyCollected;
+		Klein::EventSystem::Event<> OnRedKeyUsed;
+		Klein::EventSystem::Event<> OnYellowKeyCollected;
+		Klein::EventSystem::Event<> OnYellowKeyUsed;
+		Klein::EventSystem::Event<> OnGreenKeyCollected;
+		Klein::EventSystem::Event<> OnGreenKeyUsed;
+		Klein::EventSystem::Event<> OnGarlicEffectActivated;
+		Klein::EventSystem::Event<> OnGarlicEffectDeactivated;
+		Klein::EventSystem::Event<> OnMushroomEffectActivated;
+		Klein::EventSystem::Event<> OnMushroomEffectDeactivated;
 
 		OGP_API PlayerEntityScript(Klein::SceneManagement::Node* node);
 
 		OGP_API virtual bool IsAlive() const noexcept override;
-		OGP_API virtual bool Kill() override;
+		OGP_API virtual bool Kill(OGP::Environment::EKillerType killerType) override;
 		OGP_API virtual bool Win() override;
+		OGP_API std::size_t GetScore() const noexcept;
+		OGP_API void SetScore(std::size_t score) noexcept;
+		OGP_API void AddScore(std::size_t score) noexcept;
+		OGP_API std::size_t GetRedKeyCount() const noexcept;
+		OGP_API std::size_t GetYellowKeyCount() const noexcept;
+		OGP_API std::size_t GetGreenKeyCount() const noexcept;
+		OGP_API void AddRedKey() noexcept;
+		OGP_API bool UseRedKey() noexcept;
+		OGP_API void AddYellowKey() noexcept;
+		OGP_API bool UseYellowKey() noexcept;
+		OGP_API void AddGreenKey() noexcept;
+		OGP_API bool UseGreenKey() noexcept;
+		OGP_API std::chrono::high_resolution_clock::duration GetRemainingGarlicEffectTime() const noexcept;
+		OGP_API std::chrono::high_resolution_clock::duration GetRemainingMushroomEffectTime() const noexcept;
+		OGP_API bool IsGarlicEffectActive() const noexcept;
+		OGP_API void ActivateGarlicEffect() noexcept;
+		OGP_API bool IsMushroomEffectActive() const noexcept;
+		OGP_API void ActivateMushroomEffect() noexcept;
 		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
 		
 	protected:
@@ -41,6 +72,12 @@ namespace OGP::Scripting::Entities {
 
 		bool isAlive;
 		bool hasNotWonYet;
+		std::size_t score;
+		std::size_t redKeyCount;
+		std::size_t yellowKeyCount;
+		std::size_t greenKeyCount;
+		std::chrono::high_resolution_clock::duration remainingGarlicEffectTime;
+		std::chrono::high_resolution_clock::duration remainingMushroomEffectTime;
 		std::weak_ptr<Klein::Scripting::Physics::AABBColliderScript> collider;
 	};
 }

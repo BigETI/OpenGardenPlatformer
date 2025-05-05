@@ -35,15 +35,45 @@ bool MarmotEntityScript::IsDeadly() const noexcept {
 HumanoidInput MarmotEntityScript::GetInput(const Engine& engine) {
 	HumanoidInput ret;
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
+		Vector2<size_t> current_position(GetCurrentPosition());
 		Vector2<size_t> target_position(GetGardenEntityData().position);
 		garden->EnumerateEntities<PlayerEntityScript>(
-			[this, &target_position](const PlayerEntityScript& player) {
+			[this, &current_position, &target_position](const PlayerEntityScript& player) {
 				Vector2<size_t> player_position(player.GetCurrentPosition());
 				if (GetGardenEntityData().bounds.IsContained(player_position.GetConverted<std::int64_t>())) {
-					target_position = player_position;
+					if (player.IsGarlicEffectActive()) {
+						Vector2<int> delta(player_position.GetConverted<int>() - current_position.GetConverted<int>());
+						Vector2<int> unsigned_delta(abs(delta.x), abs(delta.y));
+						if ((unsigned_delta.x <= 2) && (unsigned_delta.y <= 2)) {
+							Vector2<int> to_be_clamped_target_position;
+							if (delta.x < 0) {
+								to_be_clamped_target_position = player_position.GetConverted<int>() + Vector2<int>(2, 0);
+							}
+							else if (delta.x > 0) {
+								to_be_clamped_target_position = player_position.GetConverted<int>() - Vector2<int>(2, 0);
+							}
+							else if (delta.y < 0) {
+								to_be_clamped_target_position = player_position.GetConverted<int>() + Vector2<int>(0, 2);
+							}
+							else if (delta.y > 0) {
+								to_be_clamped_target_position = player_position.GetConverted<int>() - Vector2<int>(0, 2);
+							}
+							else {
+								to_be_clamped_target_position = player_position.GetConverted<int>();
+							}
+							to_be_clamped_target_position.x = max(to_be_clamped_target_position.x, 0);
+							to_be_clamped_target_position.y = max(to_be_clamped_target_position.y, 0);
+							target_position = to_be_clamped_target_position.GetConverted<size_t>();
+						}
+						else {
+							target_position = player_position;
+						}
+					}
+					else {
+						target_position = player_position;
+					}
 				}
 			});
-		Vector2<size_t> current_position(GetCurrentPosition());
 		if (current_position != target_position) {
 			if ((current_position.y < target_position.y) && garden->IsClimbingUpAllowedAt(current_position)) {
 				ret.isWalkingUp = true;
