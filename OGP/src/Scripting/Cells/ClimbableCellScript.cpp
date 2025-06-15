@@ -55,7 +55,7 @@ bool ClimbableCellScript::IsClimbingUpAllowed() const noexcept {
 	return IsClimbable() && (GetGardenCellType() != EGardenCellType::Rope);
 }
 
-void ClimbableCellScript::OnFrameRender(Engine& engine, high_resolution_clock::duration deltaTime) {
+void ClimbableCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
 		if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
 			switch (GetGardenCellType()) {

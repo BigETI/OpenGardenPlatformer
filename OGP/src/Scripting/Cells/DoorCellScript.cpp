@@ -8,6 +8,7 @@
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 
 #include <OGP/Cells/EGardenCellType.hpp>
+#include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/DoorCellScript.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
@@ -23,6 +24,7 @@ using namespace Klein::SceneManagement;
 using namespace Klein::Scripting::Rendering;
 
 using namespace OGP::Cells;
+using namespace OGP::Scripting::Audio;
 using namespace OGP::Scripting::Cells;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
@@ -40,38 +42,56 @@ bool DoorCellScript::IsTopDeadly() const noexcept {
 }
 
 bool DoorCellScript::Interact(EntityScript& sourceEntity) noexcept {
-	bool ret(false);
+	if (isOpen) {
+		return false;
+	}
+	bool is_key_used(false);
 	if (PlayerEntityScript* source_player_entity = dynamic_cast<PlayerEntityScript*>(&sourceEntity)) {
 		switch (GetGardenCellType()) {
 		case EGardenCellType::RedDoor:
 		case EGardenCellType::AutomaticallyClosingRedDoor:
-			ret = source_player_entity->UseRedKey();
-			if (ret) {
-				isOpen = true;
-			}
+			is_key_used = source_player_entity->UseRedKey();
 			break;
 		case EGardenCellType::YellowDoor:
 		case EGardenCellType::AutomaticallyClosingYellowDoor:
-			ret = source_player_entity->UseYellowKey();
-			if (ret) {
-				isOpen = true;
-			}
+			is_key_used = source_player_entity->UseYellowKey();
 			break;
 		case EGardenCellType::GreenDoor:
 		case EGardenCellType::AutomaticallyClosingGreenDoor:
-			ret = source_player_entity->UseGreenKey();
-			if (ret) {
-				isOpen = true;
-			}
+			is_key_used = source_player_entity->UseGreenKey();
 			break;
 		default:
 			break;
 		}
 	}
+	return is_key_used && Open();
+}
+
+bool DoorCellScript::Open() {
+	bool ret(!isOpen);
+	if (ret) {
+		isOpen = true;
+		if (SoundEffectsScript* sound_effects = SoundEffectsScript::GetGlobalSoundEffects()) {
+			sound_effects->PlaySoundEffect("OpenDoor");
+		}
+		OnOpened();
+	}
 	return ret;
 }
 
-void DoorCellScript::OnFrameRender(Engine& engine, high_resolution_clock::duration deltaTime) {
+bool DoorCellScript::Close() {
+	bool ret(isOpen);
+	if (ret) {
+		isOpen = false;
+		if (SoundEffectsScript* sound_effects = SoundEffectsScript::GetGlobalSoundEffects()) {
+			sound_effects->PlaySoundEffect("CloseDoor");
+		}
+		OnClosed();
+	}
+	return ret;
+}
+
+void DoorCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
 		foreground_sprite_renderer->SetColor(Color<uint8_t>(0xFF, 0xFF, 0xFF, isOpen ? 0x0 : 0xFF));
 	}

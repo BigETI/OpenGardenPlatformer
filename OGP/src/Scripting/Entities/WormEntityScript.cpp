@@ -75,7 +75,7 @@ void WormEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_pt
 	EntityScript::Spawn(gardenEntityData, garden);
 }
 
-void WormEntityScript::OnGameTick(Engine& engine, high_resolution_clock::duration deltaTime) {
+void WormEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
 		movementProgress += duration<float>(deltaTime).count() * maximalMovementSpeed;
 		do {

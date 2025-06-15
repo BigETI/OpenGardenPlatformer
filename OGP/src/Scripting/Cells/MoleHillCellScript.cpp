@@ -38,7 +38,7 @@ void MoleHillCellScript::OnInitialize(Engine& engine) {
 	spawnTime = high_resolution_clock::now();
 }
 
-void MoleHillCellScript::OnFrameRender(Engine& engine, high_resolution_clock::duration deltaTime) {
+void MoleHillCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
 		foreground_sprite_renderer->SetColor(Color<uint8_t>(0xFF, 0xFF, 0xFF, IsDeadly() ? 0xFF : 0x0));
 	}

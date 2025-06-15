@@ -1,4 +1,7 @@
+#include <algorithm>
+#include <chrono>
 #include <cstddef>
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -10,12 +13,15 @@
 #include <Klein/Collections/ResizableGrid.hpp>
 #include <Klein/Math/Vector2.hpp>
 #include <Klein/ResourceManagement/ResourceID.hpp>
+#include <Klein/Scripting/Audio/AudioPlayerScript.hpp>
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 #include <Klein/Scripting/Script.hpp>
 
 #include <OGP/Cells/EGardenCellType.hpp>
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Environment/GardenData.hpp>
+#include <OGP/Scripting/Audio/MusicPlayerScript.hpp>
+#include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/ClimbableCellScript.hpp>
 #include <OGP/Scripting/Cells/DeadlyCellScript.hpp>
@@ -35,17 +41,21 @@
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
 using namespace std;
+using namespace std::filesystem;
+using namespace std::chrono_literals;
 
 using namespace Klein;
 using namespace Klein::Collections;
 using namespace Klein::Math;
 using namespace Klein::ResourceManagement;
 using namespace Klein::SceneManagement;
+using namespace Klein::Scripting::Audio;
 using namespace Klein::Scripting::Rendering;
 
 using namespace OGP::Cells;
 using namespace OGP::Entities;
 using namespace OGP::Environment;
+using namespace OGP::Scripting::Audio;
 using namespace OGP::Scripting::Cells;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
@@ -116,12 +126,22 @@ size_t GardenScript::GetHarvestableCount() const noexcept {
 }
 
 void GardenScript::IncrementHarvestableCount() noexcept {
+	bool was_completion_enabled(IsCompletionEnabled());
 	harvestableCount++;
+	if (was_completion_enabled) {
+		OnCompletionDisabled();
+	}
 }
 
 void GardenScript::DecrementHarvestableCount() noexcept {
 	if (harvestableCount > static_cast<size_t>(0)) {
 		--harvestableCount;
+		if (IsCompletionEnabled()) {
+			if (SoundEffectsScript* sound_effects = SoundEffectsScript::GetGlobalSoundEffects()) {
+				sound_effects->PlaySoundEffect("EnableCompletion");
+			}
+			OnCompletionEnabled();
+		}
 	}
 }
 
@@ -253,6 +273,14 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 			};
 			entity->Spawn(entity_data, garden);
 			entities.push_back(entity);
+		}
+		MusicPlayerScript* music_player(MusicPlayerScript::GetGlobalMusicPlayer());
+		if (music_player) {
+			path midi_path(gardenData.midiPath);
+			midi_path.replace_extension(".mp3");
+			string file_name(midi_path.filename().string());
+			std::transform(file_name.begin(), file_name.end(), file_name.begin(), ::toupper);
+			music_player->EnqueueMusicToPlay(file_name, 1s);
 		}
 	}
 	else {

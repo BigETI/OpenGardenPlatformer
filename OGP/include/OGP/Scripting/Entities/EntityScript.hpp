@@ -39,7 +39,7 @@ namespace OGP::Scripting::Entities {
 		OGP_API bool Dismount() noexcept;
 		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden);
 		OGP_API virtual bool Interact(EntityScript& sourceEntity);
-		OGP_API virtual void OnBeforeFrameRender(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
+		OGP_API virtual void OnBeforeFrameRender(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 
 	private:
 

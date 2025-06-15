@@ -20,5 +20,9 @@ namespace OGP::Scripting::Entities {
 	protected:
 
 		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
+
+	private:
+
+		void PlaySoundEffect() noexcept;
 	};
 }

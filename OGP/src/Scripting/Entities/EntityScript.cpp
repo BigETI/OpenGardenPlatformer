@@ -120,7 +120,7 @@ bool EntityScript::Interact(EntityScript& sourceEntity) {
 	return false;
 }
 
-void EntityScript::OnBeforeFrameRender(Engine& engine, high_resolution_clock::duration deltaTime) {
+void EntityScript::OnBeforeFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (shared_ptr<SpriteRendererScript> sprite_renderer = spriteRenderer.lock()) {
 		GetNode().SetLocalPosition(GetToBeRenderedPosition());
 	}

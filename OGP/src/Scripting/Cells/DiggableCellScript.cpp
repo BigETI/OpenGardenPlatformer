@@ -40,7 +40,7 @@ bool DiggableCellScript::Dig() noexcept {
 	return true;
 }
 
-void DiggableCellScript::OnFrameRender(Engine& engine, high_resolution_clock::duration deltaTime) {
+void DiggableCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	high_resolution_clock::duration dig_time(high_resolution_clock::now() - lastDigTimePoint);
 	if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
 		foreground_sprite_renderer->SetColor(Color<uint8_t>(0xFF, 0xFF, 0xFF, (dig_time > digRecoveryTime) ? 0xFF : static_cast<uint8_t>(max(duration<float>(dig_time).count() / duration<float>(digRecoveryTime).count(), 0.0f) * 255.0f)));

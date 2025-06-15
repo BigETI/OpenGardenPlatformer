@@ -55,8 +55,8 @@ namespace OGP::Scripting::Entities {
 		OGP_API bool UseYellowKey() noexcept;
 		OGP_API void AddGreenKey() noexcept;
 		OGP_API bool UseGreenKey() noexcept;
-		OGP_API std::chrono::high_resolution_clock::duration GetRemainingGarlicEffectTime() const noexcept;
-		OGP_API std::chrono::high_resolution_clock::duration GetRemainingMushroomEffectTime() const noexcept;
+		OGP_API const std::chrono::high_resolution_clock::duration& GetRemainingGarlicEffectTime() const noexcept;
+		OGP_API const std::chrono::high_resolution_clock::duration& GetRemainingMushroomEffectTime() const noexcept;
 		OGP_API bool IsGarlicEffectActive() const noexcept;
 		OGP_API void ActivateGarlicEffect() noexcept;
 		OGP_API bool IsMushroomEffectActive() const noexcept;
@@ -66,7 +66,7 @@ namespace OGP::Scripting::Entities {
 	protected:
 
 		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine) override;
-		OGP_API virtual void OnGameTick(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
+		OGP_API virtual void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 
 	private:
 

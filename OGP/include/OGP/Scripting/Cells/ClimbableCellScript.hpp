@@ -19,6 +19,6 @@ namespace OGP::Scripting::Cells {
 
 	protected:
 
-		OGP_API virtual void OnFrameRender(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
+		OGP_API virtual void OnFrameRender(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 	};
 }

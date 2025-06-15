@@ -100,9 +100,9 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 		cerr << "Failed to read comment." << endl;
 		return false;
 	}
+	string current_garden_midi_path;
 	{
-		string garden_one_midi_path;
-		if (!TryReadingDGFString(inputStream, garden_one_midi_path)) {
+		if (!TryReadingDGFString(inputStream, current_garden_midi_path)) {
 			cerr << "Failed to read garden one MIDI path." << endl;
 			return false;
 		}
@@ -170,6 +170,12 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 		if (!TryReadingDGFString(inputStream, garden_data.midiPath)) {
 			cerr << "Failed to read garden MIDI path at garden index \"" << garden_index << "\"." << endl;
 			return false;
+		}
+		if (garden_data.midiPath.empty()) {
+			garden_data.midiPath = current_garden_midi_path;
+		}
+		else {
+			current_garden_midi_path = garden_data.midiPath;
 		}
 		{
 			Vector2<size_t> garden_size;

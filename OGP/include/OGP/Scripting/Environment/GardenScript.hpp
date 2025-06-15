@@ -26,6 +26,8 @@ namespace OGP::Scripting::Environment {
 	class GardenScript : public Klein::Scripting::Script {
 	public:
 
+		Klein::EventSystem::Event<> OnCompletionDisabled;
+		Klein::EventSystem::Event<> OnCompletionEnabled;
 		Klein::EventSystem::Event<> OnCompleted;
 		Klein::EventSystem::Event<> OnFailed;
 

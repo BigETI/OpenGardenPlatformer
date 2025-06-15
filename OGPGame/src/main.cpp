@@ -9,6 +9,8 @@
 #include <Klein/Rendering/Raylib/RaylibWindowRenderer.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 
+#include <OGP/Scripting/Audio/MusicPlayerScript.hpp>
+#include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Environment/GardenCollectionScript.hpp>
 
 using namespace std;
@@ -18,6 +20,7 @@ using namespace Klein::Math;
 using namespace Klein::Raylib;
 using namespace Klein::SceneManagement;
 
+using namespace OGP::Scripting::Audio;
 using namespace OGP::Scripting::Environment;
 
 const path gameConfigurationFilePath("./game_config.json");
@@ -37,12 +40,16 @@ int main(int argc, char* argv[]) {
 	// TODO: Add main menu scene
 
 	// Environment
-	shared_ptr<Node> game_scene(engine.CreateNewEmptyScene());
-	shared_ptr<Node> environment_node(game_scene->CreateNewChild("Environment"));
-	shared_ptr<GardenCollectionScript> garden_collection(environment_node->CreateNewChild("GardenCollection")->AddScript<GardenCollectionScript>());
-	
-	// TODO: Test
-	garden_collection->LoadGardenCollectionFile("C:\\dosbox\\C\\DAISYG2\\DAISYG.DGF");
+	{
+		shared_ptr<Node> game_scene(engine.CreateNewEmptyScene());
+		shared_ptr<Node> environment_node(game_scene->CreateNewChild("Environment"));
+		shared_ptr<MusicPlayerScript> music_player(environment_node->CreateNewChild("MusicPlayer")->AddScript<MusicPlayerScript>());
+		shared_ptr<SoundEffectsScript> sound_effects(environment_node->CreateNewChild("SoundEffects")->AddScript<SoundEffectsScript>());
+		sound_effects->SetVolume(0.25f);
+		shared_ptr<GardenCollectionScript> garden_collection(environment_node->CreateNewChild("GardenCollection")->AddScript<GardenCollectionScript>());
 
+		// TODO: Test
+		garden_collection->LoadGardenCollectionFile("C:\\dosbox\\C\\DAISYG2\\DAISYG.DGF");
+	}
 	return engine.Start();
 }

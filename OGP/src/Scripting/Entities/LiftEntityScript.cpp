@@ -11,6 +11,7 @@
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Entities/ELiftMovementState.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
+#include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/LiftEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
@@ -23,6 +24,7 @@ using namespace Klein::Math;
 using namespace Klein::SceneManagement;
 
 using namespace OGP::Entities;
+using namespace OGP::Scripting::Audio;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
@@ -87,11 +89,16 @@ bool LiftEntityScript::Interact(EntityScript& sourceEntity) {
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
 		shared_ptr<EntityScript> lift_entity;
 		ret = (GetCurrentPosition() == sourceEntity.GetCurrentPosition()) && ((liftMovementState == ELiftMovementState::ParkingFromMovingUp) || (liftMovementState == ELiftMovementState::ParkingFromMovingDown) || (liftMovementState == ELiftMovementState::ParkingFromMovingLeft) || (liftMovementState == ELiftMovementState::ParkingFromMovingRight)) && garden->TryGettingEntity(*this, lift_entity) && sourceEntity.MountAt(lift_entity);
+		if (ret) {
+			if (SoundEffectsScript* sound_effects = SoundEffectsScript::GetGlobalSoundEffects()) {
+				sound_effects->PlaySoundEffect("EnterLift");
+			}
+		}
 	}
 	return ret;
 }
 
-void LiftEntityScript::OnGameTick(Engine& engine, high_resolution_clock::duration deltaTime) {
+void LiftEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	movementProgress += duration<float>(deltaTime).count() * maximalMovementSpeed;
 	parkingProgress += duration<float>(deltaTime).count();
 	do {

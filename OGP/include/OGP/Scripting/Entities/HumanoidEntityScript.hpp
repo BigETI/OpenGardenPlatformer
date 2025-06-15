@@ -5,9 +5,11 @@
 #include <memory>
 
 #include <Klein/Engine.hpp>
+#include <Klein/EventSystem/Event.hpp>
 #include <Klein/Math/Vector2.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 
+#include "../../Entities/EHumanoidMovementState.hpp"
 #include "../../Entities/GardenEntityData.hpp"
 #include "../../Entities/HumanoidInput.hpp"
 #include "../../Environment/EKillerType.hpp"
@@ -23,6 +25,17 @@ namespace OGP::Scripting::Entities {
 	class HumanoidEntityScript : public EntityScript {
 	public:
 
+		Klein::EventSystem::Event<> OnStandingStarted;
+		Klein::EventSystem::Event<> OnStandingFinished;
+		Klein::EventSystem::Event<> OnFallingStarted;
+		Klein::EventSystem::Event<> OnFallingFinished;
+		Klein::EventSystem::Event<> OnWalkingStarted;
+		Klein::EventSystem::Event<> OnWalkingFinished;
+		Klein::EventSystem::Event<> OnClimbingStarted;
+		Klein::EventSystem::Event<> OnClimbingFinished;
+		Klein::EventSystem::Event<> OnMounted;
+		Klein::EventSystem::Event<> OnDismounted;
+
 		OGP_API HumanoidEntityScript(Klein::SceneManagement::Node* node);
 
 		OGP_API virtual bool IsAlive() const noexcept;
@@ -35,7 +48,7 @@ namespace OGP::Scripting::Entities {
 	protected:
 
 		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine);
-		OGP_API virtual void OnGameTick(Klein::Engine& engine, std::chrono::high_resolution_clock::duration deltaTime) override;
+		OGP_API virtual void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 
 	private:
 
@@ -43,5 +56,8 @@ namespace OGP::Scripting::Entities {
 		Klein::Math::Vector2<std::size_t> targetPosition;
 		float movementProgress;
 		Klein::Math::Vector2<float> toBeRenderedAtOffset;
+		OGP::Entities::EHumanoidMovementState movementState;
+
+		void UpdateMovementState(OGP::Entities::EHumanoidMovementState movementState);
 	};
 }

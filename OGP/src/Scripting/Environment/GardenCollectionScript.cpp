@@ -13,6 +13,7 @@
 #include <Klein/SceneManagement/Node.hpp>
 
 #include <OGP/Cells/EGardenCellType.hpp>
+#include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Environment/GardenCollectionScript.hpp>
 #include <OGP/Serialization/LegacyGardenCollectionDeserializer.hpp>
 
@@ -26,6 +27,7 @@ using namespace Klein::SceneManagement;
 
 using namespace OGP::Cells;
 using namespace OGP::Scripting;
+using namespace OGP::Scripting::Audio;
 using namespace OGP::Scripting::Environment;
 using namespace OGP::Serialization;
 
@@ -78,7 +80,7 @@ bool GardenCollectionScript::SelectGardenIndex(size_t gardenIndex, bool isForceL
 	return ret;
 }
 
-void GardenCollectionScript::OnGameTick(Engine& engine, high_resolution_clock::duration deltaTime) {
+void GardenCollectionScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (isSelectingGarden) {
 		isSelectingGarden = false;
 		selectedGardenIndex = toSelectGardenIndex;
@@ -91,6 +93,9 @@ void GardenCollectionScript::OnGameTick(Engine& engine, high_resolution_clock::d
 
 			// TODO: Test
 			SelectGardenIndex(selectedGardenIndex + static_cast<size_t>(1));
+			if (SoundEffectsScript* sound_effects = SoundEffectsScript::GetGlobalSoundEffects()) {
+				sound_effects->PlaySoundEffect("NextLevel");
+			}
 		};
 		garden->OnFailed += [&]() {
 			ReloadGarden();
