@@ -29,7 +29,7 @@ using namespace OGP::Scripting::Cells;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
-DoorCellScript::DoorCellScript(Node* node) : CellScript(node), isOpen(false) {
+DoorCellScript::DoorCellScript(Node* node) : CellScript(node), isOpen(false), wasInteractedWithLastFrame(false) {
 	// ...
 }
 
@@ -42,6 +42,7 @@ bool DoorCellScript::IsTopDeadly() const noexcept {
 }
 
 bool DoorCellScript::Interact(EntityScript& sourceEntity) noexcept {
+	wasInteractedWithLastFrame = true;
 	if (isOpen) {
 		return false;
 	}
@@ -89,6 +90,15 @@ bool DoorCellScript::Close() {
 		OnClosed();
 	}
 	return ret;
+}
+
+void DoorCellScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
+	if (wasInteractedWithLastFrame) {
+		wasInteractedWithLastFrame = false;
+	}
+	else if (isOpen && ((GetGardenCellType() == EGardenCellType::AutomaticallyClosingRedDoor) || (GetGardenCellType() == EGardenCellType::AutomaticallyClosingYellowDoor) || (GetGardenCellType() == EGardenCellType::AutomaticallyClosingGreenDoor))) {
+		Close();
+	}
 }
 
 void DoorCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {

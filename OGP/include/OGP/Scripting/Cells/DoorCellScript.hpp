@@ -27,10 +27,12 @@ namespace OGP::Scripting::Cells {
 
 		OGP_API bool Open();
 		OGP_API bool Close();
+		OGP_API virtual void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 		OGP_API virtual void OnFrameRender(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 
 	private:
 
 		bool isOpen;
+		bool wasInteractedWithLastFrame;
 	};
 }
