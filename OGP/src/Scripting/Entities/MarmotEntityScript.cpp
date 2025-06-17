@@ -39,6 +39,9 @@ HumanoidInput MarmotEntityScript::GetInput(const Engine& engine) const noexcept 
 		Vector2<size_t> target_position(GetGardenEntityData().position);
 		garden->EnumerateEntities<PlayerEntityScript>(
 			[this, &current_position, &target_position](const PlayerEntityScript& player) {
+				if (player.IsMushroomEffectActive()) {
+					return;
+				}
 				Vector2<size_t> player_position(player.GetCurrentPosition());
 				if (GetGardenEntityData().bounds.IsContained(player_position.GetConverted<std::int64_t>())) {
 					if (player.IsGarlicEffectActive()) {
