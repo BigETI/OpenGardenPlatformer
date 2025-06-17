@@ -10,6 +10,7 @@
 #include <Klein/Scripting/Script.hpp>
 
 #include "../../Exportables/Exportable.hxx"
+#include "../../Environment/EGardenState.hpp"
 #include "../../Environment/GardenData.hpp"
 #include "../Cells/CellScript.hpp"
 #include "../Entities/EntityScript.hpp"
@@ -39,6 +40,8 @@ namespace OGP::Scripting::Environment {
 		OGP_API const Klein::Collections::ResizableGrid<std::weak_ptr<OGP::Scripting::Cells::CellScript>>& GetGardenCells() const noexcept;
 		OGP_API Klein::Collections::ResizableGrid<std::weak_ptr<OGP::Scripting::Cells::CellScript>>& GetGardenCells() noexcept;
 		OGP_API const std::vector<std::weak_ptr<OGP::Scripting::Entities::EntityScript>>& GetEntities() const noexcept;
+		OGP_API OGP::Environment::EGardenState GetGardenState() const noexcept;
+		OGP_API void SetGardenState(OGP::Environment::EGardenState gardenState) noexcept;
 		
 		template <typename TEntityScript = OGP::Scripting::Entities::EntityScript>
 		constexpr inline void EnumerateEntities(const std::function<void(const TEntityScript& entity)>& onEntityEnumerated) const noexcept {
@@ -75,5 +78,6 @@ namespace OGP::Scripting::Environment {
 		Klein::Collections::ResizableGrid<std::weak_ptr<OGP::Scripting::Cells::CellScript>> gardenCells;
 		std::vector<std::weak_ptr<OGP::Scripting::Entities::EntityScript>> entities;
 		std::size_t harvestableCount;
+		OGP::Environment::EGardenState gardenState;
 	};
 }

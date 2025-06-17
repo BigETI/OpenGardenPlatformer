@@ -39,7 +39,7 @@ constexpr static Rectangle<float> GetDebugEntitySourceRectangle(EGardenEntityTyp
 EntityScript::EntityScript(Node* node) : Script(node) {
 	gardenEntityData.type = EGardenEntityType::Player;
 	shared_ptr<SpriteRendererScript> sprite_renderer(node->EnsureScript<SpriteRendererScript>());
-	sprite_renderer->SetLayerIndex(1U);
+	sprite_renderer->SetLayerIndex(3U);
 	spriteRenderer = sprite_renderer;
 }
 
@@ -108,7 +108,7 @@ bool EntityScript::Dismount() noexcept {
 void EntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_ptr<GardenScript> garden) {
 	this->gardenEntityData = gardenEntityData;
 	if (shared_ptr<SpriteRendererScript> sprite_renderer = spriteRenderer.lock()) {
-		sprite_renderer->SetResourceID(debugEntitiesTextureResourceID);
+		sprite_renderer->SetTexture2DResourceID(debugEntitiesTextureResourceID);
 		sprite_renderer->SetSourceRectangle(GetDebugEntitySourceRectangle(gardenEntityData.type));
 	}
 	this->garden = garden;

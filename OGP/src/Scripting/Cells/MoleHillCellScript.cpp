@@ -10,8 +10,10 @@
 #include <Klein/SceneManagement/Node.hpp>
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 
+#include <OGP/Environment/EGardenState.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/MoleHillCellScript.hpp>
+#include <OGP/Scripting/Environment/GardenScript.hpp>
 
 using namespace std;
 using namespace std::chrono;
@@ -21,7 +23,9 @@ using namespace Klein::Rendering;
 using namespace Klein::SceneManagement;
 using namespace Klein::Scripting::Rendering;
 
+using namespace OGP::Environment;
 using namespace OGP::Scripting::Cells;
+using namespace OGP::Scripting::Environment;
 
 constexpr const high_resolution_clock::duration moleAppearanceLoopTime(4s);
 constexpr const float moleAppearanceRatio(0.125f);
@@ -39,7 +43,12 @@ void MoleHillCellScript::OnInitialize(Engine& engine) {
 }
 
 void MoleHillCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
+	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
+		if (garden->GetGardenState() != EGardenState::Playing) {
+			spawnTime += deltaTime;
+		}
+	}
 	if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
-		foreground_sprite_renderer->SetColor(Color<uint8_t>(0xFF, 0xFF, 0xFF, IsDeadly() ? 0xFF : 0x0));
+		foreground_sprite_renderer->SetTexture2DVisibility(IsDeadly());
 	}
 }

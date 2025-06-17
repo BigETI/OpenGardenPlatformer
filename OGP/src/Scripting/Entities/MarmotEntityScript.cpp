@@ -32,7 +32,7 @@ bool MarmotEntityScript::IsDeadly() const noexcept {
 	return true;
 }
 
-HumanoidInput MarmotEntityScript::GetInput(const Engine& engine) {
+HumanoidInput MarmotEntityScript::GetInput(const Engine& engine) const noexcept {
 	HumanoidInput ret;
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
 		Vector2<size_t> current_position(GetCurrentPosition());

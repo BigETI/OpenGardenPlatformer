@@ -63,7 +63,8 @@ using namespace OGP::Scripting::Environment;
 GardenScript::GardenScript(Node* node) :
 	Script(node),
 	timeInGameSeconds(static_cast<size_t>(0)),
-	harvestableCount(static_cast<size_t>(0)) {
+	harvestableCount(static_cast<size_t>(0)),
+	gardenState(EGardenState::Playing) {
 	// ...
 }
 
@@ -89,6 +90,14 @@ ResizableGrid<weak_ptr<CellScript>>& GardenScript::GetGardenCells() noexcept {
 
 const vector<weak_ptr<EntityScript>>& GardenScript::GetEntities() const noexcept {
 	return entities;
+}
+
+EGardenState GardenScript::GetGardenState() const noexcept {
+	return gardenState;
+}
+
+void GardenScript::SetGardenState(EGardenState gardenState) noexcept {
+	this->gardenState = gardenState;
 }
 
 bool GardenScript::TryGettingEntity(const EntityScript& entity, shared_ptr<EntityScript>& result) const noexcept {

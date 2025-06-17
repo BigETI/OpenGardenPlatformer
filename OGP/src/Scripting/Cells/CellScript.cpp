@@ -51,16 +51,16 @@ void CellScript::UpdateProperties(EGardenCellType gardenCellType, weak_ptr<Garde
 
 	shared_ptr<Node> background_sprite_renderer_node(GetNode().CreateNewChild());
 	shared_ptr<SpriteRendererScript> background_sprite_renderer(background_sprite_renderer_node->EnsureScript<SpriteRendererScript>());
-	background_sprite_renderer->SetResourceID(debugCellsTextureResourceID);
+	background_sprite_renderer->SetTexture2DResourceID(debugCellsTextureResourceID);
 	background_sprite_renderer->SetSourceRectangle(airCellSourceRectangle);
-	background_sprite_renderer->SetLayerIndex(3U);
+	background_sprite_renderer->SetLayerIndex(5U);
 	backgroundSpriteRenderer = background_sprite_renderer;
 	
 	shared_ptr<Node> foreground_sprite_renderer_node(GetNode().CreateNewChild());
 	shared_ptr<SpriteRendererScript> foreground_sprite_renderer(foreground_sprite_renderer_node->EnsureScript<SpriteRendererScript>());
-	foreground_sprite_renderer->SetResourceID(debugCellsTextureResourceID);
+	foreground_sprite_renderer->SetTexture2DResourceID(debugCellsTextureResourceID);
 	foreground_sprite_renderer->SetSourceRectangle(GetDebugCellSourceRectangle(gardenCellType));
-	foreground_sprite_renderer->SetLayerIndex(2U);
+	foreground_sprite_renderer->SetLayerIndex(4U);
 	foregroundSpriteRenderer = foreground_sprite_renderer;
 	
 	// TODO: Add support for cell texture animation

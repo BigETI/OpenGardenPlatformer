@@ -18,6 +18,7 @@
 #include <OGP/Environment/EKillerType.hpp>
 #include <OGP/Scripting/Entities/HumanoidEntityScript.hpp>
 #include <OGP/Scripting/Entities/PlayerEntityScript.hpp>
+#include <OGP/Scripting/Entities/QuestionMarkEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
 using namespace std;
@@ -46,6 +47,8 @@ const StringHash sKeyStringHash("Keyboard.KeyCode.83");
 const StringHash dKeyStringHash("Keyboard.KeyCode.68");
 const StringHash qKeyStringHash("Keyboard.KeyCode.81");
 const StringHash eKeyStringHash("Keyboard.KeyCode.69");
+const StringHash enterKeyStringHash("Keyboard.KeyCode.257");
+const StringHash numpadEnterKeyStringHash("Keyboard.KeyCode.335");
 
 PlayerEntityScript::PlayerEntityScript(Node* node) :
 	HumanoidEntityScript(node),
@@ -56,9 +59,10 @@ PlayerEntityScript::PlayerEntityScript(Node* node) :
 	yellowKeyCount(static_cast<size_t>(0)),
 	greenKeyCount(static_cast<size_t>(0)),
 	remainingGarlicEffectTime(high_resolution_clock::duration::zero()),
-	remainingMushroomEffectTime(high_resolution_clock::duration::zero()) {
+	remainingMushroomEffectTime(high_resolution_clock::duration::zero()),
+	isInQuestionMark(false) {
 	if (shared_ptr<SpriteRendererScript> sprite_renderer = GetSpriteRenderer().lock()) {
-		sprite_renderer->SetLayerIndex(0U);
+		sprite_renderer->SetLayerIndex(2U);
 	}
 	shared_ptr<AABBColliderScript> collider(GetNode().CreateNewChild()->EnsureScript<AABBColliderScript>());
 	collider->SetLocalCollisionRectangle(Rectangle<float>(Vector2<float>(), Vector2<float>(0.5f, 0.875f)));
@@ -105,29 +109,8 @@ PlayerEntityScript::PlayerEntityScript(Node* node) :
 	};
 }
 
-HumanoidInput PlayerEntityScript::GetInput(const Engine& engine) {
-	HumanoidInput ret(HumanoidEntityScript::GetInput(engine));
-	for (const auto& input_event : engine.GetCurrentInputEvents()) {
-		if (input_event.GetNameHash() == wKeyStringHash) {
-			ret.isWalkingUp = input_event.IsPressing();
-		}
-		if (input_event.GetNameHash() == aKeyStringHash) {
-			ret.isWalkingLeft = input_event.IsPressing();
-		}
-		if (input_event.GetNameHash() == sKeyStringHash) {
-			ret.isWalkingDown = input_event.IsPressing();
-		}
-		if (input_event.GetNameHash() == dKeyStringHash) {
-			ret.isWalkingRight = input_event.IsPressing();
-		}
-		if (input_event.GetNameHash() == qKeyStringHash) {
-			ret.isDiggingLeft = input_event.IsPressing();
-		}
-		if (input_event.GetNameHash() == eKeyStringHash) {
-			ret.isDiggingRight = input_event.IsPressing();
-		}
-	}
-	return ret;
+HumanoidInput PlayerEntityScript::GetInput(const Engine& engine) const noexcept {
+	return input;
 }
 
 bool PlayerEntityScript::IsAlive() const noexcept {
@@ -262,34 +245,95 @@ void PlayerEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_
 }
 
 void PlayerEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
+	bool is_skipping_questionmark(false);
+	for (const auto& input_event : engine.GetCurrentInputEvents()) {
+		if (input_event.GetNameHash() == wKeyStringHash) {
+			input.isWalkingUp = input_event.IsPressing();
+		}
+		if (input_event.GetNameHash() == aKeyStringHash) {
+			input.isWalkingLeft = input_event.IsPressing();
+		}
+		if (input_event.GetNameHash() == sKeyStringHash) {
+			input.isWalkingDown = input_event.IsPressing();
+		}
+		if (input_event.GetNameHash() == dKeyStringHash) {
+			input.isWalkingRight = input_event.IsPressing();
+		}
+		if (input_event.GetNameHash() == qKeyStringHash) {
+			input.isDiggingLeft = input_event.IsPressing();
+		}
+		if (input_event.GetNameHash() == eKeyStringHash) {
+			input.isDiggingRight = input_event.IsPressing();
+		}
+		if ((input_event.GetNameHash() == enterKeyStringHash) || (input_event.GetNameHash() == numpadEnterKeyStringHash)) {
+			is_skipping_questionmark = input_event.IsPressing();
+		}
+	}
 	HumanoidEntityScript::OnGameTick(engine, deltaTime);
 	if (isAlive) {
-		if (remainingGarlicEffectTime > high_resolution_clock::duration::zero()) {
-			remainingGarlicEffectTime -= deltaTime;
-			if (remainingGarlicEffectTime <= high_resolution_clock::duration::zero()) {
-				remainingGarlicEffectTime = high_resolution_clock::duration::zero();
-				OnGarlicEffectDeactivated();
-			}
-		}
-		if (remainingMushroomEffectTime > high_resolution_clock::duration::zero()) {
-			remainingMushroomEffectTime -= deltaTime;
-			if (remainingMushroomEffectTime <= high_resolution_clock::duration::zero()) {
-				remainingMushroomEffectTime = high_resolution_clock::duration::zero();
-				OnMushroomEffectDeactivated();
-			}
-		}
-		if (shared_ptr<AABBColliderScript> collider = this->collider.lock()) {
-			collider->EnumerateIntersections(
-				[this](Intersection intersection) {
-					Node* parent(intersection.destinationCollider->GetNode().GetParent());
-					if (parent) {
-						shared_ptr<EntityScript> entity;
-						if (parent->TryGettingScript<EntityScript>(entity) && entity->IsDeadly()) {
-							Kill(EKillerType::Entity);
+		if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
+			switch (garden->GetGardenState()) {
+			case EGardenState::Playing:
+				if (remainingGarlicEffectTime > high_resolution_clock::duration::zero()) {
+					remainingGarlicEffectTime -= deltaTime;
+					if (remainingGarlicEffectTime <= high_resolution_clock::duration::zero()) {
+						remainingGarlicEffectTime = high_resolution_clock::duration::zero();
+						OnGarlicEffectDeactivated();
+					}
+				}
+				if (remainingMushroomEffectTime > high_resolution_clock::duration::zero()) {
+					remainingMushroomEffectTime -= deltaTime;
+					if (remainingMushroomEffectTime <= high_resolution_clock::duration::zero()) {
+						remainingMushroomEffectTime = high_resolution_clock::duration::zero();
+						OnMushroomEffectDeactivated();
+					}
+				}
+				if (shared_ptr<AABBColliderScript> collider = this->collider.lock()) {
+					collider->EnumerateIntersections(
+						[this](Intersection intersection) {
+							Node* parent(intersection.destinationCollider->GetNode().GetParent());
+							if (parent) {
+								shared_ptr<EntityScript> entity;
+								if (parent->TryGettingScript<EntityScript>(entity) && entity->IsDeadly()) {
+									Kill(EKillerType::Entity);
+								}
+							}
+						}
+					);
+				}
+				if (isInQuestionMark) {
+					isInQuestionMark = false;
+					vector<shared_ptr<EntityScript>> entities;
+					for (const auto& entity : garden->GetEntitiesAt(GetCurrentPosition(), entities)) {
+						if (shared_ptr<QuestionMarkEntityScript> question_mark_entity = dynamic_pointer_cast<QuestionMarkEntityScript>(entity)) {
+							isInQuestionMark = true;
+							break;
 						}
 					}
 				}
-			);
+				else {
+					vector<shared_ptr<EntityScript>> entities;
+					for (const auto& entity : garden->GetEntitiesAt(GetCurrentPosition(), entities)) {
+						if (shared_ptr<QuestionMarkEntityScript> question_mark_entity = dynamic_pointer_cast<QuestionMarkEntityScript>(entity)) {
+							isInQuestionMark = true;
+							question_mark_entity->ShowTextPanel();
+							break;
+						}
+					}
+				}
+				break;
+			case EGardenState::InQuestionMark:
+				if (is_skipping_questionmark) {
+					vector<shared_ptr<EntityScript>> entities;
+					for (const auto& entity : garden->GetEntitiesAt(GetCurrentPosition(), entities)) {
+						if (shared_ptr<QuestionMarkEntityScript> question_mark_entity = dynamic_pointer_cast<QuestionMarkEntityScript>(entity)) {
+							question_mark_entity->HideTextPanel();
+							break;
+						}
+					}
+				}
+				break;
+			}
 		}
 	}
 }

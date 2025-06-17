@@ -11,6 +11,7 @@
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Entities/ELiftMovementState.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
+#include <OGP/Environment/EGardenState.hpp>
 #include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/LiftEntityScript.hpp>
@@ -24,6 +25,7 @@ using namespace Klein::Math;
 using namespace Klein::SceneManagement;
 
 using namespace OGP::Entities;
+using namespace OGP::Environment;
 using namespace OGP::Scripting::Audio;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
@@ -99,10 +101,13 @@ bool LiftEntityScript::Interact(EntityScript& sourceEntity) {
 }
 
 void LiftEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
-	movementProgress += duration<float>(deltaTime).count() * maximalMovementSpeed;
-	parkingProgress += duration<float>(deltaTime).count();
-	do {
-		if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
+	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
+		if (garden->GetGardenState() != EGardenState::Playing) {
+			return;
+		}
+		movementProgress += duration<float>(deltaTime).count() * maximalMovementSpeed;
+		parkingProgress += duration<float>(deltaTime).count();
+		do {
 			switch (liftMovementState) {
 			case ELiftMovementState::Up:
 				parkingProgress = 0.0f;
@@ -363,11 +368,11 @@ void LiftEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 				}
 				break;
 			}
-		}
-		if (movementProgress >= 1.0f) {
-			movementProgress = max(movementProgress - 1.0f, 0.0f);
-		}
-	} while (movementProgress >= 1.0f);
+			if (movementProgress >= 1.0f) {
+				movementProgress = max(movementProgress - 1.0f, 0.0f);
+			}
+		} while (movementProgress >= 1.0f);
+	}
 }
 
 bool LiftEntityScript::IsAtTopBound(const GardenScript& garden) const noexcept {

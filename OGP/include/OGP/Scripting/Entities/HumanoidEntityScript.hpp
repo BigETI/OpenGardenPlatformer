@@ -47,7 +47,7 @@ namespace OGP::Scripting::Entities {
 
 	protected:
 
-		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine);
+		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine) const noexcept;
 		OGP_API virtual void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 
 	private:

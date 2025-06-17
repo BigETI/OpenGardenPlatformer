@@ -11,6 +11,7 @@
 
 #include <OGP/Entities/EWormMovementState.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
+#include <OGP/Environment/EGardenState.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/PlayerEntityScript.hpp>
 #include <OGP/Scripting/Entities/WormEntityScript.hpp>
@@ -25,6 +26,7 @@ using namespace Klein::SceneManagement;
 using namespace Klein::Scripting::Physics;
 
 using namespace OGP::Entities;
+using namespace OGP::Environment;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
@@ -77,6 +79,9 @@ void WormEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_pt
 
 void WormEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
+		if (garden->GetGardenState() != EGardenState::Playing) {
+			return;
+		}
 		movementProgress += duration<float>(deltaTime).count() * maximalMovementSpeed;
 		do {
 			switch (wormMovementState) {

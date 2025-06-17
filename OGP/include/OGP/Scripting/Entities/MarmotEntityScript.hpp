@@ -17,6 +17,6 @@ namespace OGP::Scripting::Entities {
 
 	protected:
 
-		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine) override;
+		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine) const noexcept override;
 	};
 }

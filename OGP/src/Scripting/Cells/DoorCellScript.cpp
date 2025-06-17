@@ -103,6 +103,6 @@ void DoorCellScript::OnGameTick(Engine& engine, const high_resolution_clock::dur
 
 void DoorCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
-		foreground_sprite_renderer->SetColor(Color<uint8_t>(0xFF, 0xFF, 0xFF, isOpen ? 0x0 : 0xFF));
+		foreground_sprite_renderer->SetTexture2DVisibility(!isOpen);
 	}
 }

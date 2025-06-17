@@ -59,19 +59,22 @@ void HumanoidEntityScript::Spawn(const GardenEntityData& gardenEntityData, share
 	EntityScript::Spawn(gardenEntityData, garden);
 }
 
-HumanoidInput HumanoidEntityScript::GetInput(const Engine& engine) {
-	return input;
+HumanoidInput HumanoidEntityScript::GetInput(const Engine& engine) const noexcept {
+	return HumanoidInput();
 }
 
 void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (!IsAlive()) {
 		return;
 	}
-	if (shared_ptr<GardenScript> current_garden = GetGarden().lock()) {
-		input = GetInput(engine);
+	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
+		if (garden->GetGardenState() != EGardenState::Playing) {
+			return;
+		}
+		HumanoidInput input = GetInput(engine);
 		shared_ptr<EntityScript> mounted_at_entity = GetMountedAtEntity().lock();
 		Vector2<size_t> current_position(GetCurrentPosition());
-		bool is_walking_or_climbing_enabled(mounted_at_entity || current_garden->IsWalkableAt(current_position) || current_garden->IsClimbableAt(current_position));
+		bool is_walking_or_climbing_enabled(mounted_at_entity || garden->IsWalkableAt(current_position) || garden->IsClimbableAt(current_position));
 		float delta_time(duration<float>(deltaTime).count());
 		if (current_position == targetPosition) {
 			if (input.isWalkingUp || input.isWalkingDown || input.isWalkingLeft || input.isWalkingRight) {
@@ -89,31 +92,31 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 				}
 			}
 		}
-		if (input.isDiggingLeft && (current_position.x > static_cast<size_t>(0)) && (current_position.y > static_cast<size_t>(0)) && !current_garden->IsSolidAt(current_position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)))) {
-			current_garden->DigAt(current_position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(1)));
+		if (input.isDiggingLeft && (current_position.x > static_cast<size_t>(0)) && (current_position.y > static_cast<size_t>(0)) && !garden->IsSolidAt(current_position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)))) {
+			garden->DigAt(current_position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(1)));
 		}
-		if (input.isDiggingRight && (current_position.y > static_cast<size_t>(0)) && !current_garden->IsSolidAt(current_position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)))) {
-			current_garden->DigAt(current_position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)) - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
+		if (input.isDiggingRight && (current_position.y > static_cast<size_t>(0)) && !garden->IsSolidAt(current_position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)))) {
+			garden->DigAt(current_position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)) - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
 		}
 		movementProgress += delta_time * GetMaximalMovementSpeed();
 		do {
-			if (current_garden->IsWinnableAt(current_position)) {
+			if (garden->IsWinnableAt(current_position)) {
 				if (Win()) {
 					toBeRenderedAtOffset = Vector2<float>();
 				}
 				break;
 			}
-			if (current_garden->IsDeadlyAt(current_position) || current_garden->IsSolidAt(current_position)) {
+			if (garden->IsDeadlyAt(current_position) || garden->IsSolidAt(current_position)) {
 				if (Kill(EKillerType::Cell)) {
 					toBeRenderedAtOffset = Vector2<float>();
 				}
 				break;
 			}
-			current_garden->InteractAt(current_position, *this);
+			garden->InteractAt(current_position, *this);
 			mounted_at_entity = GetMountedAtEntity().lock();
 			if (current_position.y > static_cast<size_t>(0)) {
 				Vector2<size_t> bottom_position(current_position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
-				if (current_garden->IsSolidAt(bottom_position) && current_garden->IsTopDeadlyAt(bottom_position)) {
+				if (garden->IsSolidAt(bottom_position) && garden->IsTopDeadlyAt(bottom_position)) {
 					if (Kill(EKillerType::Cell)) {
 						toBeRenderedAtOffset = Vector2<float>();
 					}
@@ -131,10 +134,10 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 				toBeRenderedAtOffset = Vector2<float>();
 				movement_state = EHumanoidMovementState::Mounted;
 			}
-			else if (current_garden->IsClimbableAt(current_position)) {
+			else if (garden->IsClimbableAt(current_position)) {
 				movement_state = EHumanoidMovementState::Climbing;
 			}
-			else if (current_garden->IsWalkableAt(current_position)) {
+			else if (garden->IsWalkableAt(current_position)) {
 				movement_state = (current_position == targetPosition) ? EHumanoidMovementState::Standing : EHumanoidMovementState::Walking;
 			}
 			else {
@@ -144,7 +147,7 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 			Vector2<int> remaining_movement((movement_state == EHumanoidMovementState::Falling) ? Vector2<int>(0, -1) : (targetPosition.GetConverted<int>() - current_position.GetConverted<int>()));
 			bool is_not_moving(true);
 			if (remaining_movement.y > 0) {
-				if (current_garden->IsClimbingUpAllowedAt(current_position)) {
+				if (garden->IsClimbingUpAllowedAt(current_position)) {
 					is_not_moving = false;
 					if (movement_progress >= 1.0f) {
 						SetCurrentPosition(current_position + Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
@@ -157,9 +160,9 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 				}
 			}
 			else if (remaining_movement.y < 0) {
-				if (!mounted_at_entity && (current_position.y > static_cast<size_t>(0)) && !current_garden->IsSolidAt(current_position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)))) {
+				if (!mounted_at_entity && (current_position.y > static_cast<size_t>(0)) && !garden->IsSolidAt(current_position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)))) {
 					is_not_moving = false;
-					if ((movement_progress >= 0.5f) && current_garden->IsTopDeadlyAt(current_position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)))) {
+					if ((movement_progress >= 0.5f) && garden->IsTopDeadlyAt(current_position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)))) {
 						Kill(EKillerType::Cell);
 						break;
 					}
@@ -177,8 +180,8 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 				if (remaining_movement.x < 0) {
 					if ((current_position.x > static_cast<size_t>(0))) {
 						Vector2<size_t> left_position(current_position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)));
-						current_garden->InteractAt(left_position, *this);
-						if (!current_garden->IsSolidAt(left_position)) {
+						garden->InteractAt(left_position, *this);
+						if (!garden->IsSolidAt(left_position)) {
 							is_not_moving = false;
 							if (movement_progress >= 1.0f) {
 								SetCurrentPosition(current_position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)));
@@ -196,8 +199,8 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 				}
 				else if (remaining_movement.x > 0) {
 					Vector2<size_t> right_position(current_position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)));
-					current_garden->InteractAt(right_position, *this);
-					if (!current_garden->IsSolidAt(right_position)) {
+					garden->InteractAt(right_position, *this);
+					if (!garden->IsSolidAt(right_position)) {
 						is_not_moving = false;
 						if (movement_progress >= 1.0f) {
 							SetCurrentPosition(current_position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)));

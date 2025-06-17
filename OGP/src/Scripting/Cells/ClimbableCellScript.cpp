@@ -60,10 +60,10 @@ void ClimbableCellScript::OnFrameRender(Engine& engine, const high_resolution_cl
 		if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
 			switch (GetGardenCellType()) {
 			case EGardenCellType::LadderShowingUpWhenFinished:
-				foreground_sprite_renderer->SetColor(Color<uint8_t>(0xFF, 0xFF, 0xFF, garden->IsCompletionEnabled() ? 0xFF : 0x0));
+				foreground_sprite_renderer->SetTexture2DVisibility(garden->IsCompletionEnabled());
 				break;
 			case EGardenCellType::LadderVanishingWhenFinished:
-				foreground_sprite_renderer->SetColor(Color<uint8_t>(0xFF, 0xFF, 0xFF, garden->IsCompletionEnabled() ? 0x0 : 0xFF));
+				foreground_sprite_renderer->SetTexture2DVisibility(!garden->IsCompletionEnabled());
 				break;
 			default:
 				break;

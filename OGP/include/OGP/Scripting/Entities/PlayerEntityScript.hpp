@@ -65,7 +65,7 @@ namespace OGP::Scripting::Entities {
 		
 	protected:
 
-		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine) override;
+		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine) const noexcept override;
 		OGP_API virtual void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 
 	private:
@@ -79,5 +79,7 @@ namespace OGP::Scripting::Entities {
 		std::chrono::high_resolution_clock::duration remainingGarlicEffectTime;
 		std::chrono::high_resolution_clock::duration remainingMushroomEffectTime;
 		std::weak_ptr<Klein::Scripting::Physics::AABBColliderScript> collider;
+		OGP::Entities::HumanoidInput input;
+		bool isInQuestionMark;
 	};
 }
