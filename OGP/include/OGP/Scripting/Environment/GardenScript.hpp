@@ -70,6 +70,7 @@ namespace OGP::Scripting::Environment {
 		OGP_API bool IsWinnableAt(const Klein::Math::Vector2<std::size_t>& position) const noexcept;
 		OGP_API bool DigAt(const Klein::Math::Vector2<std::size_t>& position) noexcept;
 		OGP_API bool InteractAt(const Klein::Math::Vector2<std::size_t>& position, OGP::Scripting::Entities::EntityScript& sourceEntity) noexcept;
+		OGP_API void Unload() noexcept;
 
 	private:
 

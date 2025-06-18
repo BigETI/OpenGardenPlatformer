@@ -24,7 +24,7 @@ namespace OGP::Scripting::Environment {
 		OGP_API GardenCollectionScript(Klein::SceneManagement::Node* node);
 
 		OGP_API bool LoadGardenCollectionFile(const std::filesystem::path& gardenCollectionFilePath);
-		OGP_API void UnloadGarden();
+		OGP_API void UnloadGarden() noexcept;
 		OGP_API void ReloadGarden();
 		OGP_API bool SelectGardenIndex(std::size_t gardenIndex);
 		OGP_API bool SelectGardenIndex(std::size_t gardenIndex, bool isForceLoading);

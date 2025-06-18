@@ -58,8 +58,11 @@ bool GardenCollectionScript::LoadGardenCollectionFile(const path& gardenCollecti
 	return ret;
 }
 
-void GardenCollectionScript::UnloadGarden() {
-	garden.reset();
+void GardenCollectionScript::UnloadGarden() noexcept {
+	if (garden) {
+		garden->Unload();
+		garden.reset();
+	}
 	GetNode().RemoveAllChildren();
 }
 

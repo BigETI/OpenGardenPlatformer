@@ -374,3 +374,8 @@ bool GardenScript::InteractAt(const Vector2<size_t>& position, EntityScript& sou
 	}
 	return ret;
 }
+
+void GardenScript::Unload() noexcept {
+	entities.clear();
+	GetNode().RemoveAllChildren();
+}
