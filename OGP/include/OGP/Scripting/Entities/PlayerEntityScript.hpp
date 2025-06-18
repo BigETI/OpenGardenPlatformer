@@ -6,6 +6,7 @@
 
 #include <Klein/Engine.hpp>
 #include <Klein/EventSystem/Event.hpp>
+#include <Klein/Math/Vector2.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 #include <Klein/Scripting/Physics/AABBColliderScript.hpp>
 
@@ -81,5 +82,6 @@ namespace OGP::Scripting::Entities {
 		std::weak_ptr<Klein::Scripting::Physics::AABBColliderScript> collider;
 		OGP::Entities::HumanoidInput input;
 		bool isInQuestionMark;
+		Klein::Math::Vector2<std::size_t> lastQuestionMarkPosition;
 	};
 }

@@ -303,19 +303,22 @@ void PlayerEntityScript::OnGameTick(Engine& engine, const high_resolution_clock:
 				}
 				if (isInQuestionMark) {
 					isInQuestionMark = false;
-					vector<shared_ptr<EntityScript>> entities;
-					for (const auto& entity : garden->GetEntitiesAt(GetCurrentPosition(), entities)) {
-						if (shared_ptr<QuestionMarkEntityScript> question_mark_entity = dynamic_pointer_cast<QuestionMarkEntityScript>(entity)) {
-							isInQuestionMark = true;
-							break;
+					if (lastQuestionMarkPosition == GetCurrentPosition()) {
+						vector<shared_ptr<EntityScript>> entities;
+						for (const auto& entity : garden->GetEntitiesAt(GetCurrentPosition(), entities)) {
+							if (shared_ptr<QuestionMarkEntityScript> question_mark_entity = dynamic_pointer_cast<QuestionMarkEntityScript>(entity)) {
+								isInQuestionMark = true;
+								break;
+							}
 						}
 					}
 				}
-				else {
+				if (!isInQuestionMark) {
 					vector<shared_ptr<EntityScript>> entities;
 					for (const auto& entity : garden->GetEntitiesAt(GetCurrentPosition(), entities)) {
 						if (shared_ptr<QuestionMarkEntityScript> question_mark_entity = dynamic_pointer_cast<QuestionMarkEntityScript>(entity)) {
 							isInQuestionMark = true;
+							lastQuestionMarkPosition = GetCurrentPosition();
 							question_mark_entity->ShowTextPanel();
 							break;
 						}
