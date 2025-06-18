@@ -101,7 +101,15 @@ void WormEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 					}
 				}
 				else {
-					wormMovementState = EWormMovementState::Right;
+					hasStartedToMove = true;
+					if (IsRightMovable(*garden)) {
+						wormMovementState = EWormMovementState::Right;
+						isFinishingToMove = IsMovingRightReachesEnd(*garden);
+					}
+					else {
+						movementProgress = 0.0f;
+						isFinishingToMove = IsMovingLeftReachesEnd(*garden);
+					}
 				}
 				break;
 			case EWormMovementState::Right:
@@ -120,9 +128,15 @@ void WormEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 					}
 				}
 				else {
-					wormMovementState = EWormMovementState::Left;
 					hasStartedToMove = true;
-					isFinishingToMove = IsMovingLeftReachesEnd(*garden);
+					if (IsLeftMovable(*garden)) {
+						wormMovementState = EWormMovementState::Left;
+						isFinishingToMove = IsMovingLeftReachesEnd(*garden);
+					}
+					else {
+						movementProgress = 0.0f;
+						isFinishingToMove = IsMovingRightReachesEnd(*garden);
+					}
 				}
 				break;
 			}
