@@ -34,6 +34,7 @@ using namespace OGP::Scripting::Environment;
 constexpr static float textFontSize(0.25f);
 constexpr static float textSpacing(textFontSize * 0.2f);
 constexpr static float textPanelMargin(0.25f);
+constexpr static float textPanelSpacing(0.25f);
 
 constexpr const static high_resolution_clock::duration textCharacterAnimationTime(15ms);
 
@@ -108,7 +109,19 @@ void QuestionMarkEntityScript::Spawn(const GardenEntityData& gardenEntityData, s
 	if (shared_ptr<Node> text_panel_root_node = textPanelRootNode.lock()) {
 		if (shared_ptr<SpriteRendererScript> panel_sprite_renderer = panelSpriteRenderer.lock()) {
 			Vector2<float> panel_size((((maximal_line_length * (textFontSize + textSpacing)) - textSpacing) * 0.53125f) + textPanelMargin + textPanelMargin, lines.size() * (textFontSize + textSpacing) - textSpacing + textPanelMargin + textPanelMargin);
-			text_panel_root_node->SetLocalPosition(Vector2<float>(panel_size.x * -0.5f, panel_size.y + 1.0f));
+			Vector2<float> garden_size(garden->GetGardenCells().GetSize().GetConverted<float>());
+			Vector2<float> half_garden_size(garden_size * 0.5f);
+			Vector2<float> target_world_position(Vector2<float>(panel_size.x * -0.5f, panel_size.y + 1.0f) + GetNode().GetLocalPosition());
+			text_panel_root_node->SetLocalPosition(
+				Vector2<float>(
+					(panel_size.x > garden_size.x) ?
+					(half_garden_size.x - 0.5f) :
+					((target_world_position.x < textPanelSpacing) ? (textPanelSpacing - 0.5f) : (((target_world_position.x + panel_size.x + textPanelSpacing) > garden_size.x) ? (garden_size.x - panel_size.x - textPanelSpacing - 0.5f) : target_world_position.x)),
+					(panel_size.y > garden_size.y) ?
+					(half_garden_size.y - 0.5f) :
+					((target_world_position.y < textPanelSpacing) ? (textPanelSpacing - 0.5f) : (((target_world_position.y + panel_size.y + textPanelSpacing) > garden_size.y) ? (garden_size.y - panel_size.y - textPanelSpacing - 0.5f) : target_world_position.y))
+				) - GetNode().GetLocalPosition()
+			);
 			panel_sprite_renderer->SetPivot(Vector2<float>());
 			panel_sprite_renderer->GetNode().SetLocalPosition(Vector2<float>());
 			panel_sprite_renderer->GetNode().SetScale(panel_size);

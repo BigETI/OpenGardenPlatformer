@@ -224,6 +224,7 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 		for (const auto& entity_data : gardenData.entities) {
 			shared_ptr<Node> entity_node(GetNode().CreateNewChild(string(magic_enum::enum_name(entity_data.type))));
 			shared_ptr<EntityScript> entity;
+			bool is_player_entity(false);
 			switch (entity_data.type) {
 			case EGardenEntityType::Player:
 			{
@@ -235,8 +236,7 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 				player_entity->OnWon += [OnCompleted = &OnCompleted]() {
 					(*OnCompleted)();
 				};
-				shared_ptr<GardenCameraScript> garden_camera(GetNode().CreateNewChild("Camera")->AddScript<GardenCameraScript>());
-				garden_camera->SetToSpectateEntity(player_entity);
+				is_player_entity = true;
 				break;
 			}
 			case EGardenEntityType::Marmot:
@@ -282,6 +282,10 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 			};
 			entity->Spawn(entity_data, garden);
 			entities.push_back(entity);
+			if (is_player_entity) {
+				shared_ptr<GardenCameraScript> garden_camera(GetNode().CreateNewChild("Camera")->AddScript<GardenCameraScript>());
+				garden_camera->Spectate(entity, gardenData.cells.GetSize());
+			}
 		}
 		MusicPlayerScript* music_player(MusicPlayerScript::GetGlobalMusicPlayer());
 		if (music_player) {

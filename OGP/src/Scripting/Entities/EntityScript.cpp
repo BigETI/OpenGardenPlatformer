@@ -113,6 +113,7 @@ void EntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_ptr<Ga
 	}
 	this->garden = garden;
 	SetCurrentPosition(gardenEntityData.position);
+	GetNode().SetLocalPosition(GetToBeRenderedPosition());
 	OnSpawned(gardenEntityData);
 }
 
@@ -121,7 +122,5 @@ bool EntityScript::Interact(EntityScript& sourceEntity) {
 }
 
 void EntityScript::OnBeforeFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
-	if (shared_ptr<SpriteRendererScript> sprite_renderer = spriteRenderer.lock()) {
-		GetNode().SetLocalPosition(GetToBeRenderedPosition());
-	}
+	GetNode().SetLocalPosition(GetToBeRenderedPosition());
 }
