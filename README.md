@@ -12,8 +12,8 @@ Documentation will be published in the future.
 
 | Supported platform | Status |
 | ------------------ | ------ |
-| macOS              | ⚠      |
-| Linux              | ⚠      |
+| Linux              | ✅      |
+| macOS              | ✅      |
 | Windows (ARM)      | ⚠      |
 | Windows (x86_64)   | ✅      |
 
