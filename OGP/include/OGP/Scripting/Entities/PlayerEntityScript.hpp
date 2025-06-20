@@ -80,7 +80,9 @@ namespace OGP::Scripting::Entities {
 		std::chrono::high_resolution_clock::duration remainingGarlicEffectTime;
 		std::chrono::high_resolution_clock::duration remainingMushroomEffectTime;
 		std::weak_ptr<Klein::Scripting::Physics::AABBColliderScript> collider;
-		OGP::Entities::HumanoidInput input;
+		OGP::Entities::HumanoidInput keyboardInput;
+		OGP::Entities::HumanoidInput analogGamepadInput;
+		OGP::Entities::HumanoidInput digitalGamepadInput;
 		bool isInQuestionMark;
 		Klein::Math::Vector2<std::size_t> lastQuestionMarkPosition;
 	};

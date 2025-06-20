@@ -20,6 +20,7 @@
 #include <OGP/Cells/EGardenCellType.hpp>
 #include <OGP/Entities/EGardenEntityType.hpp>
 #include <OGP/Environment/GardenData.hpp>
+#include <OGP/Environment/GlobalWorld.hpp>
 #include <OGP/Scripting/Audio/MusicPlayerScript.hpp>
 #include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
@@ -42,7 +43,7 @@
 
 using namespace std;
 using namespace std::filesystem;
-using namespace std::chrono_literals;
+using namespace std::chrono;
 
 using namespace Klein;
 using namespace Klein::Collections;
@@ -60,10 +61,15 @@ using namespace OGP::Scripting::Cells;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
+constexpr static const float gameSecondTickCount(10.0f);
+
 GardenScript::GardenScript(Node* node) :
 	Script(node),
-	timeInGameSeconds(static_cast<size_t>(0)),
+	maximalTimeInGameSeconds(static_cast<size_t>(0)),
+	elapsedTimeInGameSeconds(static_cast<size_t>(0)),
 	harvestableCount(static_cast<size_t>(0)),
+	maximalGameTickCount(high_resolution_clock::duration::zero()),
+	elapsedGameTickCount(high_resolution_clock::duration::zero()),
 	gardenState(EGardenState::Playing) {
 	// ...
 }
@@ -76,8 +82,12 @@ string& GardenScript::GetGardenName(std::string& result) const {
 	return result = gardenName;
 }
 
-size_t GardenScript::GetTimeInGameSeconds() const noexcept {
-	return timeInGameSeconds;
+size_t GardenScript::GetMaximalTimeInGameSeconds() const noexcept {
+	return maximalTimeInGameSeconds;
+}
+
+size_t GardenScript::GetElapsedTimeInGameSeconds() const noexcept {
+	return elapsedTimeInGameSeconds;
 }
 
 const ResizableGrid<weak_ptr<CellScript>>& GardenScript::GetGardenCells() const noexcept {
@@ -90,6 +100,14 @@ ResizableGrid<weak_ptr<CellScript>>& GardenScript::GetGardenCells() noexcept {
 
 const vector<weak_ptr<EntityScript>>& GardenScript::GetEntities() const noexcept {
 	return entities;
+}
+
+const high_resolution_clock::duration& GardenScript::GetMaximalGameTickCount() const noexcept {
+	return maximalGameTickCount;
+}
+
+const high_resolution_clock::duration& GardenScript::GetElapsedGameTickCount() const noexcept {
+	return elapsedGameTickCount;
 }
 
 EGardenState GardenScript::GetGardenState() const noexcept {
@@ -162,8 +180,11 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 	shared_ptr<GardenScript> garden;
 	if (GetNode().TryGettingScript<GardenScript>(garden)) {
 		gardenName = gardenData.name;
-		timeInGameSeconds = gardenData.timeInGameSeconds;
-		for (auto cell : gardenCells.GetCells()) {
+		maximalTimeInGameSeconds = gardenData.timeInGameSeconds;
+		elapsedTimeInGameSeconds = static_cast<size_t>(0);
+		maximalGameTickCount = duration_cast<high_resolution_clock::duration>(duration<float>(gardenData.timeInGameSeconds * gameSecondTickCount));
+		elapsedGameTickCount = high_resolution_clock::duration::zero();
+		for (const auto& cell : gardenCells.GetCells()) {
 			if (shared_ptr<CellScript> current_cell = cell.lock()) {
 				current_cell->GetNode().Destroy();
 			}
@@ -382,4 +403,19 @@ bool GardenScript::InteractAt(const Vector2<size_t>& position, EntityScript& sou
 void GardenScript::Unload() noexcept {
 	entities.clear();
 	GetNode().RemoveAllChildren();
+}
+
+void GardenScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
+	if ((gardenState != EGardenState::Playing) || (elapsedGameTickCount >= maximalGameTickCount)) {
+		return;
+	}
+	elapsedGameTickCount = min(elapsedGameTickCount + duration_cast<high_resolution_clock::duration>(deltaTime * GlobalWorld::GetTickCountPerSecond()), maximalGameTickCount);
+	size_t elapsed_game_time_in_seconds(ceil(duration<float>(maximalGameTickCount - elapsedGameTickCount).count() / gameSecondTickCount));
+	if (elapsedTimeInGameSeconds != elapsed_game_time_in_seconds) {
+		elapsedTimeInGameSeconds = elapsed_game_time_in_seconds;
+		OnGameTimeUpdated(elapsed_game_time_in_seconds);
+		if (elapsed_game_time_in_seconds <= static_cast<size_t>(0)) {
+			OnFailed();
+		}
+	}
 }

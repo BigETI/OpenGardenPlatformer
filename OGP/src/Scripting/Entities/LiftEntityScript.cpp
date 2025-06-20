@@ -12,6 +12,7 @@
 #include <OGP/Entities/ELiftMovementState.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
 #include <OGP/Environment/EGardenState.hpp>
+#include <OGP/Environment/GlobalWorld.hpp>
 #include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/LiftEntityScript.hpp>
@@ -30,8 +31,8 @@ using namespace OGP::Scripting::Audio;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
-constexpr const float maximalMovementSpeed(80.0f / 8.0f);
-constexpr const float maximalParkingTime(1.0f);
+constexpr const float maximalMovementTickCountPerUnit(8.0f);
+constexpr const float maximalParkingTickCount(12.0f);
 
 LiftEntityScript::LiftEntityScript(Node* node) :
 	EntityScript(node),
@@ -105,7 +106,7 @@ void LiftEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 		if (garden->GetGardenState() != EGardenState::Playing) {
 			return;
 		}
-		movementProgress += duration<float>(deltaTime).count() * maximalMovementSpeed;
+		movementProgress += duration<float>(deltaTime).count() * GlobalWorld::GetSpeed(maximalMovementTickCountPerUnit);
 		parkingProgress += duration<float>(deltaTime).count();
 		do {
 			switch (liftMovementState) {
@@ -221,7 +222,7 @@ void LiftEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 				break;
 			case ELiftMovementState::ParkingFromMovingUp:
 				movementProgress = 0.0f;
-				if (parkingProgress >= maximalParkingTime) {
+				if (parkingProgress >= GlobalWorld::GetSeconds(maximalParkingTickCount)) {
 					if (IsAtTopBound(*garden)) {
 						if (!SwitchToMovingLeft(*garden)) {
 							if (IsAtLeftBound(*garden)) {
@@ -258,7 +259,7 @@ void LiftEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 				break;
 			case ELiftMovementState::ParkingFromMovingDown:
 				movementProgress = 0.0f;
-				if (parkingProgress >= maximalParkingTime) {
+				if (parkingProgress >= GlobalWorld::GetSeconds(maximalParkingTickCount)) {
 					if (IsAtBottomBound(*garden)) {
 						if (!SwitchToMovingRight(*garden)) {
 							if (IsAtRightBound(*garden)) {
@@ -295,7 +296,7 @@ void LiftEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 				break;
 			case ELiftMovementState::ParkingFromMovingLeft:
 				movementProgress = 0.0f;
-				if (parkingProgress >= maximalParkingTime) {
+				if (parkingProgress >= GlobalWorld::GetSeconds(maximalParkingTickCount)) {
 					if (IsAtLeftBound(*garden)) {
 						if (!SwitchToMovingDown(*garden)) {
 							if (IsAtBottomBound(*garden)) {
@@ -332,7 +333,7 @@ void LiftEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 				break;
 			case ELiftMovementState::ParkingFromMovingRight:
 				movementProgress = 0.0f;
-				if (parkingProgress >= maximalParkingTime) {
+				if (parkingProgress >= GlobalWorld::GetSeconds(maximalParkingTickCount)) {
 					if (IsAtRightBound(*garden)) {
 						if (!SwitchToMovingUp(*garden)) {
 							if (IsAtTopBound(*garden)) {
@@ -460,7 +461,7 @@ bool LiftEntityScript::SwitchToMovingRight(const GardenScript& garden) noexcept 
 }
 
 void LiftEntityScript::SwitchToMoving() noexcept {
-	movementProgress = (parkingProgress - 1.0) * maximalMovementSpeed;
+	movementProgress = (parkingProgress - GlobalWorld::GetSeconds(maximalParkingTickCount)) * GlobalWorld::GetSpeed(maximalMovementTickCountPerUnit);
 	parkingProgress = 0.0f;
 	hasStartedToMove = true;
 }
@@ -514,7 +515,7 @@ void LiftEntityScript::ParkFromMovingRight() noexcept {
 }
 
 void LiftEntityScript::Park() noexcept {
-	parkingProgress = min(movementProgress - 1.0f, 0.0f) / maximalMovementSpeed;
+	parkingProgress = min(movementProgress - GlobalWorld::GetSeconds(maximalParkingTickCount), 0.0f) / GlobalWorld::GetSpeed(maximalMovementTickCountPerUnit);
 	movementProgress = 0.0f;
 	isFinishingToMove = false;
 }

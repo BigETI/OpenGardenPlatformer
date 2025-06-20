@@ -41,20 +41,24 @@ bool PickupEntityScript::Interact(EntityScript& sourceEntity) {
 				source_player_entity->AddGreenKey();
 				break;
 			case EGardenEntityType::Apple:
+			case EGardenEntityType::Sunflower:
 				garden->DecrementHarvestableCount();
 				source_player_entity->AddScore(static_cast<size_t>(100));
 				break;
 			case EGardenEntityType::Lemon:
+			case EGardenEntityType::Tulip:
 				garden->DecrementHarvestableCount();
 				source_player_entity->AddScore(static_cast<size_t>(80));
 				break;
 			case EGardenEntityType::Cherry:
 			case EGardenEntityType::Spinach:
+			case EGardenEntityType::YellowDaisy:
 				garden->DecrementHarvestableCount();
 				source_player_entity->AddScore(static_cast<size_t>(60));
 				break;
 			case EGardenEntityType::Pineapple:
 			case EGardenEntityType::Carrot:
+			case EGardenEntityType::Rose:
 				garden->DecrementHarvestableCount();
 				source_player_entity->AddScore(static_cast<size_t>(40));
 				break;
@@ -67,18 +71,6 @@ bool PickupEntityScript::Interact(EntityScript& sourceEntity) {
 				garden->DecrementHarvestableCount();
 				source_player_entity->ActivateMushroomEffect();
 				source_player_entity->AddScore(static_cast<size_t>(80));
-				break;
-			case EGardenEntityType::Sunflower:
-				source_player_entity->AddScore(static_cast<size_t>(100));
-				break;
-			case EGardenEntityType::Tulip:
-				source_player_entity->AddScore(static_cast<size_t>(80));
-				break;
-			case EGardenEntityType::YellowDaisy:
-				source_player_entity->AddScore(static_cast<size_t>(60));
-				break;
-			case EGardenEntityType::Rose:
-				source_player_entity->AddScore(static_cast<size_t>(40));
 				break;
 			default:
 				ret = false;
@@ -98,11 +90,15 @@ void PickupEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_
 	case EGardenEntityType::Apple:
 	case EGardenEntityType::Lemon:
 	case EGardenEntityType::Cherry:
-	case EGardenEntityType::Spinach:
 	case EGardenEntityType::Pineapple:
-	case EGardenEntityType::Carrot:
 	case EGardenEntityType::Garlic:
 	case EGardenEntityType::Mushroom:
+	case EGardenEntityType::Spinach:
+	case EGardenEntityType::Carrot:
+	case EGardenEntityType::Sunflower:
+	case EGardenEntityType::Tulip:
+	case EGardenEntityType::YellowDaisy:
+	case EGardenEntityType::Rose:
 		garden->IncrementHarvestableCount();
 		break;
 	default:

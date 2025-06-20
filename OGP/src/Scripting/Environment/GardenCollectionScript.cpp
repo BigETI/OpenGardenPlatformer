@@ -36,7 +36,8 @@ GardenCollectionScript::GardenCollectionScript(Node* node) :
 	gardenCollectionDeserializers(
 		{
 			make_shared<LegacyGardenCollectionDeserializer>()
-		}),
+		}
+	),
 	selectedGardenIndex(static_cast<size_t>(0U)),
 	isSelectingGarden(false),
 	toSelectGardenIndex(static_cast<size_t>(0U)) {

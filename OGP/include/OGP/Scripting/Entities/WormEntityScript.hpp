@@ -31,7 +31,7 @@ namespace OGP::Scripting::Entities {
 	private:
 
 		OGP::Entities::EWormMovementState wormMovementState;
-		float movementProgress;
+		std::chrono::high_resolution_clock::duration elapsedTime;
 		bool hasStartedToMove;
 		bool isFinishingToMove;
 

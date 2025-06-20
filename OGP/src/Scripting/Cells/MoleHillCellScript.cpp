@@ -3,14 +3,14 @@
 #include <cstdint>
 #include <memory>
 
-#include <iostream>
-
 #include <Klein/Engine.hpp>
 #include <Klein/Rendering/Color.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 
+#include <OGP/Cells/EMoleHillState.hpp>
 #include <OGP/Environment/EGardenState.hpp>
+#include <OGP/Environment/GlobalWorld.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/MoleHillCellScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
@@ -23,29 +23,78 @@ using namespace Klein::Rendering;
 using namespace Klein::SceneManagement;
 using namespace Klein::Scripting::Rendering;
 
+using namespace OGP::Cells;
 using namespace OGP::Environment;
 using namespace OGP::Scripting::Cells;
 using namespace OGP::Scripting::Environment;
 
-constexpr const high_resolution_clock::duration moleAppearanceLoopTime(4s);
-constexpr const float moleAppearanceRatio(0.125f);
+constexpr static const float moleAppearanceLoopTickCount(90.0f);
+constexpr static const float startingAnimationTickCount(4.0f);
+constexpr static const float appearingTickCount(17.0f);
+constexpr static const float deadlyTickCount(12.0f);
+constexpr static const float disappearingTickCount(12.0f);
+constexpr static const float endingAnimationTickCount(moleAppearanceLoopTickCount - startingAnimationTickCount - appearingTickCount - deadlyTickCount - disappearingTickCount);
 
-MoleHillCellScript::MoleHillCellScript(Node* node) : CellScript(node) {
+MoleHillCellScript::MoleHillCellScript(Node* node) : CellScript(node), moleHillState(EMoleHillState::Hidden), elapsedTime(high_resolution_clock::duration::zero()) {
 	// ...
 }
 
+EMoleHillState MoleHillCellScript::GetMoleHillState() const noexcept {
+	return moleHillState;
+}
+
 bool MoleHillCellScript::IsDeadly() const noexcept {
-	return fmod(duration<float>(high_resolution_clock::now() - spawnTime).count() / duration<float>(moleAppearanceLoopTime).count(), 1.0f) >= (1.0f - moleAppearanceRatio);
+	return moleHillState == EMoleHillState::Deadly;
 }
 
 void MoleHillCellScript::OnInitialize(Engine& engine) {
-	spawnTime = high_resolution_clock::now();
+	elapsedTime = GlobalWorld::GetDuration(endingAnimationTickCount);
 }
 
 void MoleHillCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
 		if (garden->GetGardenState() != EGardenState::Playing) {
-			spawnTime += deltaTime;
+			return;
+		}
+		elapsedTime += deltaTime;
+		bool is_repeating_loop(true);
+		while (is_repeating_loop) {
+			is_repeating_loop = false;
+			high_resolution_clock::duration maximal_time;
+			switch (moleHillState) {
+			case EMoleHillState::Hidden:
+				maximal_time = GlobalWorld::GetDuration(endingAnimationTickCount + startingAnimationTickCount);
+				if (elapsedTime >= maximal_time) {
+					elapsedTime -= maximal_time;
+					is_repeating_loop = true;
+					moleHillState = EMoleHillState::Appearing;
+				}
+				break;
+			case EMoleHillState::Appearing:
+				maximal_time = GlobalWorld::GetDuration(appearingTickCount);
+				if (elapsedTime >= maximal_time) {
+					elapsedTime -= maximal_time;
+					is_repeating_loop = true;
+					moleHillState = EMoleHillState::Deadly;
+				}
+				break;
+			case EMoleHillState::Deadly:
+				maximal_time = GlobalWorld::GetDuration(deadlyTickCount);
+				if (elapsedTime >= maximal_time) {
+					elapsedTime -= maximal_time;
+					is_repeating_loop = true;
+					moleHillState = EMoleHillState::Disappearing;
+				}
+				break;
+			case EMoleHillState::Disappearing:
+				maximal_time = GlobalWorld::GetDuration(disappearingTickCount);
+				if (elapsedTime >= maximal_time) {
+					elapsedTime -= maximal_time;
+					is_repeating_loop = true;
+					moleHillState = EMoleHillState::Hidden;
+				}
+				break;
+			}
 		}
 	}
 	if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {

@@ -3,6 +3,8 @@
 namespace OGP::Entities {
 	enum class EWormMovementState {
 		Left,
-		Right
+		Right,
+		TurningLeft,
+		TurningRight
 	};
 }

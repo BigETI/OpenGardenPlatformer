@@ -16,6 +16,7 @@
 #include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
 #include <OGP/Environment/EKillerType.hpp>
+#include <OGP/Environment/GlobalWorld.hpp>
 #include <OGP/Scripting/Entities/HumanoidEntityScript.hpp>
 #include <OGP/Scripting/Entities/PlayerEntityScript.hpp>
 #include <OGP/Scripting/Entities/QuestionMarkEntityScript.hpp>
@@ -40,15 +41,27 @@ using namespace OGP::Scripting::Audio;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
-const ResourceID collectResourceID(string("SoundEffects/Collect.wav"));
-const StringHash wKeyStringHash("Keyboard.KeyCode.87");
-const StringHash aKeyStringHash("Keyboard.KeyCode.65");
-const StringHash sKeyStringHash("Keyboard.KeyCode.83");
-const StringHash dKeyStringHash("Keyboard.KeyCode.68");
-const StringHash qKeyStringHash("Keyboard.KeyCode.81");
-const StringHash eKeyStringHash("Keyboard.KeyCode.69");
-const StringHash enterKeyStringHash("Keyboard.KeyCode.257");
-const StringHash numpadEnterKeyStringHash("Keyboard.KeyCode.335");
+static const ResourceID collectResourceID(string("SoundEffects/Collect.wav"));
+static const StringHash upKeyboardKeyStringHash("Keyboard.KeyCode.265");
+static const StringHash downKeyboardKeyStringHash("Keyboard.KeyCode.264");
+static const StringHash leftKeyboardKeyStringHash("Keyboard.KeyCode.263");
+static const StringHash rightKeyboardKeyStringHash("Keyboard.KeyCode.262");
+static const StringHash aKeyboardKeyStringHash("Keyboard.KeyCode.65");
+static const StringHash sKeyboardKeyStringHash("Keyboard.KeyCode.83");
+static const StringHash enterKeyboardKeyStringHash("Keyboard.KeyCode.257");
+static const StringHash numpadEnterKeyboardKeyStringHash("Keyboard.KeyCode.335");
+static const StringHash f3KeyboardKeyStringHash("Keyboard.KeyCode.292");
+constexpr static const string gamepadPrefix("Gamepad.");
+constexpr static const string xAxisLeftGamepadStickSuffix(".0");
+constexpr static const string yAxisLeftGamepadStickSuffix(".1");
+constexpr static const string upGamepadButtonSuffix(".Button.1");
+constexpr static const string downGamepadButtonSuffix(".Button.3");
+constexpr static const string leftGamepadButtonSuffix(".Button.4");
+constexpr static const string rightGamepadButtonSuffix(".Button.2");
+constexpr static const string aGamepadButtonSuffix(".Button.7");
+constexpr static const string bGamepadButtonSuffix(".Button.6");
+constexpr static const string startGamepadButtonSuffix(".Button.15");
+constexpr static const float analogPressValueThreshold(0.25f);
 
 PlayerEntityScript::PlayerEntityScript(Node* node) :
 	HumanoidEntityScript(node),
@@ -110,7 +123,7 @@ PlayerEntityScript::PlayerEntityScript(Node* node) :
 }
 
 HumanoidInput PlayerEntityScript::GetInput(const Engine& engine) const noexcept {
-	return input;
+	return keyboardInput.GetMergedWith(analogGamepadInput).GetMergedWith(digitalGamepadInput);
 }
 
 bool PlayerEntityScript::IsAlive() const noexcept {
@@ -225,7 +238,7 @@ bool PlayerEntityScript::IsGarlicEffectActive() const noexcept {
 }
 
 void PlayerEntityScript::ActivateGarlicEffect() noexcept {
-	remainingGarlicEffectTime = 10s;
+	remainingGarlicEffectTime = GlobalWorld::GetDuration(100.0f);
 	OnGarlicEffectActivated();
 }
 
@@ -234,7 +247,7 @@ bool PlayerEntityScript::IsMushroomEffectActive() const noexcept {
 }
 
 void PlayerEntityScript::ActivateMushroomEffect() noexcept {
-	remainingMushroomEffectTime = 10s;
+	remainingMushroomEffectTime = GlobalWorld::GetDuration(100.0f);
 	OnMushroomEffectActivated();
 }
 
@@ -247,26 +260,63 @@ void PlayerEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_
 void PlayerEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	bool is_skipping_questionmark(false);
 	for (const auto& input_event : engine.GetCurrentInputEvents()) {
-		if (input_event.GetNameHash() == wKeyStringHash) {
-			input.isWalkingUp = input_event.IsPressing();
+		if (input_event.GetNameHash() == upKeyboardKeyStringHash) {
+			keyboardInput.isWalkingUp = input_event.IsPressing();
 		}
-		if (input_event.GetNameHash() == aKeyStringHash) {
-			input.isWalkingLeft = input_event.IsPressing();
+		if (input_event.GetNameHash() == downKeyboardKeyStringHash) {
+			keyboardInput.isWalkingDown = input_event.IsPressing();
 		}
-		if (input_event.GetNameHash() == sKeyStringHash) {
-			input.isWalkingDown = input_event.IsPressing();
+		if (input_event.GetNameHash() == leftKeyboardKeyStringHash) {
+			keyboardInput.isWalkingLeft = input_event.IsPressing();
 		}
-		if (input_event.GetNameHash() == dKeyStringHash) {
-			input.isWalkingRight = input_event.IsPressing();
+		if (input_event.GetNameHash() == rightKeyboardKeyStringHash) {
+			keyboardInput.isWalkingRight = input_event.IsPressing();
 		}
-		if (input_event.GetNameHash() == qKeyStringHash) {
-			input.isDiggingLeft = input_event.IsPressing();
+		if (input_event.GetNameHash() == aKeyboardKeyStringHash) {
+			keyboardInput.isDiggingLeft = input_event.IsPressing();
 		}
-		if (input_event.GetNameHash() == eKeyStringHash) {
-			input.isDiggingRight = input_event.IsPressing();
+		if (input_event.GetNameHash() == sKeyboardKeyStringHash) {
+			keyboardInput.isDiggingRight = input_event.IsPressing();
 		}
-		if ((input_event.GetNameHash() == enterKeyStringHash) || (input_event.GetNameHash() == numpadEnterKeyStringHash)) {
+		if ((input_event.GetNameHash() == enterKeyboardKeyStringHash) || (input_event.GetNameHash() == numpadEnterKeyboardKeyStringHash)) {
 			is_skipping_questionmark = input_event.IsPressing();
+		}
+		if ((input_event.GetNameHash() == f3KeyboardKeyStringHash) && input_event.IsPressing()) {
+			Kill(EKillerType::User);
+		}
+		const string& input_event_name(input_event.GetNameHash().GetString());
+		if (input_event_name.starts_with(gamepadPrefix)) {
+			if (input_event_name.ends_with(xAxisLeftGamepadStickSuffix)) {
+				float press_value(input_event.GetPressValue());
+				analogGamepadInput.isWalkingLeft = press_value <= -analogPressValueThreshold;
+				analogGamepadInput.isWalkingRight = press_value >= analogPressValueThreshold;
+			}
+			if (input_event_name.ends_with(yAxisLeftGamepadStickSuffix)) {
+				float press_value(input_event.GetPressValue());
+				analogGamepadInput.isWalkingUp = press_value <= -analogPressValueThreshold;
+				analogGamepadInput.isWalkingDown = press_value >= analogPressValueThreshold;
+			}
+			if (input_event_name.ends_with(upGamepadButtonSuffix)) {
+				digitalGamepadInput.isWalkingUp = input_event.IsPressing();
+			}
+			if (input_event_name.ends_with(downGamepadButtonSuffix)) {
+				digitalGamepadInput.isWalkingDown = input_event.IsPressing();
+			}
+			if (input_event_name.ends_with(leftGamepadButtonSuffix)) {
+				digitalGamepadInput.isWalkingLeft = input_event.IsPressing();
+			}
+			if (input_event_name.ends_with(rightGamepadButtonSuffix)) {
+				digitalGamepadInput.isWalkingRight = input_event.IsPressing();
+			}
+			if (input_event_name.ends_with(aGamepadButtonSuffix)) {
+				digitalGamepadInput.isDiggingLeft = input_event.IsPressing();
+			}
+			if (input_event_name.ends_with(bGamepadButtonSuffix)) {
+				digitalGamepadInput.isDiggingRight = input_event.IsPressing();
+			}
+			if (input_event_name.ends_with(startGamepadButtonSuffix)) {
+				is_skipping_questionmark = is_skipping_questionmark || input_event.IsPressing();
+			}
 		}
 	}
 	HumanoidEntityScript::OnGameTick(engine, deltaTime);

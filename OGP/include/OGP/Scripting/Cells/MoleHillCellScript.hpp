@@ -5,6 +5,7 @@
 #include <Klein/Engine.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 
+#include "../../Cells/EMoleHillState.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "CellScript.hpp"
 
@@ -14,6 +15,7 @@ namespace OGP::Scripting::Cells {
 
 		OGP_API MoleHillCellScript(Klein::SceneManagement::Node* node);
 
+		OGP_API OGP::Cells::EMoleHillState GetMoleHillState() const noexcept;
 		OGP_API virtual bool IsDeadly() const noexcept override;
 
 	protected:
@@ -23,6 +25,7 @@ namespace OGP::Scripting::Cells {
 
 	private:
 
-		std::chrono::high_resolution_clock::time_point spawnTime;
+		OGP::Cells::EMoleHillState moleHillState;
+		std::chrono::high_resolution_clock::duration elapsedTime;
 	};
 }

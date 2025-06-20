@@ -12,6 +12,7 @@
 #include <OGP/Entities/EWormMovementState.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
 #include <OGP/Environment/EGardenState.hpp>
+#include <OGP/Environment/GlobalWorld.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/PlayerEntityScript.hpp>
 #include <OGP/Scripting/Entities/WormEntityScript.hpp>
@@ -30,12 +31,13 @@ using namespace OGP::Environment;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
-constexpr const float maximalMovementSpeed(20.0f / 8.0f);
+constexpr const float maximalMovementTickCount(16.0f);
+constexpr const float maximalTurningTickCount(6.0f);
 
 WormEntityScript::WormEntityScript(Node* node) :
 	EntityScript(node),
 	wormMovementState(EWormMovementState::Left),
-	movementProgress(0.0f),
+	elapsedTime(high_resolution_clock::duration::zero()),
 	hasStartedToMove(true),
 	isFinishingToMove(false) {
 	shared_ptr<AABBColliderScript> collider(GetNode().CreateNewChild()->EnsureScript<AABBColliderScript>());
@@ -50,6 +52,10 @@ Vector2<float> WormEntityScript::GetToBeRenderedPosition() const noexcept {
 		break;
 	case EWormMovementState::Right:
 		ret += Vector2<float>(GetAnimatedMovementProgress(), 0.0f);
+		break;
+	case EWormMovementState::TurningLeft:
+		break;
+	case EWormMovementState::TurningRight:
 		break;
 	}
 	return ret;
@@ -72,7 +78,7 @@ void WormEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_pt
 	default:
 		break;
 	}
-	movementProgress = 0.0f;
+	elapsedTime = high_resolution_clock::duration::zero();
 	hasStartedToMove = true;
 	EntityScript::Spawn(gardenEntityData, garden);
 }
@@ -82,68 +88,86 @@ void WormEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 		if (garden->GetGardenState() != EGardenState::Playing) {
 			return;
 		}
-		movementProgress += duration<float>(deltaTime).count() * maximalMovementSpeed;
-		do {
+		elapsedTime += deltaTime;
+		bool is_repeating_loop(true);
+		while (is_repeating_loop) {
+			is_repeating_loop = false;
+			high_resolution_clock::duration maximal_time;
 			switch (wormMovementState) {
 			case EWormMovementState::Left:
 				if (IsLeftMovable(*garden)) {
-					if (movementProgress >= 1.0f) {
+					maximal_time = GlobalWorld::GetDuration(maximalMovementTickCount);
+					if (elapsedTime >= maximal_time) {
+						elapsedTime -= maximal_time;
+						is_repeating_loop = true;
 						SetCurrentPosition(GetCurrentPosition() - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)));
 						if (IsLeftMovable(*garden)) {
 							hasStartedToMove = false;
 							isFinishingToMove = IsMovingLeftReachesEnd(*garden);
 						}
 						else {
-							wormMovementState = EWormMovementState::Right;
-							hasStartedToMove = true;
-							isFinishingToMove = IsMovingRightReachesEnd(*garden);
+							wormMovementState = EWormMovementState::TurningRight;
 						}
 					}
 				}
 				else {
-					hasStartedToMove = true;
-					if (IsRightMovable(*garden)) {
-						wormMovementState = EWormMovementState::Right;
-						isFinishingToMove = IsMovingRightReachesEnd(*garden);
-					}
-					else {
-						movementProgress = 0.0f;
-						isFinishingToMove = IsMovingLeftReachesEnd(*garden);
-					}
+					is_repeating_loop = true;
+					wormMovementState = EWormMovementState::TurningRight;
 				}
 				break;
 			case EWormMovementState::Right:
 				if (IsRightMovable(*garden)) {
-					if (movementProgress >= 1.0f) {
+					maximal_time = GlobalWorld::GetDuration(maximalMovementTickCount);
+					if (elapsedTime >= maximal_time) {
+						elapsedTime -= maximal_time;
+						is_repeating_loop = true;
 						SetCurrentPosition(GetCurrentPosition() + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)));
 						if (IsRightMovable(*garden)) {
 							hasStartedToMove = false;
 							isFinishingToMove = IsMovingRightReachesEnd(*garden);
 						}
 						else {
-							wormMovementState = EWormMovementState::Left;
-							hasStartedToMove = true;
-							isFinishingToMove = IsMovingLeftReachesEnd(*garden);
+							wormMovementState = EWormMovementState::TurningLeft;
 						}
 					}
 				}
 				else {
-					hasStartedToMove = true;
+					is_repeating_loop = true;
+					wormMovementState = EWormMovementState::TurningLeft;
+				}
+				break;
+			case EWormMovementState::TurningLeft:
+				maximal_time = GlobalWorld::GetDuration(maximalTurningTickCount);
+				if (elapsedTime >= maximal_time) {
+					elapsedTime -= maximal_time;
+					is_repeating_loop = true;
 					if (IsLeftMovable(*garden)) {
-						wormMovementState = EWormMovementState::Left;
+						hasStartedToMove = true;
 						isFinishingToMove = IsMovingLeftReachesEnd(*garden);
+						wormMovementState = EWormMovementState::Left;
 					}
 					else {
-						movementProgress = 0.0f;
+						wormMovementState = EWormMovementState::TurningRight;
+					}
+				}
+				break;
+			case EWormMovementState::TurningRight:
+				maximal_time = GlobalWorld::GetDuration(maximalTurningTickCount);
+				if (elapsedTime >= maximal_time) {
+					elapsedTime -= maximal_time;
+					is_repeating_loop = true;
+					if (IsRightMovable(*garden)) {
+						hasStartedToMove = true;
 						isFinishingToMove = IsMovingRightReachesEnd(*garden);
+						wormMovementState = EWormMovementState::Right;
+					}
+					else {
+						wormMovementState = EWormMovementState::TurningLeft;
 					}
 				}
 				break;
 			}
-			if (movementProgress >= 1.0f) {
-				movementProgress -= 1.0f;
-			}
-		} while (movementProgress >= 1.0f);
+		}
 	}
 }
 
@@ -196,5 +220,7 @@ bool WormEntityScript::IsMovingRightReachesEnd(const GardenScript& garden) const
 }
 
 float WormEntityScript::GetAnimatedMovementProgress() const noexcept {
-	return hasStartedToMove ? (isFinishingToMove ? Easing::EaseInOut(movementProgress) : Easing::EaseIn(movementProgress)) : (isFinishingToMove ? Easing::EaseOut(movementProgress) : movementProgress);
+	high_resolution_clock::duration maximal_movement_time(GlobalWorld::GetDuration(maximalMovementTickCount));
+	float movement_progress(duration<float>(min(elapsedTime, maximal_movement_time)).count() / duration<float>(maximal_movement_time).count());
+	return hasStartedToMove ? (isFinishingToMove ? Easing::EaseInOut(movement_progress) : Easing::EaseIn(movement_progress)) : (isFinishingToMove ? Easing::EaseOut(movement_progress) : movement_progress);
 }

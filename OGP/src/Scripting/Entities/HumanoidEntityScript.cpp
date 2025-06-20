@@ -10,6 +10,7 @@
 #include <OGP/Entities/GardenEntityData.hpp>
 #include <OGP/Entities/HumanoidInput.hpp>
 #include <OGP/Environment/EKillerType.hpp>
+#include <OGP/Environment/GlobalWorld.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/HumanoidEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
@@ -38,7 +39,7 @@ bool HumanoidEntityScript::IsAlive() const noexcept {
 }
 
 float HumanoidEntityScript::GetMaximalMovementSpeed() const noexcept {
-	return 10.0f;
+	return GlobalWorld::GetSpeed(8.0f);
 }
 
 bool HumanoidEntityScript::Kill(EKillerType killerType) {

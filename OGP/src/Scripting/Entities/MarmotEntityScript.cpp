@@ -32,6 +32,8 @@ bool MarmotEntityScript::IsDeadly() const noexcept {
 	return true;
 }
 
+// TODO: Match marmot behaviour from original game
+
 HumanoidInput MarmotEntityScript::GetInput(const Engine& engine) const noexcept {
 	HumanoidInput ret;
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
