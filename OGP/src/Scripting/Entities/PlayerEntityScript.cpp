@@ -61,7 +61,7 @@ constexpr static const string rightGamepadButtonSuffix(".Button.2");
 constexpr static const string aGamepadButtonSuffix(".Button.7");
 constexpr static const string bGamepadButtonSuffix(".Button.6");
 constexpr static const string startGamepadButtonSuffix(".Button.15");
-constexpr static const float analogPressValueThreshold(0.25f);
+constexpr static const float analogPressValueThreshold(0.5f);
 
 PlayerEntityScript::PlayerEntityScript(Node* node) :
 	HumanoidEntityScript(node),
