@@ -7,6 +7,8 @@
 #include <Klein/Math/Ratio.hpp>
 #include <Klein/Raylib/RaylibEngine.hpp>
 #include <Klein/Rendering/Raylib/RaylibWindowRenderer.hpp>
+#include <Klein/ResourceManagement/FileSystem.hpp>
+#include <Klein/ResourceManagement/ResourceID.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 
 #include <OGP/Scripting/Audio/MusicPlayerScript.hpp>
@@ -18,6 +20,7 @@ using namespace std::filesystem;
 
 using namespace Klein::Math;
 using namespace Klein::Raylib;
+using namespace Klein::ResourceManagement;
 using namespace Klein::SceneManagement;
 
 using namespace OGP::Scripting::Audio;
@@ -49,7 +52,7 @@ int main(int argc, char* argv[]) {
 		shared_ptr<GardenCollectionScript> garden_collection(environment_node->CreateNewChild("GardenCollection")->AddScript<GardenCollectionScript>());
 
 		// TODO: Test
-		garden_collection->LoadGardenCollectionFile("./Resources/GardenCollections/DAISYG.DGF");
+		garden_collection->LoadGardenCollectionFile(command_line_arguments.size() > static_cast<size_t>(1) ? path(command_line_arguments.at(static_cast<size_t>(1))) : FileSystem::GetFilePathFromResourceID(ResourceID("GardenCollections/DAISYG.DGF")));
 	}
 	return engine.Start();
 }
