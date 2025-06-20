@@ -41,7 +41,8 @@ static const string legacyGardenCollectionStreamHeaderString("FB: Daisy's Garden
 constexpr const array<uint8_t, 3U> legacyGardenCollectionStreamHeaderUnknownBytes({ 0x07, 0x00, 0x00 });
 constexpr const array<uint8_t, 5U> legacyGardenCollectionRemainingUnknownInternalConstant({ 0xFF, 0x01, 0x00, 0x09, 0x00 });
 static const string legacyGardenCollectionInternalHeaderString("CDaisygPg");
-constexpr const uint32_t legacyGardenCollectionGardenSeparator(0x00028001);
+constexpr const uint32_t firstLegacyGardenCollectionGardenSeparator(0x00018001);
+constexpr const uint32_t secondLegacyGardenCollectionGardenSeparator(0x00028001);
 
 LegacyGardenCollectionDeserializer::LegacyGardenCollectionDeserializer() {
 	// ...
@@ -142,22 +143,20 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 			return false;
 		}
 	}
-	{
-		uint16_t program_version;
-		if (!TryReadingValue<uint16_t>(inputStream, program_version)) {
-			cerr << "Failed to read program version." << endl;
-			return false;
-		}
-		if ((program_version != 1) && (program_version != 2)) {
-			cerr << "Invalid parsed program version \"" << program_version << "\"." << endl;
-			return false;
-		}
+	uint16_t program_version;
+	if (!TryReadingValue<uint16_t>(inputStream, program_version)) {
+		cerr << "Failed to read program version." << endl;
+		return false;
+	}
+	if ((program_version != 1) && (program_version != 2)) {
+		cerr << "Invalid parsed program version \"" << program_version << "\"." << endl;
+		return false;
 	}
 	result.gardenCollection.resize(garden_count);
 	for (size_t garden_index(static_cast<size_t>(0U)); garden_index != garden_count; garden_index++) {
 		if (garden_index != static_cast<size_t>(0U)) {
 			uint32_t garden_separator;
-			if (!TryReadingValue<uint32_t>(inputStream, garden_separator) || (garden_separator != legacyGardenCollectionGardenSeparator)) {
+			if (!TryReadingValue<uint32_t>(inputStream, garden_separator) || ((garden_separator != firstLegacyGardenCollectionGardenSeparator) && (garden_separator != secondLegacyGardenCollectionGardenSeparator))) {
 				cerr << "Failed to read garden separator at garden index \"" << garden_index << "\"." << endl;
 				return false;
 			}
@@ -167,15 +166,20 @@ bool LegacyGardenCollectionDeserializer::TryDeserializingStream(istream& inputSt
 			cerr << "Failed to read garden name at garden index \"" << garden_index << "\"." << endl;
 			return false;
 		}
-		if (!TryReadingDGFString(inputStream, garden_data.midiPath)) {
-			cerr << "Failed to read garden MIDI path at garden index \"" << garden_index << "\"." << endl;
-			return false;
-		}
-		if (garden_data.midiPath.empty()) {
-			garden_data.midiPath = current_garden_midi_path;
+		if (program_version == static_cast<uint16_t>(2U)) {
+			if (!TryReadingDGFString(inputStream, garden_data.midiPath)) {
+				cerr << "Failed to read garden MIDI path at garden index \"" << garden_index << "\"." << endl;
+				return false;
+			}
+			if (garden_data.midiPath.empty()) {
+				garden_data.midiPath = current_garden_midi_path;
+			}
+			else {
+				current_garden_midi_path = garden_data.midiPath;
+			}
 		}
 		else {
-			current_garden_midi_path = garden_data.midiPath;
+			garden_data.midiPath = current_garden_midi_path;
 		}
 		{
 			Vector2<size_t> garden_size;
