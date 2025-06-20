@@ -34,6 +34,10 @@ HumanoidEntityScript::HumanoidEntityScript(Node* node) :
 	// ...
 }
 
+const Vector2<size_t>& HumanoidEntityScript::GetTargetPosition() const noexcept {
+	return targetPosition;
+}
+
 bool HumanoidEntityScript::IsAlive() const noexcept {
 	return true;
 }

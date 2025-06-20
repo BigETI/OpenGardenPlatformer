@@ -32,8 +32,6 @@ bool MarmotEntityScript::IsDeadly() const noexcept {
 	return true;
 }
 
-// TODO: Match marmot behaviour from original game
-
 HumanoidInput MarmotEntityScript::GetInput(const Engine& engine) const noexcept {
 	HumanoidInput ret;
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
@@ -44,38 +42,36 @@ HumanoidInput MarmotEntityScript::GetInput(const Engine& engine) const noexcept 
 				if (player.IsMushroomEffectActive()) {
 					return;
 				}
-				Vector2<size_t> player_position(player.GetCurrentPosition());
-				if (GetGardenEntityData().bounds.IsContained(player_position.GetConverted<std::int64_t>())) {
+				Vector2<size_t> player_target_position(player.GetTargetPosition());
+				if (GetGardenEntityData().bounds.IsContained(player_target_position.GetConverted<std::int64_t>())) {
 					if (player.IsGarlicEffectActive()) {
-						Vector2<int> delta(player_position.GetConverted<int>() - current_position.GetConverted<int>());
+						Vector2<int> delta(player_target_position.GetConverted<int>() - current_position.GetConverted<int>());
 						Vector2<int> unsigned_delta(abs(delta.x), abs(delta.y));
 						if ((unsigned_delta.x <= 2) && (unsigned_delta.y <= 2)) {
 							Vector2<int> to_be_clamped_target_position;
 							if (delta.x < 0) {
-								to_be_clamped_target_position = player_position.GetConverted<int>() + Vector2<int>(2, 0);
+								to_be_clamped_target_position = player_target_position.GetConverted<int>() + Vector2<int>(2, 0);
 							}
 							else if (delta.x > 0) {
-								to_be_clamped_target_position = player_position.GetConverted<int>() - Vector2<int>(2, 0);
+								to_be_clamped_target_position = player_target_position.GetConverted<int>() - Vector2<int>(2, 0);
 							}
 							else if (delta.y < 0) {
-								to_be_clamped_target_position = player_position.GetConverted<int>() + Vector2<int>(0, 2);
+								to_be_clamped_target_position = player_target_position.GetConverted<int>() + Vector2<int>(0, 2);
 							}
 							else if (delta.y > 0) {
-								to_be_clamped_target_position = player_position.GetConverted<int>() - Vector2<int>(0, 2);
+								to_be_clamped_target_position = player_target_position.GetConverted<int>() - Vector2<int>(0, 2);
 							}
 							else {
-								to_be_clamped_target_position = player_position.GetConverted<int>();
+								to_be_clamped_target_position = player_target_position.GetConverted<int>();
 							}
-							to_be_clamped_target_position.x = max(to_be_clamped_target_position.x, 0);
-							to_be_clamped_target_position.y = max(to_be_clamped_target_position.y, 0);
-							target_position = to_be_clamped_target_position.GetConverted<size_t>();
+							target_position = GetGardenEntityData().bounds.GetConverted<int>().GetClampedPosition(to_be_clamped_target_position).GetConverted<size_t>();
 						}
 						else {
-							target_position = player_position;
+							target_position = player_target_position;
 						}
 					}
 					else {
-						target_position = player_position;
+						target_position = player_target_position;
 					}
 				}
 			});
