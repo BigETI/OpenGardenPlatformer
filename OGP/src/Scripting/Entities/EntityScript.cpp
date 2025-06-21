@@ -88,11 +88,13 @@ bool EntityScript::MountAt(const shared_ptr<EntityScript>& mountedAtEntity) noex
 		if (shared_ptr<EntityScript> mounted_at_entity = this->mountedAtEntity.lock()) {
 			if (mounted_at_entity != mountedAtEntity) {
 				this->mountedAtEntity = mountedAtEntity;
+				currentPosition = mountedAtEntity->currentPosition;
 				ret = true;
 			}
 		}
 		else {
 			this->mountedAtEntity = mountedAtEntity;
+			currentPosition = mountedAtEntity->currentPosition;
 			ret = true;
 		}
 	}

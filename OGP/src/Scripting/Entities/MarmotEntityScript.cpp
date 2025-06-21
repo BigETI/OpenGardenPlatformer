@@ -7,6 +7,7 @@
 #include <Klein/Scripting/Physics/AABBColliderScript.hpp>
 
 #include <OGP/Entities/HumanoidInput.hpp>
+#include <OGP/Environment/EKillerType.hpp>
 #include <OGP/Scripting/Entities/HumanoidEntityScript.hpp>
 #include <OGP/Scripting/Entities/MarmotEntityScript.hpp>
 #include <OGP/Scripting/Entities/PlayerEntityScript.hpp>
@@ -20,6 +21,7 @@ using namespace Klein::SceneManagement;
 using namespace Klein::Scripting::Physics;
 
 using namespace OGP::Entities;
+using namespace OGP::Environment;
 using namespace OGP::Scripting::Entities;
 using namespace OGP::Scripting::Environment;
 
@@ -30,6 +32,13 @@ MarmotEntityScript::MarmotEntityScript(Node* node) : HumanoidEntityScript(node) 
 
 bool MarmotEntityScript::IsDeadly() const noexcept {
 	return true;
+}
+
+bool MarmotEntityScript::Kill(EKillerType killerType) {
+	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
+		Spawn(GetGardenEntityData(), garden);
+	}
+	return false;
 }
 
 HumanoidInput MarmotEntityScript::GetInput(const Engine& engine) const noexcept {

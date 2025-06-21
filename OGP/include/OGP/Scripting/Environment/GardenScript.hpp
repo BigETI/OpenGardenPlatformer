@@ -56,8 +56,22 @@ namespace OGP::Scripting::Environment {
 				}
 			}
 		}
-		
-		OGP_API bool TryGettingEntity(const OGP::Scripting::Entities::EntityScript& entity, std::shared_ptr<OGP::Scripting::Entities::EntityScript>& result) const noexcept;
+
+		template <typename TEntityScript = OGP::Scripting::Entities::EntityScript>
+		constexpr inline bool TryGettingEntity(const TEntityScript& entity, std::shared_ptr<TEntityScript>& result) const noexcept {
+			bool ret(false);
+			for (const auto& target_entity : entities) {
+				if (std::shared_ptr<TEntityScript> current_target_entity = std::dynamic_pointer_cast<TEntityScript>(target_entity.lock())) {
+					if (current_target_entity.get() == &entity) {
+						result = current_target_entity;
+						ret = true;
+						break;
+					}
+				}
+			}
+			return ret;
+		}
+
 		OGP_API bool RemoveEntity(std::shared_ptr<OGP::Scripting::Entities::EntityScript> entity) noexcept;
 		OGP_API std::size_t GetHarvestableCount() const noexcept;
 		OGP_API void IncrementHarvestableCount() noexcept;

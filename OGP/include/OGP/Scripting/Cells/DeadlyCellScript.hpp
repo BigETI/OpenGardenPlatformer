@@ -3,10 +3,10 @@
 #include <Klein/SceneManagement/Node.hpp>
 
 #include "../../Exportables/Exportable.hxx"
-#include "CellScript.hpp"
+#include "SolidCellScript.hpp"
 
 namespace OGP::Scripting::Cells {
-	class DeadlyCellScript : public CellScript {
+	class DeadlyCellScript : public SolidCellScript {
 	public:
 
 		OGP_API DeadlyCellScript(Klein::SceneManagement::Node* node);

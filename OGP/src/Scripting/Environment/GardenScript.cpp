@@ -118,20 +118,6 @@ void GardenScript::SetGardenState(EGardenState gardenState) noexcept {
 	this->gardenState = gardenState;
 }
 
-bool GardenScript::TryGettingEntity(const EntityScript& entity, shared_ptr<EntityScript>& result) const noexcept {
-	bool ret(false);
-	for (const auto& target_entity : entities) {
-		if (shared_ptr<EntityScript> current_target_entity = target_entity.lock()) {
-			if (current_target_entity.get() == &entity) {
-				result = current_target_entity;
-				ret = true;
-				break;
-			}
-		}
-	}
-	return ret;
-}
-
 bool GardenScript::RemoveEntity(shared_ptr<EntityScript> entity) noexcept {
 	bool ret(false);
 	for (int index(static_cast<int>(entities.size()) - 1); index >= 0; index--) {
@@ -242,7 +228,12 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 				}
 			}
 		}
-		for (const auto& entity_data : gardenData.entities) {
+		bool has_player_already_been_spawned(false);
+		for (auto entity_data_iterator = gardenData.entities.rbegin(); entity_data_iterator != gardenData.entities.rend(); ++entity_data_iterator) {
+			const GardenEntityData& entity_data(*entity_data_iterator);
+			if (has_player_already_been_spawned && (entity_data.type == EGardenEntityType::Player)) {
+				continue;
+			}
 			shared_ptr<Node> entity_node(GetNode().CreateNewChild(string(magic_enum::enum_name(entity_data.type))));
 			shared_ptr<EntityScript> entity;
 			bool is_player_entity(false);
@@ -258,6 +249,7 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 					(*OnCompleted)();
 				};
 				is_player_entity = true;
+				has_player_already_been_spawned = true;
 				break;
 			}
 			case EGardenEntityType::Marmot:

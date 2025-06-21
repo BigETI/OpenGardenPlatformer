@@ -13,6 +13,7 @@
 #include <OGP/Environment/GlobalWorld.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/HumanoidEntityScript.hpp>
+#include <OGP/Scripting/Entities/LiftEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
 using namespace std;
@@ -30,12 +31,17 @@ using namespace OGP::Scripting::Environment;
 HumanoidEntityScript::HumanoidEntityScript(Node* node) :
 	EntityScript(node),
 	movementProgress(0.0f),
-	movementState(EHumanoidMovementState::Standing) {
+	movementState(EHumanoidMovementState::Standing),
+	hasExitedLift(false) {
 	// ...
 }
 
 const Vector2<size_t>& HumanoidEntityScript::GetTargetPosition() const noexcept {
 	return targetPosition;
+}
+
+float HumanoidEntityScript::GetMovementProgress() const noexcept {
+	return movementProgress;
 }
 
 bool HumanoidEntityScript::IsAlive() const noexcept {
@@ -55,7 +61,28 @@ bool HumanoidEntityScript::Win() {
 }
 
 Vector2<float> HumanoidEntityScript::GetToBeRenderedPosition() const noexcept {
-	return EntityScript::GetToBeRenderedPosition() + toBeRenderedAtOffset;
+	bool is_movable(true);
+	if (shared_ptr<EntityScript> mounted_at_entity = GetMountedAtEntity().lock()) {
+		if (shared_ptr<LiftEntityScript> mounted_at_lift_entity = dynamic_pointer_cast<LiftEntityScript>(mounted_at_entity)) {
+			switch (mounted_at_lift_entity->GetLiftMovementState()) {
+			case ELiftMovementState::Up:
+			case ELiftMovementState::Down:
+			case ELiftMovementState::Left:
+			case ELiftMovementState::Right:
+				is_movable = false;
+				break;
+			case ELiftMovementState::ParkingFromMovingUp:
+			case ELiftMovementState::ParkingFromMovingDown:
+			case ELiftMovementState::ParkingFromMovingLeft:
+			case ELiftMovementState::ParkingFromMovingRight:
+				break;
+			}
+		}
+		else {
+			is_movable = false;
+		}
+	}
+	return is_movable ? (EntityScript::GetToBeRenderedPosition() + toBeRenderedAtOffset) : EntityScript::GetToBeRenderedPosition();
 }
 
 void HumanoidEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_ptr<GardenScript> garden) {
@@ -81,7 +108,8 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 		Vector2<size_t> current_position(GetCurrentPosition());
 		bool is_walking_or_climbing_enabled(mounted_at_entity || garden->IsWalkableAt(current_position) || garden->IsClimbableAt(current_position));
 		float delta_time(duration<float>(deltaTime).count());
-		if (current_position == targetPosition) {
+		if (mounted_at_entity || (current_position == targetPosition)) {
+			targetPosition = current_position;
 			if (input.isWalkingUp || input.isWalkingDown || input.isWalkingLeft || input.isWalkingRight) {
 				if (input.isWalkingLeft && is_walking_or_climbing_enabled) {
 					targetPosition = (targetPosition.x > static_cast<size_t>(0)) ? (targetPosition - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0))) : targetPosition;
@@ -103,6 +131,31 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 		if (input.isDiggingRight && (current_position.y > static_cast<size_t>(0)) && !garden->IsSolidAt(current_position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)))) {
 			garden->DigAt(current_position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)) - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
 		}
+		bool is_not_movable(false);
+		if (shared_ptr<LiftEntityScript> mounted_at_lift_entity = dynamic_pointer_cast<LiftEntityScript>(mounted_at_entity)) {
+			UpdateMovementState(EHumanoidMovementState::Mounted);
+			switch (mounted_at_lift_entity->GetLiftMovementState()) {
+			case ELiftMovementState::Up:
+			case ELiftMovementState::Down:
+			case ELiftMovementState::Left:
+			case ELiftMovementState::Right:
+				is_not_movable = true;
+				break;
+			case ELiftMovementState::ParkingFromMovingUp:
+			case ELiftMovementState::ParkingFromMovingDown:
+			case ELiftMovementState::ParkingFromMovingLeft:
+			case ELiftMovementState::ParkingFromMovingRight:
+				break;
+			}
+		}
+		else if (mounted_at_entity) {
+			UpdateMovementState(EHumanoidMovementState::Mounted);
+			is_not_movable = true;
+		}
+		if (is_not_movable) {
+			movementProgress = 0.0f;
+			return;
+		}
 		movementProgress += delta_time * GetMaximalMovementSpeed();
 		do {
 			if (garden->IsWinnableAt(current_position)) {
@@ -119,9 +172,9 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 			}
 			garden->InteractAt(current_position, *this);
 			mounted_at_entity = GetMountedAtEntity().lock();
-			if (current_position.y > static_cast<size_t>(0)) {
+			if ((current_position.y > static_cast<size_t>(0)) && (movementState == EHumanoidMovementState::Falling)) {
 				Vector2<size_t> bottom_position(current_position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
-				if (garden->IsSolidAt(bottom_position) && garden->IsTopDeadlyAt(bottom_position)) {
+				if (garden->IsTopDeadlyAt(bottom_position) || garden->IsDeadlyAt(bottom_position)) {
 					if (Kill(EKillerType::Cell)) {
 						toBeRenderedAtOffset = Vector2<float>();
 					}
@@ -142,7 +195,7 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 			else if (garden->IsClimbableAt(current_position)) {
 				movement_state = EHumanoidMovementState::Climbing;
 			}
-			else if (garden->IsWalkableAt(current_position)) {
+			else if (hasExitedLift || garden->IsWalkableAt(current_position)) {
 				movement_state = (current_position == targetPosition) ? EHumanoidMovementState::Standing : EHumanoidMovementState::Walking;
 			}
 			else {
@@ -157,6 +210,7 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 					if (movement_progress >= 1.0f) {
 						SetCurrentPosition(current_position + Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
 						current_position = GetCurrentPosition();
+						hasExitedLift = false;
 						toBeRenderedAtOffset = Vector2<float>();
 					}
 					else {
@@ -174,6 +228,7 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 					if (movement_progress >= 1.0f) {
 						SetCurrentPosition(current_position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
 						current_position = GetCurrentPosition();
+						hasExitedLift = false;
 						toBeRenderedAtOffset = Vector2<float>();
 					}
 					else {
@@ -188,17 +243,40 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 						garden->InteractAt(left_position, *this);
 						if (!garden->IsSolidAt(left_position)) {
 							is_not_moving = false;
+							if (mounted_at_entity) {
+								if (shared_ptr<LiftEntityScript> mounted_at_lift_entity = dynamic_pointer_cast<LiftEntityScript>(mounted_at_entity)) {
+									switch (mounted_at_lift_entity->GetLiftMovementState()) {
+									case ELiftMovementState::Up:
+									case ELiftMovementState::Down:
+									case ELiftMovementState::Left:
+									case ELiftMovementState::Right:
+										break;
+									case ELiftMovementState::ParkingFromMovingUp:
+									case ELiftMovementState::ParkingFromMovingDown:
+									case ELiftMovementState::ParkingFromMovingLeft:
+									case ELiftMovementState::ParkingFromMovingRight:
+										is_not_moving = false;
+										if (Dismount()) {
+											hasExitedLift = true;
+											targetPosition.y = current_position.y;
+										}
+										break;
+									}
+								}
+							}
+							else {
+								is_not_moving = false;
+							}
 							if (movement_progress >= 1.0f) {
 								SetCurrentPosition(current_position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)));
 								current_position = GetCurrentPosition();
-								if (mounted_at_entity) {
-									Dismount();
-								}
+								hasExitedLift = false;
 								toBeRenderedAtOffset = Vector2<float>();
 							}
 							else {
 								toBeRenderedAtOffset = Vector2<float>(-movement_progress, 0.0f);
 							}
+
 						}
 					}
 				}
@@ -207,12 +285,34 @@ void HumanoidEntityScript::OnGameTick(Engine& engine, const high_resolution_cloc
 					garden->InteractAt(right_position, *this);
 					if (!garden->IsSolidAt(right_position)) {
 						is_not_moving = false;
+						if (mounted_at_entity) {
+							if (shared_ptr<LiftEntityScript> mounted_at_lift_entity = dynamic_pointer_cast<LiftEntityScript>(mounted_at_entity)) {
+								switch (mounted_at_lift_entity->GetLiftMovementState()) {
+								case ELiftMovementState::Up:
+								case ELiftMovementState::Down:
+								case ELiftMovementState::Left:
+								case ELiftMovementState::Right:
+									break;
+								case ELiftMovementState::ParkingFromMovingUp:
+								case ELiftMovementState::ParkingFromMovingDown:
+								case ELiftMovementState::ParkingFromMovingLeft:
+								case ELiftMovementState::ParkingFromMovingRight:
+									is_not_moving = false;
+									if (Dismount()) {
+										hasExitedLift = true;
+										targetPosition.y = current_position.y;
+									}
+									break;
+								}
+							}
+						}
+						else {
+							is_not_moving = false;
+						}
 						if (movement_progress >= 1.0f) {
 							SetCurrentPosition(current_position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)));
 							current_position = GetCurrentPosition();
-							if (mounted_at_entity) {
-								Dismount();
-							}
+							hasExitedLift = false;
 							toBeRenderedAtOffset = Vector2<float>();
 						}
 						else {

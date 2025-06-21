@@ -16,6 +16,7 @@
 #include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Entities/LiftEntityScript.hpp>
+#include <OGP/Scripting/Entities/PlayerEntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
 
 using namespace std;
@@ -42,6 +43,10 @@ LiftEntityScript::LiftEntityScript(Node* node) :
 	hasStartedToMove(true),
 	isFinishingToMove(false) {
 	// ...
+}
+
+OGP_API ELiftMovementState LiftEntityScript::GetLiftMovementState() const noexcept {
+	return liftMovementState;
 }
 
 Vector2<float> LiftEntityScript::GetToBeRenderedPosition() const noexcept {
@@ -88,13 +93,20 @@ void LiftEntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_pt
 }
 
 bool LiftEntityScript::Interact(EntityScript& sourceEntity) {
+	if (sourceEntity.GetMountedAtEntity().lock()) {
+		return false;
+	}
 	bool ret(false);
-	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
-		shared_ptr<EntityScript> lift_entity;
-		ret = (GetCurrentPosition() == sourceEntity.GetCurrentPosition()) && ((liftMovementState == ELiftMovementState::ParkingFromMovingUp) || (liftMovementState == ELiftMovementState::ParkingFromMovingDown) || (liftMovementState == ELiftMovementState::ParkingFromMovingLeft) || (liftMovementState == ELiftMovementState::ParkingFromMovingRight)) && garden->TryGettingEntity(*this, lift_entity) && sourceEntity.MountAt(lift_entity);
-		if (ret) {
-			if (SoundEffectsScript* sound_effects = SoundEffectsScript::GetGlobalSoundEffects()) {
-				sound_effects->PlaySoundEffect("EnterLift");
+	if (PlayerEntityScript* player_entity = dynamic_cast<PlayerEntityScript*>(&sourceEntity)) {
+		if (GetCurrentPosition() == player_entity->GetTargetPosition()) {
+			if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
+				shared_ptr<LiftEntityScript> lift_entity;
+				ret = (GetCurrentPosition() == sourceEntity.GetCurrentPosition()) && ((liftMovementState == ELiftMovementState::ParkingFromMovingUp) || (liftMovementState == ELiftMovementState::ParkingFromMovingDown) || (liftMovementState == ELiftMovementState::ParkingFromMovingLeft) || (liftMovementState == ELiftMovementState::ParkingFromMovingRight)) && garden->TryGettingEntity(*this, lift_entity) && sourceEntity.MountAt(lift_entity);
+				if (ret) {
+					if (SoundEffectsScript* sound_effects = SoundEffectsScript::GetGlobalSoundEffects()) {
+						sound_effects->PlaySoundEffect("EnterLift");
+					}
+				}
 			}
 		}
 	}
@@ -134,35 +146,52 @@ void LiftEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 						}
 					}
 				}
+				{
+					float movement_progress(fmod(movementProgress, 1.0f));
+					vector<shared_ptr<EntityScript>> entities;
+					for (const auto& entity : garden->GetEntitiesAt((GetCurrentPosition() + Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1))), entities)) {
+						if (shared_ptr<PlayerEntityScript> humanoid_entity = dynamic_pointer_cast<PlayerEntityScript>(entity)) {
+							float player_movement_progress(fmod(humanoid_entity->GetMovementProgress(), 1.0f));
+							shared_ptr<LiftEntityScript> lift_entity;
+							if (
+								((GetCurrentPosition() + Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1))) == humanoid_entity->GetCurrentPosition()) &&
+								((1.0f - player_movement_progress) <= movement_progress) &&
+								garden->TryGettingEntity(*this, lift_entity) &&
+								humanoid_entity->MountAt(lift_entity)) {
+								if (SoundEffectsScript* sound_effects = SoundEffectsScript::GetGlobalSoundEffects()) {
+									sound_effects->PlaySoundEffect("EnterLift");
+								}
+							}
+						}
+					}
+				}
 				break;
 			case ELiftMovementState::Down:
 				parkingProgress = 0.0f;
 				if (IsAtBottomBound(*garden)) {
 					ParkFromMovingDown();
 				}
-				else {
-					if (GetCurrentPosition().y > static_cast<size_t>(1)) {
-						Vector2<size_t> target_position(GetCurrentPosition() - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
-						if (garden->IsSolidAt(target_position)) {
-							ParkFromMovingDown();
-						}
-						else {
-							float movement_progress(min(movementProgress, 1.0f));
-							if (movement_progress >= 1.0f) {
-								hasStartedToMove = false;
-								SetCurrentPosition(target_position);
-								if (IsAtBottomBound(*garden) || garden->IsSolidAt(target_position)) {
-									ParkFromMovingDown();
-								}
-								else {
-									isFinishingToMove = IsMovingDownReachesEnd(*garden);
-								}
+				else if (GetCurrentPosition().y >= static_cast<size_t>(1)) {
+					Vector2<size_t> target_position(GetCurrentPosition() - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
+					if (garden->IsSolidAt(target_position)) {
+						ParkFromMovingDown();
+					}
+					else {
+						float movement_progress(min(movementProgress, 1.0f));
+						if (movement_progress >= 1.0f) {
+							hasStartedToMove = false;
+							SetCurrentPosition(target_position);
+							if (IsAtBottomBound(*garden) || garden->IsSolidAt(target_position)) {
+								ParkFromMovingDown();
+							}
+							else {
+								isFinishingToMove = IsMovingDownReachesEnd(*garden);
 							}
 						}
 					}
-					else {
-						ParkFromMovingDown();
-					}
+				}
+				else {
+					ParkFromMovingDown();
 				}
 				break;
 			case ELiftMovementState::Left:
@@ -170,29 +199,27 @@ void LiftEntityScript::OnGameTick(Engine& engine, const high_resolution_clock::d
 				if (IsAtLeftBound(*garden)) {
 					ParkFromMovingLeft();
 				}
-				else {
-					if (GetCurrentPosition().x > static_cast<size_t>(1)) {
-						Vector2<size_t> target_position(GetCurrentPosition() - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)));
-						if (garden->IsSolidAt(target_position)) {
-							ParkFromMovingLeft();
-						}
-						else {
-							float movement_progress(min(movementProgress, 1.0f));
-							if (movement_progress >= 1.0f) {
-								hasStartedToMove = false;
-								SetCurrentPosition(target_position);
-								if (IsAtLeftBound(*garden) || garden->IsSolidAt(target_position)) {
-									ParkFromMovingLeft();
-								}
-								else {
-									isFinishingToMove = IsMovingLeftReachesEnd(*garden);
-								}
+				else if (GetCurrentPosition().x >= static_cast<size_t>(1)) {
+					Vector2<size_t> target_position(GetCurrentPosition() - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0)));
+					if (garden->IsSolidAt(target_position)) {
+						ParkFromMovingLeft();
+					}
+					else {
+						float movement_progress(min(movementProgress, 1.0f));
+						if (movement_progress >= 1.0f) {
+							hasStartedToMove = false;
+							SetCurrentPosition(target_position);
+							if (IsAtLeftBound(*garden) || garden->IsSolidAt(target_position)) {
+								ParkFromMovingLeft();
+							}
+							else {
+								isFinishingToMove = IsMovingLeftReachesEnd(*garden);
 							}
 						}
 					}
-					else {
-						ParkFromMovingLeft();
-					}
+				}
+				else {
+					ParkFromMovingLeft();
 				}
 				break;
 			case ELiftMovementState::Right:

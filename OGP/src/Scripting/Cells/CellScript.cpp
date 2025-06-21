@@ -79,7 +79,7 @@ bool CellScript::IsSolid() const noexcept {
 }
 
 bool CellScript::IsTopWalkable() const noexcept {
-	return IsSolid() || IsClimbingUpAllowed();
+	return (IsSolid() || IsClimbingUpAllowed()) && !IsDeadly() && !IsTopDeadly();
 }
 
 bool CellScript::IsClimbable() const noexcept {

@@ -39,6 +39,7 @@ namespace OGP::Scripting::Entities {
 		OGP_API HumanoidEntityScript(Klein::SceneManagement::Node* node);
 
 		OGP_API const Klein::Math::Vector2<std::size_t>& GetTargetPosition() const noexcept;
+		OGP_API float GetMovementProgress() const noexcept;
 		OGP_API virtual bool IsAlive() const noexcept;
 		OGP_API virtual float GetMaximalMovementSpeed() const noexcept;
 		OGP_API virtual bool Kill(OGP::Environment::EKillerType killerType);
@@ -58,6 +59,7 @@ namespace OGP::Scripting::Entities {
 		float movementProgress;
 		Klein::Math::Vector2<float> toBeRenderedAtOffset;
 		OGP::Entities::EHumanoidMovementState movementState;
+		bool hasExitedLift;
 
 		void UpdateMovementState(OGP::Entities::EHumanoidMovementState movementState);
 	};

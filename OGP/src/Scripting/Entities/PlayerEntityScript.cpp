@@ -51,16 +51,16 @@ static const StringHash sKeyboardKeyStringHash("Keyboard.KeyCode.83");
 static const StringHash enterKeyboardKeyStringHash("Keyboard.KeyCode.257");
 static const StringHash numpadEnterKeyboardKeyStringHash("Keyboard.KeyCode.335");
 static const StringHash f3KeyboardKeyStringHash("Keyboard.KeyCode.292");
-constexpr static const string gamepadPrefix("Gamepad.");
-constexpr static const string xAxisLeftGamepadStickSuffix(".0");
-constexpr static const string yAxisLeftGamepadStickSuffix(".1");
-constexpr static const string upGamepadButtonSuffix(".Button.1");
-constexpr static const string downGamepadButtonSuffix(".Button.3");
-constexpr static const string leftGamepadButtonSuffix(".Button.4");
-constexpr static const string rightGamepadButtonSuffix(".Button.2");
-constexpr static const string aGamepadButtonSuffix(".Button.7");
-constexpr static const string bGamepadButtonSuffix(".Button.6");
-constexpr static const string startGamepadButtonSuffix(".Button.15");
+static const string gamepadPrefix("Gamepad.");
+static const string xAxisLeftGamepadStickSuffix(".0");
+static const string yAxisLeftGamepadStickSuffix(".1");
+static const string upGamepadButtonSuffix(".Button.1");
+static const string downGamepadButtonSuffix(".Button.3");
+static const string leftGamepadButtonSuffix(".Button.4");
+static const string rightGamepadButtonSuffix(".Button.2");
+static const string aGamepadButtonSuffix(".Button.7");
+static const string bGamepadButtonSuffix(".Button.6");
+static const string startGamepadButtonSuffix(".Button.15");
 constexpr static const float analogPressValueThreshold(0.5f);
 
 PlayerEntityScript::PlayerEntityScript(Node* node) :
