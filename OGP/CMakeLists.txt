@@ -15,6 +15,7 @@ add_subdirectory ("deps")
 add_library (OGPStatic STATIC
 	"src/Entities/HumanoidInput.cpp"
 	"src/Environment/GlobalWorld.cpp"
+	"src/SceneManagement/BaseSceneLoader.cpp"
 	"src/Scripting/Audio/MusicPlayerScript.cpp"
 	"src/Scripting/Audio/SoundEffectsScript.cpp"
 	"src/Scripting/Cells/CellScript.cpp"
@@ -69,6 +70,7 @@ target_link_libraries (OGPStatic
 add_library (OGP SHARED
 	"src/Entities/HumanoidInput.cpp"
 	"src/Environment/GlobalWorld.cpp"
+	"src/SceneManagement/BaseSceneLoader.cpp"
 	"src/Scripting/Audio/MusicPlayerScript.cpp"
 	"src/Scripting/Audio/SoundEffectsScript.cpp"
 	"src/Scripting/Cells/CellScript.cpp"
