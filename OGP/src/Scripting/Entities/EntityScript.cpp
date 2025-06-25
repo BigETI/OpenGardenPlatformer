@@ -111,7 +111,7 @@ void EntityScript::Spawn(const GardenEntityData& gardenEntityData, shared_ptr<Ga
 	this->gardenEntityData = gardenEntityData;
 	if (shared_ptr<SpriteRendererScript> sprite_renderer = spriteRenderer.lock()) {
 		sprite_renderer->SetTexture2DResourceID(debugEntitiesTextureResourceID);
-		sprite_renderer->SetSourceRectangle(GetDebugEntitySourceRectangle(gardenEntityData.type));
+		sprite_renderer->SetTexture2DSourceRectangle(GetDebugEntitySourceRectangle(gardenEntityData.type));
 	}
 	this->garden = garden;
 	SetCurrentPosition(gardenEntityData.position);

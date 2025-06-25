@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <Klein/Engine.hpp>
+#include <Klein/Hashing/StringHash.hpp>
 #include <Klein/Math/Vector2.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 
@@ -22,6 +23,7 @@ using namespace std::chrono;
 using namespace std::filesystem;
 
 using namespace Klein;
+using namespace Klein::Hashing;
 using namespace Klein::Math;
 using namespace Klein::SceneManagement;
 
@@ -30,6 +32,8 @@ using namespace OGP::Scripting;
 using namespace OGP::Scripting::Audio;
 using namespace OGP::Scripting::Environment;
 using namespace OGP::Serialization;
+
+static const StringHash escapeKeyboardKeyStringHash("Keyboard.KeyCode.256");
 
 GardenCollectionScript::GardenCollectionScript(Node* node) :
 	Script(node),
@@ -105,5 +109,10 @@ void GardenCollectionScript::OnGameTick(Engine& engine, const high_resolution_cl
 			ReloadGarden();
 		};
 		garden->LoadGardenFromGardenData(gardenCollectionData.gardenCollection.at(selectedGardenIndex));
+	}
+	for (const auto& input_event : engine.GetCurrentInputEvents()) {
+		if ((input_event.GetNameHash() == escapeKeyboardKeyStringHash) && input_event.IsPressing()) {
+			OnClosureRequested();
+		}
 	}
 }

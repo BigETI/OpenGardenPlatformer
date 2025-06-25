@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <Klein/Engine.hpp>
+#include <Klein/EventSystem/Event.hpp>
 #include <Klein/Math/Vector2.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 #include <Klein/Scripting/Script.hpp>
@@ -20,6 +21,8 @@
 namespace OGP::Scripting::Environment {
 	class GardenCollectionScript : public Klein::Scripting::Script {
 	public:
+
+		Klein::EventSystem::Event<> OnClosureRequested;
 
 		OGP_API GardenCollectionScript(Klein::SceneManagement::Node* node);
 

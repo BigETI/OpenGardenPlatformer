@@ -47,7 +47,7 @@ QuestionMarkEntityScript::QuestionMarkEntityScript(Node* node) :
 	shared_ptr<Node> text_panel_root_node(node->CreateNewChild());
 	shared_ptr<SpriteRendererScript> panel_sprite_renderer(text_panel_root_node->CreateNewChild()->EnsureScript<SpriteRendererScript>());
 	panel_sprite_renderer->SetLayerIndex(1U);
-	panel_sprite_renderer->SetColor(Color<uint8_t>(0x0, 0x0, 0x0, 0x7F));
+	panel_sprite_renderer->SetColor(Color<float>(0.0f, 0.0f, 0.0f, 0.5f));
 	panel_sprite_renderer->SetTexture2DVisibility(false);
 	textPanelRootNode = text_panel_root_node;
 	panelSpriteRenderer = panel_sprite_renderer;

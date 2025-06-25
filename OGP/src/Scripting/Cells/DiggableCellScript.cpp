@@ -43,6 +43,6 @@ void DiggableCellScript::OnFrameRender(Engine& engine, const high_resolution_clo
 	high_resolution_clock::duration dig_time(high_resolution_clock::now() - lastDigTimePoint);
 	if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
 		high_resolution_clock::duration dig_recovery_time(GlobalWorld::GetDuration(digRecoveryTickCount));
-		foreground_sprite_renderer->SetColor(Color<uint8_t>(0xFF, 0xFF, 0xFF, (dig_time > dig_recovery_time) ? 0xFF : static_cast<uint8_t>(max(duration<float>(dig_time).count() / duration<float>(dig_recovery_time).count(), 0.0f) * 255.0f)));
+		foreground_sprite_renderer->SetColor(Color<float>(1.0f, 1.0f, 1.0f, (dig_time > dig_recovery_time) ? 1.0f : clamp(duration<float>(dig_time).count() / duration<float>(dig_recovery_time).count(), 0.0f, 1.0f)));
 	}
 }
