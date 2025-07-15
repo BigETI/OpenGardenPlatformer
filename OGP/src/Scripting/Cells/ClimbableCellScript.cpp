@@ -57,16 +57,19 @@ bool ClimbableCellScript::IsClimbingUpAllowed() const noexcept {
 
 void ClimbableCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
-		if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
-			switch (GetGardenCellType()) {
-			case EGardenCellType::LadderShowingUpWhenFinished:
-				foreground_sprite_renderer->SetTexture2DVisibility(garden->IsCompletionEnabled());
-				break;
-			case EGardenCellType::LadderVanishingWhenFinished:
-				foreground_sprite_renderer->SetTexture2DVisibility(!garden->IsCompletionEnabled());
-				break;
-			default:
-				break;
+		bool is_completion_enabled(garden->IsCompletionEnabled());
+		for (const auto& foreground_sprite_renderer : GetForegroundSpriteRenderers()) {
+			if (shared_ptr<SpriteRendererScript> current_foreground_sprite_renderer = foreground_sprite_renderer.lock()) {
+				switch (GetGardenCellType()) {
+				case EGardenCellType::LadderShowingUpWhenFinished:
+					current_foreground_sprite_renderer->SetTexture2DVisibility(is_completion_enabled);
+					break;
+				case EGardenCellType::LadderVanishingWhenFinished:
+					current_foreground_sprite_renderer->SetTexture2DVisibility(!is_completion_enabled);
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}

@@ -178,6 +178,8 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 		gardenCells.Resize(gardenData.cells.GetSize(), EGridResizingRule::Naive);
 		Vector2<size_t> cell_grid_size(gardenCells.GetSize());
 		EGardenCellType garden_cell_type;
+		vector<shared_ptr<CellScript>> cells;
+		cells.reserve(cell_grid_size.x * cell_grid_size.y);
 		for (Vector2<size_t> cell_position; cell_position.y != cell_grid_size.y; cell_position.y++) {
 			for (cell_position.x = static_cast<size_t>(0U); cell_position.x != cell_grid_size.x; cell_position.x++) {
 				if (gardenData.cells.TryGettingCell(cell_position, garden_cell_type)) {
@@ -222,11 +224,15 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 					default:
 						cell = cell_node->AddScript<CellScript>();
 					}
-					cell->UpdateProperties(garden_cell_type, garden);
+					cell->UpdateProperties(garden_cell_type, cell_position, garden);
 					cell_node->SetLocalPosition(cell_position.GetConverted<float>());
 					gardenCells.SetCell(cell_position, cell);
+					cells.push_back(cell);
 				}
 			}
+		}
+		for (const auto& cell : cells) {
+			cell->UpdateVisuals();
 		}
 		bool has_player_already_been_spawned(false);
 		for (auto entity_data_iterator = gardenData.entities.rbegin(); entity_data_iterator != gardenData.entities.rend(); ++entity_data_iterator) {

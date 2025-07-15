@@ -31,7 +31,11 @@ DiggableCellScript::DiggableCellScript(Node* node) : CellScript(node), lastDigTi
 }
 
 bool DiggableCellScript::IsSolid() const noexcept {
-	return (GetGardenCellType() != EGardenCellType::Trap) && (GetGardenCellType() != EGardenCellType::GrassTrap) && (high_resolution_clock::now() - lastDigTimePoint) > GlobalWorld::GetDuration(digRecoveryTickCount);
+	return (GetGardenCellType() != EGardenCellType::Trap) && (GetGardenCellType() != EGardenCellType::GrassTrap) && ((high_resolution_clock::now() - lastDigTimePoint) > GlobalWorld::GetDuration(digRecoveryTickCount));
+}
+
+bool DiggableCellScript::IsGroundConnectable() const noexcept {
+	return CellScript::IsGroundConnectable() && (high_resolution_clock::now() - lastDigTimePoint) > GlobalWorld::GetDuration(digRecoveryTickCount);
 }
 
 bool DiggableCellScript::Dig() noexcept {
@@ -40,9 +44,13 @@ bool DiggableCellScript::Dig() noexcept {
 }
 
 void DiggableCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
+	CellScript::OnFrameRender(engine, deltaTime);
 	high_resolution_clock::duration dig_time(high_resolution_clock::now() - lastDigTimePoint);
-	if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
-		high_resolution_clock::duration dig_recovery_time(GlobalWorld::GetDuration(digRecoveryTickCount));
-		foreground_sprite_renderer->SetColor(Color<float>(1.0f, 1.0f, 1.0f, (dig_time > dig_recovery_time) ? 1.0f : clamp(duration<float>(dig_time).count() / duration<float>(dig_recovery_time).count(), 0.0f, 1.0f)));
+	high_resolution_clock::duration dig_recovery_time(GlobalWorld::GetDuration(digRecoveryTickCount));
+	Color<float> color(1.0f, 1.0f, 1.0f, (dig_time > dig_recovery_time) ? 1.0f : clamp(duration<float>(dig_time).count() / duration<float>(dig_recovery_time).count(), 0.0f, 1.0f));
+	for (const auto& foreground_sprite_renderer : GetForegroundSpriteRenderers()) {
+		if (shared_ptr<SpriteRendererScript> current_foreground_sprite_renderer = foreground_sprite_renderer.lock()) {
+			current_foreground_sprite_renderer->SetColor(color);
+		}
 	}
 }

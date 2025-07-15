@@ -97,7 +97,9 @@ void MoleHillCellScript::OnFrameRender(Engine& engine, const high_resolution_clo
 			}
 		}
 	}
-	if (shared_ptr<SpriteRendererScript> foreground_sprite_renderer = GetForegroundSpriteRenderer().lock()) {
-		foreground_sprite_renderer->SetTexture2DVisibility(IsDeadly());
+	for (const auto& foreground_sprite_renderer : GetForegroundSpriteRenderers()) {
+		if (shared_ptr<SpriteRendererScript> current_foreground_sprite_renderer = foreground_sprite_renderer.lock()) {
+			current_foreground_sprite_renderer->SetTexture2DVisibility(IsDeadly());
+		}
 	}
 }
