@@ -44,13 +44,24 @@ set_property (TARGET OGPStatic
 	PROPERTY COMPILE_WARNING_AS_ERROR ON
 )
 
-target_compile_features (OGPStatic
-	PRIVATE cxx_std_23
-)
+if (OGP_USE_CXX_STD_17)
+	target_compile_features (OGPStatic
+		PRIVATE cxx_std_17
+	)
 
-target_compile_definitions (OGPStatic
-	PUBLIC IS_OGP_STATIC
-)
+	target_compile_definitions (OGPStatic
+		PUBLIC IS_OGP_STATIC
+		PUBLIC IS_OGP_CXX_STD_17
+	)
+else ()
+	target_compile_features (OGPStatic
+		PRIVATE cxx_std_23
+	)
+
+	target_compile_definitions (OGPStatic
+		PUBLIC IS_OGP_STATIC
+	)
+endif ()
 
 target_include_directories (OGPStatic
 	PUBLIC "include"
@@ -99,13 +110,24 @@ set_property (TARGET OGP
 	PROPERTY COMPILE_WARNING_AS_ERROR ON
 )
 
-target_compile_features (OGP
-	PRIVATE cxx_std_23
-)
+if (OGP_USE_CXX_STD_17)
+	target_compile_features (OGP
+		PRIVATE cxx_std_17
+	)
 
-target_compile_definitions (OGP
-	PUBLIC IS_OGP_EXPORTING
-)
+	target_compile_definitions (OGP
+		PUBLIC IS_OGP_EXPORTING
+		PUBLIC IS_OGP_CXX_STD_17
+	)
+else ()
+	target_compile_features (OGP
+		PRIVATE cxx_std_23
+	)
+
+	target_compile_definitions (OGP
+		PUBLIC IS_OGP_EXPORTING
+	)
+endif ()
 
 target_include_directories (OGP
 	PUBLIC "include"

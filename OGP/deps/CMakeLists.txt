@@ -15,13 +15,16 @@ set (FETCHCONTENT_QUIET FALSE)
 ###########
 
 set (KLEIN_DISABLE_TESTS ON)
+if (OGP_USE_CXX_STD_17)
+	set (KLEIN_USE_CXX_STD_17 ON)
+endif ()
 
 if (OGP_USE_LOCAL_KLEIN_DEPENDENCY)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../Klein" Klein)
 else()
 FetchContent_Declare (Klein
 	GIT_REPOSITORY https://github.com/BigETI/Klein.git
-	GIT_TAG "dev"
+	GIT_TAG "experiment/cxx-std-17"
 	GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable (Klein)

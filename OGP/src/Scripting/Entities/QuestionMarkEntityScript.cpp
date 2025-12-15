@@ -1,6 +1,8 @@
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <string>
 
 #include <Klein/Engine.hpp>
 #include <Klein/Math/Vector2.hpp>
@@ -37,7 +39,25 @@ constexpr static float textPanelMargin(0.25f);
 constexpr static float textPanelSpacing(0.25f);
 
 constexpr const static high_resolution_clock::duration textCharacterAnimationTime(15ms);
-
+#ifdef IS_OGP_CXX_STD_17
+constexpr typename string::size_type
+erase(string& c, const string::value_type& value) {
+	size_t ret(static_cast<size_t>(0));
+	for (size_t index(static_cast<size_t>(0)); (index + ret) != c.size(); index++) {
+		if (c.at(index) == value) {
+			for (size_t shift_index(index); (shift_index + static_cast<size_t>(1)) != c.size(); shift_index++) {
+				c[shift_index] = c.at(shift_index + 1);
+			}
+			++ret;
+		}
+	}
+	if (ret > static_cast<size_t>(0)) {
+		c[c.size() - ret] = '\0';
+		c.resize(c.size() - ret);
+	}
+	return ret;
+}
+#endif
 QuestionMarkEntityScript::QuestionMarkEntityScript(Node* node) :
 	EntityScript(node),
 	isTextPanelVisible(false),

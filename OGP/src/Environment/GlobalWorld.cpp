@@ -8,37 +8,26 @@ using namespace std::chrono;
 using namespace OGP::Environment;
 
 constexpr static inline float GetTickCountPerSecond(EGlobalWorldSpeed globalWorldSpeed) {
-	float ret;
 	switch (globalWorldSpeed) {
 	case EGlobalWorldSpeed::Slowest:
-		ret = 2.0f;
-		break;
+		return 2.0f;
 	case EGlobalWorldSpeed::VerySlow:
-		ret = 4.0f;
-		break;
+		return 4.0f;
 	case EGlobalWorldSpeed::Slower:
-		ret = 8.0f;
-		break;
+		return 8.0f;
 	case EGlobalWorldSpeed::Slow:
-		ret = 16.0f;
-		break;
+		return 16.0f;
 	case EGlobalWorldSpeed::Normal:
-		ret = 32.0f;
-		break;
+		return 32.0f;
 	case EGlobalWorldSpeed::Fast:
-		ret = 64.0f;
-		break;
+		return 64.0f;
 	case EGlobalWorldSpeed::Faster:
-		ret = 128.0f;
-		break;
+		return 128.0f;
 	case EGlobalWorldSpeed::VeryFast:
-		ret = 256.0f;
-		break;
+		return 256.0f;
 	case EGlobalWorldSpeed::Fastest:
-		ret = 512.0f;
-		break;
+		return 512.0f;
 	}
-	return ret;
 }
 
 EGlobalWorldSpeed GlobalWorld::globalWorldSpeed(EGlobalWorldSpeed::Normal);

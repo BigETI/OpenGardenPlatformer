@@ -12,6 +12,7 @@
 #include <Klein/Scripting/Audio/AudioPlayerScript.hpp>
 #include <Klein/Scripting/Physics/AABBColliderScript.hpp>
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
+#include <Klein/Strings/Utility.hpp>
 
 #include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Entities/GardenEntityData.hpp>
@@ -34,6 +35,7 @@ using namespace Klein::SceneManagement;
 using namespace Klein::Scripting::Audio;
 using namespace Klein::Scripting::Physics;
 using namespace Klein::Scripting::Rendering;
+using namespace Klein::Strings;
 
 using namespace OGP::Entities;
 using namespace OGP::Environment;
@@ -285,36 +287,36 @@ void PlayerEntityScript::OnGameTick(Engine& engine, const high_resolution_clock:
 			Kill(EKillerType::User);
 		}
 		const string& input_event_name(input_event.GetNameHash().GetString());
-		if (input_event_name.starts_with(gamepadPrefix)) {
-			if (input_event_name.ends_with(xAxisLeftGamepadStickSuffix)) {
+		if (IsStartingWith(input_event_name, gamepadPrefix)) {
+			if (IsEndingWith(input_event_name, xAxisLeftGamepadStickSuffix)) {
 				float press_value(input_event.GetPressValue());
 				analogGamepadInput.isWalkingLeft = press_value <= -analogPressValueThreshold;
 				analogGamepadInput.isWalkingRight = press_value >= analogPressValueThreshold;
 			}
-			if (input_event_name.ends_with(yAxisLeftGamepadStickSuffix)) {
+			if (IsEndingWith(input_event_name, yAxisLeftGamepadStickSuffix)) {
 				float press_value(input_event.GetPressValue());
 				analogGamepadInput.isWalkingUp = press_value <= -analogPressValueThreshold;
 				analogGamepadInput.isWalkingDown = press_value >= analogPressValueThreshold;
 			}
-			if (input_event_name.ends_with(upGamepadButtonSuffix)) {
+			if (IsEndingWith(input_event_name, upGamepadButtonSuffix)) {
 				digitalGamepadInput.isWalkingUp = input_event.IsPressing();
 			}
-			if (input_event_name.ends_with(downGamepadButtonSuffix)) {
+			if (IsEndingWith(input_event_name, downGamepadButtonSuffix)) {
 				digitalGamepadInput.isWalkingDown = input_event.IsPressing();
 			}
-			if (input_event_name.ends_with(leftGamepadButtonSuffix)) {
+			if (IsEndingWith(input_event_name, leftGamepadButtonSuffix)) {
 				digitalGamepadInput.isWalkingLeft = input_event.IsPressing();
 			}
-			if (input_event_name.ends_with(rightGamepadButtonSuffix)) {
+			if (IsEndingWith(input_event_name, rightGamepadButtonSuffix)) {
 				digitalGamepadInput.isWalkingRight = input_event.IsPressing();
 			}
-			if (input_event_name.ends_with(aGamepadButtonSuffix)) {
+			if (IsEndingWith(input_event_name, aGamepadButtonSuffix)) {
 				digitalGamepadInput.isDiggingLeft = input_event.IsPressing();
 			}
-			if (input_event_name.ends_with(bGamepadButtonSuffix)) {
+			if (IsEndingWith(input_event_name, bGamepadButtonSuffix)) {
 				digitalGamepadInput.isDiggingRight = input_event.IsPressing();
 			}
-			if (input_event_name.ends_with(startGamepadButtonSuffix)) {
+			if (IsEndingWith(input_event_name, startGamepadButtonSuffix)) {
 				is_skipping_questionmark = is_skipping_questionmark || input_event.IsPressing();
 			}
 		}

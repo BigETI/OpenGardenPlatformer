@@ -53,7 +53,11 @@ namespace OGP::Serialization {
 
 		template <typename TInputValue, typename TOutputValue = TInputValue>
 		constexpr static bool TryReadingValue(std::istream& inputStream, TOutputValue& result) noexcept {
+#ifdef IS_OGP_CXX_STD_17
+			bool ret(false);
+#else
 			bool ret;
+#endif
 			if (std::is_same<TInputValue, TOutputValue>::value) {
 				ret = inputStream.read(reinterpret_cast<char*>(&result), sizeof(TOutputValue)).good();
 				if (ret) {

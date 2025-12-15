@@ -1,8 +1,14 @@
 #include <cstddef>
 #include <filesystem>
 #include <memory>
-#include <span>
+#ifndef IS_OGP_CXX_STD_17
+#	include <span>
+#endif
 #include <string>
+
+#ifdef IS_OGP_CXX_STD_17
+#	include <tcb/span.hpp>
+#endif
 
 #include <Klein/Raylib/RaylibEngine.hpp>
 #include <Klein/ResourceManagement/FileSystem.hpp>
@@ -22,7 +28,9 @@
 
 using namespace std;
 using namespace std::filesystem;
-
+#ifdef IS_OGP_CXX_STD_17
+using namespace tcb;
+#endif
 using namespace Klein::Raylib;
 using namespace Klein::ResourceManagement;
 using namespace Klein::SceneManagement;

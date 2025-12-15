@@ -49,7 +49,10 @@ namespace OGP::Scripting::Environment {
 		OGP_API void SetGardenState(OGP::Environment::EGardenState gardenState) noexcept;
 		
 		template <typename TEntityScript = OGP::Scripting::Entities::EntityScript>
-		constexpr inline void EnumerateEntities(const std::function<void(const TEntityScript& entity)>& onEntityEnumerated) const noexcept {
+#ifndef IS_OGP_CXX_STD_17
+		constexpr
+#endif
+		inline void EnumerateEntities(const std::function<void(const TEntityScript& entity)>& onEntityEnumerated) const noexcept {
 			for (const auto& entity_ptr : entities) {
 				if (std::shared_ptr<TEntityScript> entity = std::dynamic_pointer_cast<TEntityScript>(entity_ptr.lock())) {
 					onEntityEnumerated(*(entity.get()));
@@ -58,7 +61,10 @@ namespace OGP::Scripting::Environment {
 		}
 
 		template <typename TEntityScript = OGP::Scripting::Entities::EntityScript>
-		constexpr inline bool TryGettingEntity(const TEntityScript& entity, std::shared_ptr<TEntityScript>& result) const noexcept {
+#ifndef IS_OGP_CXX_STD_17
+		constexpr
+#endif
+		inline bool TryGettingEntity(const TEntityScript& entity, std::shared_ptr<TEntityScript>& result) const noexcept {
 			bool ret(false);
 			for (const auto& target_entity : entities) {
 				if (std::shared_ptr<TEntityScript> current_target_entity = std::dynamic_pointer_cast<TEntityScript>(target_entity.lock())) {

@@ -2,8 +2,14 @@
 
 #include <filesystem>
 #include <memory>
-#include <span>
+#ifndef IS_OGP_CXX_STD_17
+#	include <span>
+#endif
 #include <string>
+
+#ifdef IS_OGP_CXX_STD_17
+#	include <tcb/span.hpp>
+#endif
 
 #include <Klein/Raylib/RaylibEngine.hpp>
 
@@ -16,8 +22,11 @@ namespace OGPGame {
 		Game() = delete;
 		Game(const Game&) = delete;
 		Game(Game&&) noexcept = delete;
-
+#ifdef IS_OGP_CXX_STD_17
+		static int Start(const tcb::span<const std::string>& commandLineArguments);
+#else
 		static int Start(const std::span<const std::string>& commandLineArguments);
+#endif
 		static void ShowIntroductionScene();
 		static void ShowMainMenuScene();
 		static void PlayGardenCollection(const std::filesystem::path& gardenCOllectionPath);

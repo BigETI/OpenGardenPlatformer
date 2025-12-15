@@ -4,6 +4,7 @@
 
 #include <Klein/Engine.hpp>
 #include <Klein/Math/Easing.hpp>
+#include <Klein/Math/Utility.hpp>
 #include <Klein/Math/Vector2.hpp>
 #include <Klein/Rendering/IRenderer.hpp>
 #include <Klein/Scripting/Rendering/CameraScript.hpp>
@@ -68,15 +69,15 @@ void GardenCameraScript::OnFrameRender(Engine& engine, const high_resolution_clo
 			cameraMovementSmoothing = ::cameraMovementSmoothing;
 		}
 		auto t = duration<float>(elapsedCameraAnimationTime).count() / duration<float>(cameraZoomAnimationTime).count();
-		cameraZoom = lerp(beginningCameraZoom, endingCameraZoom, Easing::EaseInOut(t));
+		cameraZoom = GetLinearInterpolated(beginningCameraZoom, endingCameraZoom, Easing::EaseInOut(t));
 		current_camera->SetCameraZoom(cameraZoom);
 	}
 
 	Vector2<float> target_position(GetTargetPosition());
 	GetNode().SetLocalPosition(
 		Vector2<float>(
-			lerp(GetNode().GetLocalPosition().x, target_position.x, cameraMovementSmoothing),
-			lerp(GetNode().GetLocalPosition().y, target_position.y, cameraMovementSmoothing)
+			GetLinearInterpolated(GetNode().GetLocalPosition().x, target_position.x, cameraMovementSmoothing),
+			GetLinearInterpolated(GetNode().GetLocalPosition().y, target_position.y, cameraMovementSmoothing)
 		)
 	);
 }

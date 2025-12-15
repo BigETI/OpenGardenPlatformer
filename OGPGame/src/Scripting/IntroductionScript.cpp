@@ -2,6 +2,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#ifdef IS_OGP_CXX_STD_17
+#	include <string_view>
+#endif
 
 #include <Klein/Engine.hpp>
 #include <Klein/Math/Bounds.hpp>
@@ -13,6 +16,7 @@
 #include <Klein/Rendering/Color.hpp>
 #include <Klein/ResourceManagement/FileSystem.hpp>
 #include <Klein/ResourceManagement/ResourceID.hpp>
+#include <Klein/Strings/Utility.hpp>
 
 #include <OGP/Scripting/Audio/MusicPlayerScript.hpp>
 
@@ -31,6 +35,7 @@ using namespace Klein::Scripting::Rendering;
 using namespace Klein::Scripting::UI;
 using namespace Klein::Rendering;
 using namespace Klein::ResourceManagement;
+using namespace Klein::Strings;
 
 using namespace OGP::Scripting::Audio;
 
@@ -68,7 +73,7 @@ void IntroductionScript::OnInitialize(Engine& engine) {
 void IntroductionScript::OnGameTick(Engine& engine, const high_resolution_clock::duration& deltaTime) {
 	for (const auto& input_event : engine.GetCurrentInputEvents()) {
 		const string& input_event_name(input_event.GetNameHash().GetString());
-		if (input_event.IsPressing() && (input_event_name.starts_with("Keyboard") || ((input_event_name.starts_with("Gamepad") || input_event_name.starts_with("Mouse")) && input_event_name.contains("Button")))) {
+		if (input_event.IsPressing() && (IsStartingWith(input_event_name, "Keyboard") || ((IsStartingWith(input_event_name, "Gamepad") || IsStartingWith(input_event_name, "Mouse")) && IsContaining(input_event_name, "Button")))) {
 			isSkippingIntroductionStep = true;
 		}
 	}
