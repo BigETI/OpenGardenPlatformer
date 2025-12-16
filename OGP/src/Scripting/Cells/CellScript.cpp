@@ -34,12 +34,14 @@ const ResourceID groundTextureResourceID(string("Textures/Environment/Ground.png
 constexpr inline const Vector2<float> groundSourceRectangleSize(0.1f, 0.125f);
 const ResourceID debugCellsTextureResourceID(string("Debug/Textures/Cells.png"));
 constexpr inline const Vector2<float> debugCellSourceRectangleSize(0.125f, 0.125f);
-
-constexpr inline static bool IsCellGroundConnectable(const shared_ptr<CellScript>& cell) noexcept {
+#ifndef IS_OGP_CXX_STD_17
+constexpr
+#endif
+inline static bool IsCellGroundConnectable(const shared_ptr<CellScript>& cell) noexcept {
 	return !cell || cell->IsGroundConnectable();
 }
 
-Rectangle<float> GetDebugCellSourceRectangle(EGardenCellType gardenCellType) {
+constexpr inline Rectangle<float> GetDebugCellSourceRectangle(EGardenCellType gardenCellType) {
 	return Rectangle<float>(Vector2<float>(static_cast<float>(static_cast<int>(gardenCellType) % 8), static_cast<float>(static_cast<int>(gardenCellType) / 8)) / 8.0f, debugCellSourceRectangleSize);
 }
 
