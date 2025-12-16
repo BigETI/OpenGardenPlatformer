@@ -1,6 +1,5 @@
 #include <filesystem>
-#include <span>
-#include <string>
+#include <memory>
 
 #include <Klein/ResourceManagement/FileSystem.hpp>
 #include <Klein/SceneManagement/Node.hpp>
