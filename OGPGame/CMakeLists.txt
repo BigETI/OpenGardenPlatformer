@@ -33,16 +33,8 @@ target_include_directories (OGPGame
 	PUBLIC "include"
 )
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	target_link_libraries (OGPGame
-		PRIVATE OGPStatic
-		PRIVATE stdc++fs
-		PRIVATE atomic
-	)
-else ()
-	target_link_libraries (OGPGame
-		PRIVATE OGPStatic
-	)
-endif ()
+target_link_libraries (OGPGame
+	PRIVATE OGPStatic
+)
 
 file (COPY "${CMAKE_SOURCE_DIR}/OGPGame/res/Resources" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
