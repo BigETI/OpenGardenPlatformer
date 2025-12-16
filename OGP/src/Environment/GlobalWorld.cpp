@@ -1,4 +1,3 @@
-#include <cassert>
 #include <chrono>
 
 #include <OGP/Environment/EGlobalWorldSpeed.hpp>
@@ -30,8 +29,7 @@ constexpr static inline float GetTickCountPerSecond(EGlobalWorldSpeed globalWorl
 	case EGlobalWorldSpeed::Fastest:
 		return 512.0f;
 	}
-	assert(false);
-	return 0.0f;
+	return 32.0f;
 }
 
 EGlobalWorldSpeed GlobalWorld::globalWorldSpeed(EGlobalWorldSpeed::Normal);
