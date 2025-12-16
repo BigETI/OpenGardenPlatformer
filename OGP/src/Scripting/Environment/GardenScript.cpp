@@ -6,7 +6,9 @@
 #include <string>
 #include <vector>
 
-#include <magic_enum.hpp>
+#ifndef IS_OGP_CXX_STD_17
+#	include <magic_enum.hpp>
+#endif
 
 #include <Klein/Engine.hpp>
 #include <Klein/Collections/EGridResizingRule.hpp>
@@ -240,7 +242,11 @@ void GardenScript::LoadGardenFromGardenData(const GardenData& gardenData) {
 			if (has_player_already_been_spawned && (entity_data.type == EGardenEntityType::Player)) {
 				continue;
 			}
+#ifdef IS_OGP_CXX_STD_17
+			shared_ptr<Node> entity_node(GetNode().CreateNewChild());
+#else
 			shared_ptr<Node> entity_node(GetNode().CreateNewChild(string(magic_enum::enum_name(entity_data.type))));
+#endif
 			shared_ptr<EntityScript> entity;
 			bool is_player_entity(false);
 			switch (entity_data.type) {

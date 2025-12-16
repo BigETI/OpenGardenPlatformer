@@ -30,16 +30,19 @@ FetchContent_Declare (Klein
 FetchContent_MakeAvailable (Klein)
 endif()
 
-################
-#              #
-#  Magic Enum  #
-#              #
-################
+if (NOT OGP_USE_CXX_STD_17)
 
-FetchContent_Declare (magic_enum
-	GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
-	GIT_TAG "v0.9.3"
-	GIT_SHALLOW TRUE
-)
+	################
+	#              #
+	#  Magic Enum  #
+	#              #
+	################
 
-FetchContent_MakeAvailable (magic_enum)
+	FetchContent_Declare (magic_enum
+		GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+		GIT_TAG "v0.9.3"
+		GIT_SHALLOW TRUE
+	)
+
+	FetchContent_MakeAvailable (magic_enum)
+endif ()

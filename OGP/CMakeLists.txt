@@ -67,10 +67,16 @@ target_include_directories (OGPStatic
 	PUBLIC "include"
 )
 
-target_link_libraries (OGPStatic
-	PUBLIC KleinStatic
-	PUBLIC magic_enum
-)
+if (OGP_USE_CXX_STD_17)
+	target_link_libraries (OGPStatic
+		PUBLIC KleinStatic
+	)
+else ()
+	target_link_libraries (OGPStatic
+		PUBLIC KleinStatic
+		PUBLIC magic_enum
+	)
+endif ()
 
 ##################################
 #                                #
@@ -133,10 +139,16 @@ target_include_directories (OGP
 	PUBLIC "include"
 )
 
-target_link_libraries (OGP
-	PUBLIC Klein
-	PUBLIC magic_enum
-)
+if (OGP_USE_CXX_STD_17)
+	target_link_libraries (OGP
+		PUBLIC Klein
+	)
+else ()
+	target_link_libraries (OGP
+		PUBLIC Klein
+		PUBLIC magic_enum
+	)
+endif ()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_compile_options (OGP
