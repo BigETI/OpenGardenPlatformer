@@ -40,7 +40,7 @@ constexpr static float textPanelSpacing(0.25f);
 
 constexpr const static high_resolution_clock::duration textCharacterAnimationTime(15ms);
 #ifdef IS_OGP_CXX_STD_17
-constexpr typename string::size_type
+string::size_type
 erase(string& c, const string::value_type& value) {
 	size_t ret(static_cast<size_t>(0));
 	for (size_t index(static_cast<size_t>(0)); (index + ret) != c.size(); index++) {
