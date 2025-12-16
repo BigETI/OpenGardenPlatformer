@@ -1,8 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include <span>
-#include <string>
 
 #include <Klein/SceneManagement/ISceneLoader.hpp>
 #include <Klein/SceneManagement/Node.hpp>
