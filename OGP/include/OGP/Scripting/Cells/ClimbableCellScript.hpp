@@ -5,7 +5,7 @@
 #include <Klein/Engine.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 
-#include "../../Environment/EDirection.hpp"
+#include "../../Environment/ESideFlags.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "CellScript.hpp"
 
@@ -17,7 +17,7 @@ namespace OGP::Scripting::Cells {
 
 		OGP_API bool IsClimbable() const noexcept override;
 		OGP_API bool IsClimbingUpAllowed() const noexcept override;
-		OGP_API bool IsGroundConnectable(OGP::Environment::EDirection atDirection) const noexcept override;
+		OGP_API OGP::Environment::ESideFlags GetConnectableSideFlags() const noexcept override;
 
 	protected:
 

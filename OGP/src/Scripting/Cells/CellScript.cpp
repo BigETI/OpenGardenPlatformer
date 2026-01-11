@@ -12,7 +12,7 @@
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 
 #include <OGP/Cells/EGardenCellType.hpp>
-#include <OGP/Environment/EDirection.hpp>
+#include <OGP/Environment/ESideFlags.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Entities/EntityScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
@@ -37,8 +37,8 @@ constexpr inline const Vector2<float> groundSourceRectangleSize(0.1f, 0.125f);
 const ResourceID debugCellsTextureResourceID(string("Debug/Textures/Cells.png"));
 constexpr inline const Vector2<float> debugCellSourceRectangleSize(0.125f, 0.125f);
 
-constexpr inline static bool IsCellGroundConnectable(const shared_ptr<CellScript>& cell, EDirection atDirection) noexcept {
-	return !cell || cell->IsGroundConnectable(atDirection);
+constexpr inline static bool IsCellConnectable(const shared_ptr<CellScript>& cell, ESideFlags sideFlags) noexcept {
+	return !cell || ((cell->GetConnectableSideFlags() & sideFlags) == sideFlags);
 }
 
 Rectangle<float> GetDebugCellSourceRectangle(EGardenCellType gardenCellType) {
@@ -47,7 +47,7 @@ Rectangle<float> GetDebugCellSourceRectangle(EGardenCellType gardenCellType) {
 
 const Rectangle<float> airCellSourceRectangle = GetDebugCellSourceRectangle(EGardenCellType::Air);
 
-CellScript::CellScript(Node* node) : Script(node), wasGroundConnectable(false) {
+CellScript::CellScript(Node* node) : Script(node), oldConnectableSideFlags(ESideFlags::None) {
 	// ...
 }
 
@@ -137,38 +137,36 @@ bool CellScript::IsTopDeadly() const noexcept {
 	return IsDeadly();
 }
 
-bool CellScript::IsGroundConnectable() const noexcept {
-	return
-		(gardenCellType == EGardenCellType::Ground) ||
-		(gardenCellType == EGardenCellType::HardGround) ||
-		(gardenCellType == EGardenCellType::Trap) ||
-		(gardenCellType == EGardenCellType::GrassGround) ||
-		(gardenCellType == EGardenCellType::HardGrassGround) ||
-		(gardenCellType == EGardenCellType::GrassTrap) ||
-		(gardenCellType == EGardenCellType::Water) ||
-		(gardenCellType == EGardenCellType::SurfaceWater);
-}
-
-bool CellScript::IsGroundConnectable(EDirection atDirection) const noexcept {
-	if (IsGroundConnectable()) {
-		return true;
-	}
-	switch (atDirection) {
-	case EDirection::Top:
-		return (gardenCellType == EGardenCellType::SurfaceWater);
-	case EDirection::Bottom:
-		return
-			(gardenCellType == EGardenCellType::Fence) ||
-			(gardenCellType == EGardenCellType::Bush) ||
-			(gardenCellType == EGardenCellType::MoleHill) ||
-			(gardenCellType == EGardenCellType::RedDoor) ||
-			(gardenCellType == EGardenCellType::AutomaticallyClosingRedDoor) ||
-			(gardenCellType == EGardenCellType::YellowDoor) ||
-			(gardenCellType == EGardenCellType::AutomaticallyClosingYellowDoor) ||
-			(gardenCellType == EGardenCellType::GreenDoor) ||
-			(gardenCellType == EGardenCellType::AutomaticallyClosingGreenDoor);
+ESideFlags CellScript::GetConnectableSideFlags() const noexcept {
+	switch (gardenCellType) {
+	case EGardenCellType::Fence:
+	case EGardenCellType::Bush:
+	case EGardenCellType::MoleHill:
+	case EGardenCellType::RedDoor:
+	case EGardenCellType::AutomaticallyClosingRedDoor:
+	case EGardenCellType::YellowDoor:
+	case EGardenCellType::AutomaticallyClosingYellowDoor:
+	case EGardenCellType::GreenDoor:
+	case EGardenCellType::AutomaticallyClosingGreenDoor:
+		return ESideFlags::Bottom;
+	case EGardenCellType::Ground:
+	case EGardenCellType::HardGround:
+	case EGardenCellType::Trap:
+	case EGardenCellType::GrassGround:
+	case EGardenCellType::HardGrassGround:
+	case EGardenCellType::GrassTrap:
+	case EGardenCellType::Water:
+		return ESideFlags::All;
+	case EGardenCellType::SurfaceWater:
+		return ESideFlags::WithoutTop;
+	case EGardenCellType::Ladder:
+	case EGardenCellType::LadderShowingUpWhenFinished:
+	case EGardenCellType::LadderVanishingWhenFinished:
+		return ESideFlags::Top | ESideFlags::Bottom;
+	case EGardenCellType::Rope:
+		return ESideFlags::Left | ESideFlags::Right;
 	default:
-		return false;
+		return ESideFlags::None;
 	}
 }
 
@@ -181,9 +179,9 @@ bool CellScript::Interact(EntityScript& sourceEntity) noexcept {
 }
 
 void CellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
-	bool is_ground_connectable(IsGroundConnectable());
-	if (wasGroundConnectable != is_ground_connectable) {
-		wasGroundConnectable = is_ground_connectable;
+	ESideFlags connectable_side_flags(GetConnectableSideFlags());
+	if (oldConnectableSideFlags != connectable_side_flags) {
+		oldConnectableSideFlags = connectable_side_flags;
 		if (shared_ptr<GardenScript> current_garden = garden.lock()) {
 			bool is_top_available((position.y + static_cast<size_t>(1)) < current_garden->GetGardenCells().GetSize().y);
 			bool is_bottom_available(position.y > static_cast<size_t>(0));
@@ -231,25 +229,16 @@ void CellScript::UpdateVisuals(const shared_ptr<GardenScript>& garden) {
 				if (shared_ptr<SpriteRendererScript> top_right_foreground_sprite_renderer = foregroundSpriteRenderers.at(static_cast<size_t>(1)).lock()) {
 					if (shared_ptr<SpriteRendererScript> bottom_left_foreground_sprite_renderer = foregroundSpriteRenderers.at(static_cast<size_t>(2)).lock()) {
 						if (shared_ptr<SpriteRendererScript> bottom_right_foreground_sprite_renderer = foregroundSpriteRenderers.at(static_cast<size_t>(3)).lock()) {
-							bool is_top_connectable(false);
-							bool is_bottom_connectable(false);
-							bool is_left_connectable(false);
-							bool is_right_connectable(false);
-							bool is_top_left_connectable(false);
-							bool is_bottom_left_connectable(false);
-							bool is_top_right_connectable(false);
-							bool is_bottom_right_connectable(false);
-							if (IsGroundConnectable()) {
-								Vector2<size_t> top_position(position + Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
-								is_top_connectable = ((position.y + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().y) || IsCellGroundConnectable(garden->GetCellAt(top_position), EDirection::Bottom);
-								is_bottom_connectable = (position.y < static_cast<size_t>(1)) || IsCellGroundConnectable(garden->GetCellAt(position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1))), EDirection::Top);
-								is_left_connectable = (position.x < static_cast<size_t>(1)) || IsCellGroundConnectable(garden->GetCellAt(position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0))), EDirection::Right);
-								is_right_connectable = ((position.x + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().x) || IsCellGroundConnectable(garden->GetCellAt(position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0))), EDirection::Left);
-								is_top_left_connectable = (position.x < static_cast<size_t>(1)) || ((position.y + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().y) || IsCellGroundConnectable(garden->GetCellAt(Vector2<size_t>(position.x - static_cast<size_t>(1), position.y + static_cast<size_t>(1))), EDirection::BottomRight);
-								is_bottom_left_connectable = (position.x < static_cast<size_t>(1)) || (position.y < static_cast<size_t>(1)) || IsCellGroundConnectable(garden->GetCellAt(position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(1))), EDirection::TopRight);
-								is_top_right_connectable = ((position.x + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().x) || ((position.y + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().y) || IsCellGroundConnectable(garden->GetCellAt(position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(1))), EDirection::BottomLeft);
-								is_bottom_right_connectable = ((position.x + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().x) || (position.y < static_cast<size_t>(1)) || IsCellGroundConnectable(garden->GetCellAt(Vector2<size_t>(position.x + static_cast<size_t>(1), position.y - static_cast<size_t>(1))), EDirection::TopLeft);
-							}
+							ESideFlags connectable_side_flags(GetConnectableSideFlags());
+							Vector2<size_t> top_position(position + Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1)));
+							bool is_top_connectable(((connectable_side_flags & ESideFlags::Top) == ESideFlags::Top) && (((position.y + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().y) || IsCellConnectable(garden->GetCellAt(top_position), ESideFlags::Bottom)));
+							bool is_bottom_connectable(((connectable_side_flags & ESideFlags::Bottom) == ESideFlags::Bottom) && ((position.y < static_cast<size_t>(1)) || IsCellConnectable(garden->GetCellAt(position - Vector2<size_t>(static_cast<size_t>(0), static_cast<size_t>(1))), ESideFlags::Top)));
+							bool is_left_connectable(((connectable_side_flags & ESideFlags::Left) == ESideFlags::Left) && ((position.x < static_cast<size_t>(1)) || IsCellConnectable(garden->GetCellAt(position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0))), ESideFlags::Right)));
+							bool is_right_connectable(((connectable_side_flags & ESideFlags::Right) == ESideFlags::Right) && (((position.x + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().x) || IsCellConnectable(garden->GetCellAt(position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(0))), ESideFlags::Left)));
+							bool is_top_left_connectable(((connectable_side_flags & ESideFlags::TopLeft) == ESideFlags::TopLeft) && ((position.x < static_cast<size_t>(1)) || ((position.y + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().y) || IsCellConnectable(garden->GetCellAt(Vector2<size_t>(position.x - static_cast<size_t>(1), position.y + static_cast<size_t>(1))), ESideFlags::BottomRight)));
+							bool is_bottom_left_connectable(((connectable_side_flags & ESideFlags::BottomLeft) == ESideFlags::BottomLeft) && ((position.x < static_cast<size_t>(1)) || (position.y < static_cast<size_t>(1)) || IsCellConnectable(garden->GetCellAt(position - Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(1))), ESideFlags::TopRight)));
+							bool is_top_right_connectable(((connectable_side_flags & ESideFlags::TopRight) == ESideFlags::TopRight) && (((position.x + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().x) || ((position.y + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().y) || IsCellConnectable(garden->GetCellAt(position + Vector2<size_t>(static_cast<size_t>(1), static_cast<size_t>(1))), ESideFlags::BottomLeft)));
+							bool is_bottom_right_connectable(((connectable_side_flags & ESideFlags::BottomRight) == ESideFlags::BottomRight) && (((position.x + static_cast<size_t>(1)) >= garden->GetGardenCells().GetSize().x) || (position.y < static_cast<size_t>(1)) || IsCellConnectable(garden->GetCellAt(Vector2<size_t>(position.x + static_cast<size_t>(1), position.y - static_cast<size_t>(1))), ESideFlags::TopLeft)));
 							int top_left_index(is_top_connectable ? (is_left_connectable ? (is_top_left_connectable ? 0 : 4) : 2) : (is_left_connectable ? 1 : 3));
 							int top_right_index(is_top_connectable ? (is_right_connectable ? (is_top_right_connectable ? 5 : 9) : 7) : (is_right_connectable ? 6 : 8));
 							int bottom_left_index(is_bottom_connectable ? (is_left_connectable ? (is_bottom_left_connectable ? 10 : 14) : 12) : (is_left_connectable ? 11 : 13));

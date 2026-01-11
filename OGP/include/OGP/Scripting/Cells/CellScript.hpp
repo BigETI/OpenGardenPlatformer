@@ -11,7 +11,7 @@
 #include <Klein/Scripting/Script.hpp>
 
 #include "../../Cells/EGardenCellType.hpp"
-#include "../../Environment/EDirection.hpp"
+#include "../../Environment/ESideFlags.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "../Entities/EntityScript.hpp"
 #include "../Environment/GardenScript.hpp"
@@ -42,8 +42,7 @@ namespace OGP::Scripting::Cells {
 		OGP_API virtual bool IsClimbingUpAllowed() const noexcept;
 		OGP_API virtual bool IsDeadly() const noexcept;
 		OGP_API virtual bool IsTopDeadly() const noexcept;
-		OGP_API virtual bool IsGroundConnectable() const noexcept;
-		OGP_API virtual bool IsGroundConnectable(OGP::Environment::EDirection atDirection) const noexcept;
+		OGP_API virtual OGP::Environment::ESideFlags GetConnectableSideFlags() const noexcept;
 		OGP_API virtual bool Dig() noexcept;
 		OGP_API virtual bool Interact(OGP::Scripting::Entities::EntityScript& sourceEntity) noexcept;
 
@@ -58,7 +57,7 @@ namespace OGP::Scripting::Cells {
 		std::weak_ptr<OGP::Scripting::Environment::GardenScript> garden;
 		std::weak_ptr<Klein::Scripting::Rendering::SpriteRendererScript> backgroundSpriteRenderer;
 		std::vector<std::weak_ptr<Klein::Scripting::Rendering::SpriteRendererScript>> foregroundSpriteRenderers;
-		bool wasGroundConnectable;
+		OGP::Environment::ESideFlags oldConnectableSideFlags;
 
 		void UpdateVisuals(const std::shared_ptr<OGP::Scripting::Environment::GardenScript>& garden);
 		std::shared_ptr<Klein::Scripting::Rendering::SpriteRendererScript> AppendForegroundSpriteRenderer();

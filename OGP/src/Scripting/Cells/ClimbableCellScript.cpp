@@ -8,7 +8,7 @@
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 
 #include <OGP/Cells/EGardenCellType.hpp>
-#include <OGP/Environment/EDirection.hpp>
+#include <OGP/Environment/ESideFlags.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/ClimbableCellScript.hpp>
 #include <OGP/Scripting/Environment/GardenScript.hpp>
@@ -57,26 +57,12 @@ bool ClimbableCellScript::IsClimbingUpAllowed() const noexcept {
 	return IsClimbable() && (GetGardenCellType() != EGardenCellType::Rope);
 }
 
-bool ClimbableCellScript::IsGroundConnectable(EDirection atDirection) const noexcept {
-	if (CellScript::IsGroundConnectable(atDirection)) {
-		return true;
-	}
-	if (!IsClimbable()) {
-		return false;
-	}
-	switch (GetGardenCellType()) {
-	case EGardenCellType::Ladder:
-	case EGardenCellType::LadderShowingUpWhenFinished:
-	case EGardenCellType::LadderVanishingWhenFinished:
-		return (atDirection == EDirection::Top) || (atDirection == EDirection::Bottom);
-	case EGardenCellType::Rope:
-		return (atDirection == EDirection::Left) || (atDirection == EDirection::Right);
-	default:
-		return false;
-	}
+ESideFlags ClimbableCellScript::GetConnectableSideFlags() const noexcept {
+	return IsClimbable() ? CellScript::GetConnectableSideFlags() : ESideFlags::None;
 }
 
 void ClimbableCellScript::OnFrameRender(Engine& engine, const high_resolution_clock::duration& deltaTime) {
+	CellScript::OnFrameRender(engine, deltaTime);
 	if (shared_ptr<GardenScript> garden = GetGarden().lock()) {
 		bool is_completion_enabled(garden->IsCompletionEnabled());
 		for (const auto& foreground_sprite_renderer : GetForegroundSpriteRenderers()) {

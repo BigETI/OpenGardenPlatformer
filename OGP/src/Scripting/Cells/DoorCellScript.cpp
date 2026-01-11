@@ -8,7 +8,6 @@
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 
 #include <OGP/Cells/EGardenCellType.hpp>
-#include <OGP/Environment/EDirection.hpp>
 #include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/DoorCellScript.hpp>

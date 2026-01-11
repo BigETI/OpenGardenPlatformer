@@ -8,6 +8,7 @@
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 
 #include <OGP/Cells/EGardenCellType.hpp>
+#include <OGP/Environment/ESideFlags.hpp>
 #include <OGP/Environment/GlobalWorld.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/DiggableCellScript.hpp>
@@ -34,8 +35,8 @@ bool DiggableCellScript::IsSolid() const noexcept {
 	return (GetGardenCellType() != EGardenCellType::Trap) && (GetGardenCellType() != EGardenCellType::GrassTrap) && ((high_resolution_clock::now() - lastDigTimePoint) > GlobalWorld::GetDuration(digRecoveryTickCount));
 }
 
-bool DiggableCellScript::IsGroundConnectable() const noexcept {
-	return CellScript::IsGroundConnectable() && (high_resolution_clock::now() - lastDigTimePoint) > GlobalWorld::GetDuration(digRecoveryTickCount);
+ESideFlags DiggableCellScript::GetConnectableSideFlags() const noexcept {
+	return ((high_resolution_clock::now() - lastDigTimePoint) > GlobalWorld::GetDuration(digRecoveryTickCount)) ? CellScript::GetConnectableSideFlags() : ESideFlags::None;
 }
 
 bool DiggableCellScript::Dig() noexcept {
