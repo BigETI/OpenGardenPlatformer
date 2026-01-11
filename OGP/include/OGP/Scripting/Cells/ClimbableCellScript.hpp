@@ -5,6 +5,7 @@
 #include <Klein/Engine.hpp>
 #include <Klein/SceneManagement/Node.hpp>
 
+#include "../../Environment/EDirection.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "CellScript.hpp"
 
@@ -14,11 +15,12 @@ namespace OGP::Scripting::Cells {
 
 		OGP_API ClimbableCellScript(Klein::SceneManagement::Node* node);
 
-		OGP_API virtual bool IsClimbable() const noexcept override;
-		OGP_API virtual bool IsClimbingUpAllowed() const noexcept override;
+		OGP_API bool IsClimbable() const noexcept override;
+		OGP_API bool IsClimbingUpAllowed() const noexcept override;
+		OGP_API bool IsGroundConnectable(OGP::Environment::EDirection atDirection) const noexcept override;
 
 	protected:
 
-		OGP_API virtual void OnFrameRender(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
+		OGP_API void OnFrameRender(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 	};
 }

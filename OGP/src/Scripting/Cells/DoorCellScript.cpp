@@ -8,6 +8,7 @@
 #include <Klein/Scripting/Rendering/SpriteRendererScript.hpp>
 
 #include <OGP/Cells/EGardenCellType.hpp>
+#include <OGP/Environment/EDirection.hpp>
 #include <OGP/Scripting/Audio/SoundEffectsScript.hpp>
 #include <OGP/Scripting/Cells/CellScript.hpp>
 #include <OGP/Scripting/Cells/DoorCellScript.hpp>
@@ -24,6 +25,7 @@ using namespace Klein::SceneManagement;
 using namespace Klein::Scripting::Rendering;
 
 using namespace OGP::Cells;
+using namespace OGP::Environment;
 using namespace OGP::Scripting::Audio;
 using namespace OGP::Scripting::Cells;
 using namespace OGP::Scripting::Entities;

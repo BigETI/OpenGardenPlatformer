@@ -548,5 +548,5 @@ void LiftEntityScript::Park() noexcept {
 }
 
 float LiftEntityScript::GetAnimatedMovementProgress() const noexcept {
-	return hasStartedToMove ? (isFinishingToMove ? Easing::EaseInOut(movementProgress) : Easing::EaseIn(movementProgress)) : (isFinishingToMove ? Easing::EaseOut(movementProgress) : movementProgress);
+	return hasStartedToMove ? (isFinishingToMove ? Easing::GetEasedInOut(movementProgress) : Easing::GetEasedIn(movementProgress)) : (isFinishingToMove ? Easing::GetEasedOut(movementProgress) : movementProgress);
 }

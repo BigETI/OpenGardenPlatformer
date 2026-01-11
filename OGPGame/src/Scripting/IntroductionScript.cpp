@@ -143,10 +143,6 @@ void IntroductionScript::SkipIntroductionStep() {
 	else {
 		isIntroducing = false;
 		Game::ShowMainMenuScene();
-
-		// TODO: Debug
-		//Game::PlayGardenCollection(FileSystem::GetFilePathFromResourceID(ResourceID("GardenCollections/DAISYG.DGF")));
-
 		GetNode().Destroy();
 	}
 }

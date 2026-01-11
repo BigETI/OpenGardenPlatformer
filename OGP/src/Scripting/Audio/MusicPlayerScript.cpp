@@ -131,7 +131,7 @@ void MusicPlayerScript::OnGameTick(Engine& engine, const high_resolution_clock::
 		if (shared_ptr<IAudioClip> playing_audio_clip = playingAudioClip.lock()) {
 			elapsedTransitionTime = min(elapsedTransitionTime + deltaTime, currentTransitionTime);
 			float transition(duration<float>(elapsedTransitionTime).count() / duration<float>(currentTransitionTime).count());
-			playing_audio_clip->SetVolume(Easing::EaseOut(transition));
+			playing_audio_clip->SetVolume(Easing::GetEasedOut(transition));
 			if (elapsedTransitionTime >= currentTransitionTime) {
 				currentTransitionTime = high_resolution_clock::duration::zero();
 				elapsedTransitionTime = high_resolution_clock::duration::zero();
@@ -171,8 +171,8 @@ void MusicPlayerScript::OnGameTick(Engine& engine, const high_resolution_clock::
 			if (shared_ptr<IAudioClip> next_audio_clip = nextAudioClip.lock()) {
 				elapsedTransitionTime = min(elapsedTransitionTime + deltaTime, currentTransitionTime);
 				float transition(duration<float>(elapsedTransitionTime).count() / duration<float>(currentTransitionTime).count());
-				playing_audio_clip->SetVolume(Easing::EaseIn(1.0f - transition));
-				next_audio_clip->SetVolume(Easing::EaseOut(transition));
+				playing_audio_clip->SetVolume(Easing::GetEasedIn(1.0f - transition));
+				next_audio_clip->SetVolume(Easing::GetEasedOut(transition));
 				if (elapsedTransitionTime >= currentTransitionTime) {
 					currentTransitionTime = high_resolution_clock::duration::zero();
 					elapsedTransitionTime = high_resolution_clock::duration::zero();
@@ -196,7 +196,7 @@ void MusicPlayerScript::OnGameTick(Engine& engine, const high_resolution_clock::
 		if (shared_ptr<IAudioClip> playing_audio_clip = playingAudioClip.lock()) {
 			elapsedTransitionTime = min(elapsedTransitionTime + deltaTime, currentTransitionTime);
 			float volume(duration<float>(elapsedTransitionTime) / duration<float>(currentTransitionTime));
-			playing_audio_clip->SetVolume(Easing::EaseIn(1.0f - volume));
+			playing_audio_clip->SetVolume(Easing::GetEasedIn(1.0f - volume));
 			if (elapsedTransitionTime >= currentTransitionTime) {
 				playing_audio_clip->Stop();
 				currentTransitionTime = high_resolution_clock::duration::zero();

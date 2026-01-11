@@ -19,8 +19,8 @@ namespace OGP::Scripting::Audio {
 	class MusicPlayerScript : public Klein::Scripting::Script {
 	public:
 
-		MusicPlayerScript(Klein::SceneManagement::Node* node);
-		virtual ~MusicPlayerScript() noexcept override;
+		OGP_API MusicPlayerScript(Klein::SceneManagement::Node* node);
+		OGP_API virtual ~MusicPlayerScript() noexcept override;
 
 		OGP_API static MusicPlayerScript* GetGlobalMusicPlayer() noexcept;
 
@@ -30,9 +30,9 @@ namespace OGP::Scripting::Audio {
 
 	protected:
 
-		OGP_API virtual void OnEnable(Klein::Engine& engine) override;
-		OGP_API virtual void OnDisable(Klein::Engine& engine) override;
-		OGP_API virtual void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
+		OGP_API void OnEnable(Klein::Engine& engine) override;
+		OGP_API void OnDisable(Klein::Engine& engine) override;
+		OGP_API void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 
 	private:
 

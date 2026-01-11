@@ -9,20 +9,22 @@
 #include <Klein/Scripting/Audio/AudioPlayerScript.hpp>
 #include <Klein/Scripting/Script.hpp>
 
+#include "../../Exportables/Exportable.hxx"
+
 namespace OGP::Scripting::Audio {
 	class SoundEffectsScript : public Klein::Scripting::Script {
 	public:
 
-		SoundEffectsScript(Klein::SceneManagement::Node* node);
-		virtual ~SoundEffectsScript() noexcept override;
+		OGP_API SoundEffectsScript(Klein::SceneManagement::Node* node);
+		OGP_API virtual ~SoundEffectsScript() noexcept override;
 
-		static SoundEffectsScript* GetGlobalSoundEffects() noexcept;
+		OGP_API static SoundEffectsScript* GetGlobalSoundEffects() noexcept;
 
-		float GetVolume() const noexcept;
-		void SetVolume(float volume) noexcept;
-		void PreloadSoundEffectWhenAvailable(const std::string& soundEffectID);
-		bool PlaySoundEffect(const std::string& soundEffectID) noexcept;
-		bool PlaySoundEffect(const std::string& soundEffectID, float volume) noexcept;
+		OGP_API float GetVolume() const noexcept;
+		OGP_API void SetVolume(float volume) noexcept;
+		OGP_API void PreloadSoundEffectWhenAvailable(const std::string& soundEffectID);
+		OGP_API bool PlaySoundEffect(const std::string& soundEffectID) noexcept;
+		OGP_API bool PlaySoundEffect(const std::string& soundEffectID, float volume) noexcept;
 
 	private:
 

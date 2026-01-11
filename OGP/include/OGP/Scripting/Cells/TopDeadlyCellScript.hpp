@@ -11,6 +11,6 @@ namespace OGP::Scripting::Cells {
 
 		OGP_API TopDeadlyCellScript(Klein::SceneManagement::Node* node);
 
-		OGP_API virtual bool IsTopDeadly() const noexcept override;
+		OGP_API bool IsTopDeadly() const noexcept override;
 	};
 }

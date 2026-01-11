@@ -68,7 +68,7 @@ void GardenCameraScript::OnFrameRender(Engine& engine, const high_resolution_clo
 			cameraMovementSmoothing = ::cameraMovementSmoothing;
 		}
 		auto t = duration<float>(elapsedCameraAnimationTime).count() / duration<float>(cameraZoomAnimationTime).count();
-		cameraZoom = lerp(beginningCameraZoom, endingCameraZoom, Easing::EaseInOut(t));
+		cameraZoom = lerp(beginningCameraZoom, endingCameraZoom, Easing::GetEasedInOut(t));
 		current_camera->SetCameraZoom(cameraZoom);
 	}
 

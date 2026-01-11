@@ -11,6 +11,7 @@
 #include <Klein/Scripting/Script.hpp>
 
 #include "../../Cells/EGardenCellType.hpp"
+#include "../../Environment/EDirection.hpp"
 #include "../../Exportables/Exportable.hxx"
 #include "../Entities/EntityScript.hpp"
 #include "../Environment/GardenScript.hpp"
@@ -42,6 +43,7 @@ namespace OGP::Scripting::Cells {
 		OGP_API virtual bool IsDeadly() const noexcept;
 		OGP_API virtual bool IsTopDeadly() const noexcept;
 		OGP_API virtual bool IsGroundConnectable() const noexcept;
+		OGP_API virtual bool IsGroundConnectable(OGP::Environment::EDirection atDirection) const noexcept;
 		OGP_API virtual bool Dig() noexcept;
 		OGP_API virtual bool Interact(OGP::Scripting::Entities::EntityScript& sourceEntity) noexcept;
 

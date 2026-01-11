@@ -14,9 +14,9 @@ namespace OGP::Scripting::Cells {
 
 		OGP_API DiggableCellScript(Klein::SceneManagement::Node* node);
 
-		OGP_API virtual bool IsSolid() const noexcept override;
-		OGP_API virtual bool IsGroundConnectable() const noexcept override;
-		OGP_API virtual bool Dig() noexcept override;
+		OGP_API bool IsSolid() const noexcept override;
+		OGP_API bool IsGroundConnectable() const noexcept override;
+		OGP_API bool Dig() noexcept override;
 
 	protected:
 

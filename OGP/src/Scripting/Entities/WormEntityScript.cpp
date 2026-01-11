@@ -222,5 +222,5 @@ bool WormEntityScript::IsMovingRightReachesEnd(const GardenScript& garden) const
 float WormEntityScript::GetAnimatedMovementProgress() const noexcept {
 	high_resolution_clock::duration maximal_movement_time(GlobalWorld::GetDuration(maximalMovementTickCount));
 	float movement_progress(duration<float>(min(elapsedTime, maximal_movement_time)).count() / duration<float>(maximal_movement_time).count());
-	return hasStartedToMove ? (isFinishingToMove ? Easing::EaseInOut(movement_progress) : Easing::EaseIn(movement_progress)) : (isFinishingToMove ? Easing::EaseOut(movement_progress) : movement_progress);
+	return hasStartedToMove ? (isFinishingToMove ? Easing::GetEasedInOut(movement_progress) : Easing::GetEasedIn(movement_progress)) : (isFinishingToMove ? Easing::GetEasedOut(movement_progress) : movement_progress);
 }

@@ -57,11 +57,6 @@ int Game::Start(const span<const string>& commandLineArguments) {
 	bool is_garden_collection_path_specified(commandLineArguments.size() > static_cast<size_t>(1));
 	path garden_collection_path(is_garden_collection_path_specified ? path(commandLineArguments[static_cast<size_t>(1)]) : FileSystem::GetFilePathFromResourceID(ResourceID("GardenCollections/DAISYG.DGF")));
 	gameSceneLoader = engine->RegisterSceneLoader<GameSceneLoader>(gameSceneLoaderResourceID, garden_collection_path);
-
-	// TODO: Add introduction scene
-
-	// TODO: Add main menu scene
-
 	engine->CreateNewSceneNode(baseSceneLoaderResourceID)->CreateNewChild()->AddScript<DroppedGardenCollectionFileLoaderScript>();
 	if (is_garden_collection_path_specified) {
 		PlayGardenCollection(garden_collection_path);

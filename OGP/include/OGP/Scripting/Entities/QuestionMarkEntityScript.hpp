@@ -21,8 +21,8 @@ namespace OGP::Scripting::Entities {
 
 		OGP_API void ShowTextPanel() noexcept;
 		OGP_API void HideTextPanel() noexcept;
-		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
-		OGP_API virtual void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
+		OGP_API void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
+		OGP_API void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 
 	private:
 

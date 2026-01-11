@@ -41,9 +41,9 @@ namespace OGP::Scripting::Entities {
 
 		OGP_API PlayerEntityScript(Klein::SceneManagement::Node* node);
 
-		OGP_API virtual bool IsAlive() const noexcept override;
-		OGP_API virtual bool Kill(OGP::Environment::EKillerType killerType) override;
-		OGP_API virtual bool Win() override;
+		OGP_API bool IsAlive() const noexcept override;
+		OGP_API bool Kill(OGP::Environment::EKillerType killerType) override;
+		OGP_API bool Win() override;
 		OGP_API std::size_t GetScore() const noexcept;
 		OGP_API void SetScore(std::size_t score) noexcept;
 		OGP_API void AddScore(std::size_t score) noexcept;
@@ -62,12 +62,12 @@ namespace OGP::Scripting::Entities {
 		OGP_API void ActivateGarlicEffect() noexcept;
 		OGP_API bool IsMushroomEffectActive() const noexcept;
 		OGP_API void ActivateMushroomEffect() noexcept;
-		OGP_API virtual void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
+		OGP_API void Spawn(const OGP::Entities::GardenEntityData& gardenEntityData, std::shared_ptr<OGP::Scripting::Environment::GardenScript> garden) override;
 		
 	protected:
 
-		OGP_API virtual OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine) const noexcept override;
-		OGP_API virtual void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
+		OGP_API OGP::Entities::HumanoidInput GetInput(const Klein::Engine& engine) const noexcept override;
+		OGP_API void OnGameTick(Klein::Engine& engine, const std::chrono::high_resolution_clock::duration& deltaTime) override;
 
 	private:
 
